@@ -18,6 +18,22 @@ const TopNav: React.FC = () => {
   const navigate = useNavigate()
   const { user, logout } = useAuth()
 
+  const allowedKitchenRoles = ['KITCHEN_STAFF', 'MANAGER', 'RESTAURANT_OWNER', 'SUPER_ADMIN']
+  const kitchenItem = { label: 'Kitchen', to: '/kitchen' }
+  const visibleNavItems = React.useMemo(() => {
+    const items = [...navItems]
+    // Insert Kitchen between Waiter Dashboard and Menu Matrix when user has allowed role
+    if (user && allowedKitchenRoles.includes(user.role || '')) {
+      const idx = items.findIndex(i => i.to === '/waiter/dashboard')
+      if (idx >= 0) {
+        items.splice(idx + 1, 0, kitchenItem)
+      } else {
+        items.push(kitchenItem)
+      }
+    }
+    return items
+  }, [user])
+
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
@@ -37,7 +53,7 @@ const TopNav: React.FC = () => {
         </div>
 
         <nav className="hidden items-center gap-2 md:flex">
-          {navItems.map((item) => (
+          {visibleNavItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}

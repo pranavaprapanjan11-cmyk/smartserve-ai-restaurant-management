@@ -107,6 +107,9 @@ const DigitalTwin: React.FC = () => {
 
   useEffect(() => {
     fetchOrdersAndBuildTwin();
+    const onOrdersUpdated = () => fetchOrdersAndBuildTwin();
+    window.addEventListener('ordersUpdated', onOrdersUpdated);
+    return () => window.removeEventListener('ordersUpdated', onOrdersUpdated);
   }, [token]);
 
   const getTableColor = (table: TableState) => {

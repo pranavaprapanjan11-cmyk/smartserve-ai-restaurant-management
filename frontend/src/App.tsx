@@ -17,6 +17,7 @@ import BillingEditor from './pages/billing/BillingEditor'
 import WaiterDashboard from './pages/orders/WaiterDashboard'
 import CreateOrder from './pages/orders/CreateOrder'
 import OrderDetails from './pages/orders/OrderDetails'
+import KitchenDashboard from './pages/kitchen/KitchenDashboard'
 
 const Analytics: React.FC = () => (
   <div className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-10 text-white shadow-2xl shadow-cyan-500/5 backdrop-blur-xl">
@@ -111,6 +112,7 @@ const App: React.FC = () => {
         <Route path="/settings" element={<RestaurantConfig />} />
         <Route path="/billing" element={<BillingEditor />} />
         <Route path="/employees" element={<Employees />} />
+        <Route path="/kitchen" element={<ProtectedRoute roles={["KITCHEN_STAFF","MANAGER","RESTAURANT_OWNER","SUPER_ADMIN"]}><KitchenDashboard/></ProtectedRoute>} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

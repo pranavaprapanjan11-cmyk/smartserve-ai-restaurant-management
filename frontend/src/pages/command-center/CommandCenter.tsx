@@ -42,6 +42,9 @@ const CommandCenter: React.FC = () => {
     }
 
     loadStatsAndOrders()
+    const onOrdersUpdated = () => loadStatsAndOrders()
+    window.addEventListener('ordersUpdated', onOrdersUpdated)
+    return () => window.removeEventListener('ordersUpdated', onOrdersUpdated)
   }, [token])
 
   const activeOrdersCount = orders.filter(o => o.status !== orderService.OrderStatus.PAID).length
