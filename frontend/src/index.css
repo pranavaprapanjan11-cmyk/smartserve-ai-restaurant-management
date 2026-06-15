@@ -3,3 +3,14 @@
 html, body, #root {
   height: 100%;
 }
+
+body {
+  background: #070A13;
+  color: #ffffff;
+}
+
+::selection {
+  background: rgba(0, 229, 255, 0.18);
+  color: #ffffff;
+}
+

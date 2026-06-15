@@ -27,7 +27,15 @@ export async function register(req: Request, res: Response) {
     const token = signToken({ id: user.id, role: user.role, email: user.email });
     return res.status(201).json({ user, token });
   } catch (err) {
-    console.error('register error', err);
+    console.error('register error: failed to create user', {
+      message: err instanceof Error ? err.message : String(err),
+      stack: err instanceof Error ? err.stack : undefined,
+      body: req.body,
+      env: {
+        DATABASE_URL: process.env.DATABASE_URL ? 'SET' : 'MISSING',
+        JWT_SECRET: process.env.JWT_SECRET ? 'SET' : 'MISSING',
+      },
+    });
     return res.status(500).json({ message: 'Internal server error' });
   }
 }
