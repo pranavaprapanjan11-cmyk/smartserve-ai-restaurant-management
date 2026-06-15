@@ -12,6 +12,8 @@ import OcrPanel from './pages/ocr/OcrPanel'
 import AiOptimizer from './pages/ai/AiOptimizer'
 import AddMenuItem from './pages/menu/AddMenuItem'
 import EditMenuItem from './pages/menu/EditMenuItem'
+import RestaurantConfig from './pages/config/RestaurantConfig'
+import BillingEditor from './pages/billing/BillingEditor'
 
 const Analytics: React.FC = () => (
   <div className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-10 text-white shadow-2xl shadow-cyan-500/5 backdrop-blur-xl">
@@ -100,7 +102,8 @@ const App: React.FC = () => {
         <Route path="/orders" element={<Orders />} />
         <Route path="/inventory" element={<Inventory />} />
         <Route path="/analytics" element={<Analytics />} />
-        <Route path="/billing" element={<Billing />} />
+        <Route path="/settings" element={<RestaurantConfig />} />
+        <Route path="/billing" element={<BillingEditor />} />
         <Route path="/employees" element={<Employees />} />
       </Route>
 

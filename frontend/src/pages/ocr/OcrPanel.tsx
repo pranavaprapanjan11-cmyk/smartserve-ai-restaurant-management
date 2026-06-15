@@ -2,6 +2,10 @@ import React from 'react'
 import { motion } from 'framer-motion'
 
 const OcrPanel: React.FC = () => {
+  const handleFileSelect = () => {
+    console.log('OCR upload button clicked – integration pending')
+  }
+
   return (
     <div className="space-y-8">
       <motion.section
@@ -28,7 +32,11 @@ const OcrPanel: React.FC = () => {
               <p className="text-xl font-semibold text-white">Upload receipts, invoices, or kitchen sheets</p>
               <p className="mt-2 text-sm text-slate-400">No OCR processing yet — this panel is designed for future integration.</p>
             </div>
-            <button className="mt-4 rounded-3xl bg-cyan-500/15 px-6 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-500/25">
+            <button
+              type="button"
+              onClick={handleFileSelect}
+              className="mt-4 rounded-3xl bg-cyan-500/15 px-6 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-500/25"
+            >
               Select Files
             </button>
           </div>

@@ -1,6 +1,9 @@
 -- File: database/schema/002_create_menu_schema.sql
 -- PostgreSQL schema for menu management system
 
+-- Ensure UUID generation extension is available for gen_random_uuid()
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 -- Menu Categories Table
 CREATE TABLE IF NOT EXISTS menu_categories (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

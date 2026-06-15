@@ -35,6 +35,19 @@ router.get('/', getMenuItems);
 // GET /api/menu/search - Search menu items
 router.get('/search', searchMenuItems);
 
+// ==================== CATEGORIES ====================
+
+// GET /api/menu/categories - Get all categories
+router.get('/categories', getCategories);
+
+// POST /api/menu/categories - Create category
+router.post('/categories', validateCreateMenuCategory, createMenuCategory);
+
+// ==================== STATISTICS ====================
+
+// GET /api/menu/stats - Get menu statistics
+router.get('/stats', getMenuStats);
+
 // POST /api/menu - Create menu item
 router.post('/', validateCreateMenuItem, createMenuItem);
 
@@ -49,18 +62,5 @@ router.delete('/:id', deleteMenuItem);
 
 // PATCH /api/menu/:id/availability - Toggle availability
 router.patch('/:id/availability', validateToggleAvailability, toggleMenuItemAvailability);
-
-// ==================== CATEGORIES ====================
-
-// GET /api/menu/categories - Get all categories
-router.get('/categories', getCategories);
-
-// POST /api/menu/categories - Create category
-router.post('/categories', validateCreateMenuCategory, createMenuCategory);
-
-// ==================== STATISTICS ====================
-
-// GET /api/menu/stats - Get menu statistics
-router.get('/stats', getMenuStats);
 
 export default router;

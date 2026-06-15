@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
 import * as menuService from '../../services/menuService'
 
 const alerts = [
@@ -14,14 +16,16 @@ const notifications = [
 ]
 
 const CommandCenter: React.FC = () => {
+  const { token } = useAuth()
+  const navigate = useNavigate()
   const [stats, setStats] = useState<menuService.MenuStats | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const loadStats = async () => {
+      if (!token) return
       setIsLoading(true)
       try {
-        const token = localStorage.getItem('auth_token') || ''
         const statsData = await menuService.getMenuStats(token)
         setStats(statsData)
       } catch (err) {
@@ -32,7 +36,7 @@ const CommandCenter: React.FC = () => {
     }
 
     loadStats()
-  }, [])
+  }, [token])
 
   const revenueVelocity = stats ? (stats.total_revenue / 7).toFixed(0) : '—'
   const kitchenHealth = stats ? Math.max(0, 90 - stats.bestsellers_count * 2) : 0
@@ -152,13 +156,25 @@ const CommandCenter: React.FC = () => {
           <p className="text-sm uppercase tracking-[0.35em] text-cyan-300/70">Quick Actions</p>
           <h3 className="mt-4 text-2xl font-semibold text-white">Runbook</h3>
           <div className="mt-8 space-y-3">
-            <button className="w-full rounded-3xl border border-cyan-400/20 bg-cyan-500/10 px-5 py-4 text-left text-white transition hover:border-cyan-300/30 hover:bg-cyan-500/15">
+            <button
+              type="button"
+              onClick={() => navigate('/inventory')}
+              className="w-full rounded-3xl border border-cyan-400/20 bg-cyan-500/10 px-5 py-4 text-left text-white transition hover:border-cyan-300/30 hover:bg-cyan-500/15"
+            >
               Review pending inventory alerts
             </button>
-            <button className="w-full rounded-3xl border border-amber-400/20 bg-amber-500/10 px-5 py-4 text-left text-white transition hover:border-amber-300/30 hover:bg-amber-500/15">
+            <button
+              type="button"
+              onClick={() => navigate('/orders')}
+              className="w-full rounded-3xl border border-amber-400/20 bg-amber-500/10 px-5 py-4 text-left text-white transition hover:border-amber-300/30 hover:bg-amber-500/15"
+            >
               Assign delayed orders to kitchen team
             </button>
-            <button className="w-full rounded-3xl border border-emerald-400/20 bg-emerald-500/10 px-5 py-4 text-left text-white transition hover:border-emerald-300/30 hover:bg-emerald-500/15">
+            <button
+              type="button"
+              onClick={() => navigate('/menu')}
+              className="w-full rounded-3xl border border-emerald-400/20 bg-emerald-500/10 px-5 py-4 text-left text-white transition hover:border-emerald-300/30 hover:bg-emerald-500/15"
+            >
               Inspect high-margin menu items
             </button>
           </div>

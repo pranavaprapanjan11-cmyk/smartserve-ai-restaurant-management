@@ -14,6 +14,8 @@ const MenuMatrix: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [isSearching, setIsSearching] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   useEffect(() => {
     const loadData = async () => {
@@ -26,9 +28,7 @@ const MenuMatrix: React.FC = () => {
         ])
         setCategories(categoriesData)
         setItems(itemsData)
-        if (itemsData.length > 0) {
-          setSelectedItem(itemsData[0])
-        }
+        setSelectedItem(itemsData.length > 0 ? itemsData[0] : null)
       } catch (err) {
         console.error('Failed to load menu matrix', err)
       } finally {
@@ -53,17 +53,37 @@ const MenuMatrix: React.FC = () => {
       if (!searchQuery.trim()) {
         const itemsData = await menuService.getMenuItems(token)
         setItems(itemsData)
+        setSelectedItem(itemsData.length > 0 ? itemsData[0] : null)
         return
       }
       const itemsData = await menuService.searchMenuItems(searchQuery.trim(), selectedCategory, token)
       setItems(itemsData)
-      if (itemsData.length > 0) {
-        setSelectedItem(itemsData[0])
-      }
+      setSelectedItem(itemsData.length > 0 ? itemsData[0] : null)
     } catch (err) {
       console.error('Menu search failed', err)
     } finally {
       setIsSearching(false)
+    }
+  }
+
+  const handleDeleteItem = async (item: menuService.MenuItem) => {
+    if (!token) return
+    const confirmed = window.confirm(`Delete "${item.name}"? This cannot be undone.`)
+    if (!confirmed) return
+
+    setIsDeleting(true)
+    setDeleteError(null)
+    try {
+      await menuService.deleteMenuItem(item.id, token)
+      setItems((prev) => prev.filter((menuItem) => menuItem.id !== item.id))
+      if (selectedItem?.id === item.id) {
+        setSelectedItem(null)
+      }
+    } catch (err) {
+      console.error('Failed to delete menu item', err)
+      setDeleteError('Unable to delete item. Please try again.')
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -88,6 +108,11 @@ const MenuMatrix: React.FC = () => {
     acc[category.id] = items.filter((item) => item.category_id === category.id).length
     return acc
   }, {})
+
+  const formatPrice = (price: number | string | undefined) => {
+    const value = Number(price ?? 0)
+    return Number.isFinite(value) ? value.toFixed(2) : '0.00'
+  }
 
   return (
     <div className="space-y-8">
@@ -160,6 +185,12 @@ const MenuMatrix: React.FC = () => {
                   type="search"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      handleSearch()
+                    }
+                  }}
                   placeholder="Search menu items..."
                   className="w-full bg-transparent text-sm text-white outline-none placeholder:text-slate-500"
                 />
@@ -196,7 +227,7 @@ const MenuMatrix: React.FC = () => {
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-base font-semibold text-white">{item.name}</p>
-                        <p className="mt-1 text-sm text-slate-400">₹{item.price.toFixed(2)} · {item.is_available ? 'Available' : 'Unavailable'}</p>
+                        <p className="mt-1 text-sm text-slate-400">₹{formatPrice(item.price)} · {item.is_available ? 'Available' : 'Unavailable'}</p>
                       </div>
                       <div className={`rounded-full px-3 py-1 text-xs font-semibold ${item.is_available ? 'bg-emerald-500/10 text-emerald-200' : 'bg-slate-600/20 text-slate-300'}`}>
                         {item.is_available ? 'Active' : 'Offline'}
@@ -244,7 +275,7 @@ const MenuMatrix: React.FC = () => {
                   <div className="mt-5 grid gap-3 sm:grid-cols-2">
                     <div className="rounded-3xl bg-white/5 p-4">
                       <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Price</p>
-                      <p className="mt-2 text-xl font-semibold text-emerald-300">₹{selectedItem.price.toFixed(2)}</p>
+                      <p className="mt-2 text-xl font-semibold text-emerald-300">₹{formatPrice(selectedItem.price)}</p>
                     </div>
                     <div className="rounded-3xl bg-white/5 p-4">
                       <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Availability</p>
@@ -268,6 +299,14 @@ const MenuMatrix: React.FC = () => {
                   className="w-full rounded-3xl bg-cyan-500/15 px-5 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-500/25"
                 >
                   {selectedItem.is_available ? 'Mark Unavailable' : 'Mark Available'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDeleteItem(selectedItem)}
+                  disabled={isDeleting}
+                  className="w-full rounded-3xl bg-amber-500/15 px-5 py-3 text-sm font-semibold text-amber-100 transition hover:bg-amber-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isDeleting ? 'Deleting...' : 'Delete Item'}
                 </button>
               </div>
             ) : (

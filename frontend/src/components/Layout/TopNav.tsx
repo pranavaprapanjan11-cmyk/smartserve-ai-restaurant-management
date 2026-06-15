@@ -7,6 +7,8 @@ const navItems = [
   { label: 'Command Center', to: '/dashboard' },
   { label: 'Digital Twin', to: '/digital-twin' },
   { label: 'Menu Matrix', to: '/menu' },
+  { label: 'Billing', to: '/billing' },
+  { label: 'Restaurant Settings', to: '/settings' },
   { label: 'OCR Panel', to: '/ocr' },
   { label: 'AI Optimizer', to: '/ai-optimizer' },
 ]

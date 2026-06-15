@@ -74,27 +74,48 @@ export interface CreateMenuItemPayload {
 
 export interface UpdateMenuItemPayload extends Partial<CreateMenuItemPayload> {}
 
+function normalizeMenuItem(item: any): MenuItem {
+  return {
+    ...item,
+    price: typeof item.price === 'string' ? parseFloat(item.price) : item.price,
+    preparation_time: item.preparation_time != null ? Number(item.preparation_time) : undefined,
+    spice_level: item.spice_level != null ? Number(item.spice_level) : undefined,
+    calories: item.calories != null ? Number(item.calories) : undefined,
+    is_available: Boolean(item.is_available),
+    is_bestseller: Boolean(item.is_bestseller),
+    analytics: item.analytics
+      ? {
+          ...item.analytics,
+          orders_count: Number(item.analytics.orders_count),
+          revenue: Number(item.analytics.revenue),
+          rating: Number(item.analytics.rating),
+          last_ordered_at: item.analytics.last_ordered_at || undefined,
+        }
+      : undefined,
+  } as MenuItem
+}
+
 // ==================== MENU ITEMS ====================
 
 export async function createMenuItem(payload: CreateMenuItemPayload, token: string): Promise<MenuItem> {
   const res = await axios.post<MenuItem>(`${API_BASE}/menu`, payload, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  return res.data;
+  return normalizeMenuItem(res.data);
 }
 
 export async function getMenuItems(token: string): Promise<MenuItem[]> {
   const res = await axios.get<MenuItem[]>(`${API_BASE}/menu`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  return res.data;
+  return res.data.map(normalizeMenuItem);
 }
 
 export async function getMenuItemById(id: string, token: string): Promise<MenuItem> {
   const res = await axios.get<MenuItem>(`${API_BASE}/menu/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  return res.data;
+  return normalizeMenuItem(res.data);
 }
 
 export async function updateMenuItem(
@@ -105,7 +126,7 @@ export async function updateMenuItem(
   const res = await axios.put<MenuItem>(`${API_BASE}/menu/${id}`, payload, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  return res.data;
+  return normalizeMenuItem(res.data);
 }
 
 export async function deleteMenuItem(id: string, token: string): Promise<void> {
@@ -162,11 +183,15 @@ export async function searchMenuItems(
   categoryId?: string,
   token?: string
 ): Promise<MenuItem[]> {
+  if (!token) {
+    throw new Error('Token is required for search');
+  }
+
   const params = new URLSearchParams({ q: query });
   if (categoryId) params.append('category_id', categoryId);
 
   const res = await axios.get<MenuItem[]>(`${API_BASE}/menu/search?${params.toString()}`, {
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    headers: { Authorization: `Bearer ${token}` },
   });
-  return res.data;
+  return res.data.map(normalizeMenuItem);
 }
