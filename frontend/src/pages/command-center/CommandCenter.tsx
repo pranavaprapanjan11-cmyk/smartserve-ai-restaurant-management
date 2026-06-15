@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import * as menuService from '../../services/menuService'
+import * as orderService from '../../services/orderService'
 
 const alerts = [
   { id: '1', type: 'Inventory', message: 'Low spice stock for Tandoori Masala', severity: 'critical' },
@@ -19,24 +20,36 @@ const CommandCenter: React.FC = () => {
   const { token } = useAuth()
   const navigate = useNavigate()
   const [stats, setStats] = useState<menuService.MenuStats | null>(null)
+  const [orders, setOrders] = useState<orderService.Order[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const loadStats = async () => {
+    const loadStatsAndOrders = async () => {
       if (!token) return
       setIsLoading(true)
       try {
-        const statsData = await menuService.getMenuStats(token)
+        const [statsData, ordersData] = await Promise.all([
+          menuService.getMenuStats(token),
+          orderService.getOrders(token)
+        ])
         setStats(statsData)
+        setOrders(ordersData)
       } catch (err) {
-        console.error('Failed to load command center stats', err)
+        console.error('Failed to load command center stats and orders', err)
       } finally {
         setIsLoading(false)
       }
     }
 
-    loadStats()
+    loadStatsAndOrders()
   }, [token])
+
+  const activeOrdersCount = orders.filter(o => o.status !== orderService.OrderStatus.PAID).length
+  const preparingOrdersCount = orders.filter(
+    o => o.status === orderService.OrderStatus.SENT_TO_KITCHEN || o.status === orderService.OrderStatus.PREPARING
+  ).length
+  const readyOrdersCount = orders.filter(o => o.status === orderService.OrderStatus.READY).length
+  const servedOrdersCount = orders.filter(o => o.status === orderService.OrderStatus.SERVED).length
 
   const revenueVelocity = stats ? (stats.total_revenue / 7).toFixed(0) : '—'
   const kitchenHealth = stats ? Math.max(0, 90 - stats.bestsellers_count * 2) : 0
@@ -120,30 +133,30 @@ const CommandCenter: React.FC = () => {
         >
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-sm uppercase tracking-[0.35em] text-emerald-300/70">Status Feed</p>
-              <h3 className="mt-4 text-2xl font-semibold text-white">Operational Highlights</h3>
+              <p className="text-sm uppercase tracking-[0.35em] text-emerald-300/70">Live Metrics</p>
+              <h3 className="mt-4 text-2xl font-semibold text-white">Order Operations</h3>
             </div>
-            <span className="rounded-full bg-white/5 px-4 py-2 text-xs uppercase tracking-[0.25em] text-slate-300">
-              Real-time mock data
+            <span className="rounded-full bg-emerald-500/10 px-4 py-2 text-xs uppercase tracking-[0.25em] text-emerald-300 ring-1 ring-emerald-400/20">
+              Real-time DB data
             </span>
           </div>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             <div className="rounded-3xl border border-white/10 bg-[#0c101c]/80 p-5">
-              <p className="text-sm text-slate-400">Staff ready</p>
-              <p className="mt-3 text-3xl font-semibold text-cyan-300">17</p>
+              <p className="text-sm text-slate-400">Active Orders</p>
+              <p className="mt-3 text-4xl font-semibold text-cyan-300">{activeOrdersCount}</p>
             </div>
             <div className="rounded-3xl border border-white/10 bg-[#0c101c]/80 p-5">
-              <p className="text-sm text-slate-400">Tables seated</p>
-              <p className="mt-3 text-3xl font-semibold text-amber-300">12 / 16</p>
+              <p className="text-sm text-slate-400">Preparing Orders</p>
+              <p className="mt-3 text-4xl font-semibold text-amber-300">{preparingOrdersCount}</p>
             </div>
             <div className="rounded-3xl border border-white/10 bg-[#0c101c]/80 p-5">
-              <p className="text-sm text-slate-400">Orders in kitchen</p>
-              <p className="mt-3 text-3xl font-semibold text-white">9</p>
+              <p className="text-sm text-slate-400">Ready Orders</p>
+              <p className="mt-3 text-4xl font-semibold text-emerald-300">{readyOrdersCount}</p>
             </div>
             <div className="rounded-3xl border border-white/10 bg-[#0c101c]/80 p-5">
-              <p className="text-sm text-slate-400">Average ticket</p>
-              <p className="mt-3 text-3xl font-semibold text-emerald-300">₹1420</p>
+              <p className="text-sm text-slate-400">Served Orders</p>
+              <p className="mt-3 text-4xl font-semibold text-white">{servedOrdersCount}</p>
             </div>
           </div>
         </motion.div>

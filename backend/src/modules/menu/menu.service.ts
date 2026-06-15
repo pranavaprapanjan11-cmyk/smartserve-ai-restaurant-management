@@ -137,7 +137,7 @@ export async function getMenuItems(restaurantId: string): Promise<MenuItemWithAn
   `;
 
   const { rows } = await pool.query(sql, [restaurantId]);
-  return rows.map((row) => ({
+  return rows.map((row: any) => ({
     ...row,
     analytics: row.analytics,
   })) as MenuItemWithAnalytics[];

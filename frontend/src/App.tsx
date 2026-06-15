@@ -14,6 +14,9 @@ import AddMenuItem from './pages/menu/AddMenuItem'
 import EditMenuItem from './pages/menu/EditMenuItem'
 import RestaurantConfig from './pages/config/RestaurantConfig'
 import BillingEditor from './pages/billing/BillingEditor'
+import WaiterDashboard from './pages/orders/WaiterDashboard'
+import CreateOrder from './pages/orders/CreateOrder'
+import OrderDetails from './pages/orders/OrderDetails'
 
 const Analytics: React.FC = () => (
   <div className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-10 text-white shadow-2xl shadow-cyan-500/5 backdrop-blur-xl">
@@ -99,7 +102,10 @@ const App: React.FC = () => {
         <Route path="/menu/edit/:id" element={<EditMenuItem />} />
         <Route path="/ocr" element={<OcrPanel />} />
         <Route path="/ai-optimizer" element={<AiOptimizer />} />
-        <Route path="/orders" element={<Orders />} />
+        <Route path="/orders" element={<Navigate to="/waiter/dashboard" replace />} />
+        <Route path="/waiter/dashboard" element={<WaiterDashboard />} />
+        <Route path="/waiter/orders/create" element={<CreateOrder />} />
+        <Route path="/waiter/orders/:id" element={<OrderDetails />} />
         <Route path="/inventory" element={<Inventory />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/settings" element={<RestaurantConfig />} />

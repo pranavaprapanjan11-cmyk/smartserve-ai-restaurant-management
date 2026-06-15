@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 const navItems = [
   { label: 'Command Center', to: '/dashboard' },
   { label: 'Digital Twin', to: '/digital-twin' },
+  { label: 'Waiter Dashboard', to: '/waiter/dashboard' },
   { label: 'Menu Matrix', to: '/menu' },
   { label: 'Billing', to: '/billing' },
   { label: 'Restaurant Settings', to: '/settings' },

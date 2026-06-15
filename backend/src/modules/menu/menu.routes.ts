@@ -21,11 +21,27 @@ import {
   validateToggleAvailability,
 } from './menu.validation';
 import { authenticateJWT } from '../auth/auth.middleware';
+import { getRestaurantId } from '../orders/orders.service';
 
 const router = Router();
 
 // Apply authentication to all routes
 router.use(authenticateJWT);
+
+// Resolve restaurant ID for waiter/staff users so they see the owner's menu items
+router.use(async (req, res, next) => {
+  try {
+    const user = (req as any).user;
+    if (user) {
+      const restaurantId = await getRestaurantId(user.id, user.role);
+      // Temporarily override user.id to point to the resolved restaurant owner id
+      (req as any).user.id = restaurantId;
+    }
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
 
 // ==================== MENU ITEMS ====================
 
