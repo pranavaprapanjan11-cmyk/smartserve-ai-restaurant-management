@@ -6,11 +6,17 @@ export interface RestaurantSettingsModel {
   address: string;
   contactNumber: string;
   gstNumber: string;
+  theme?: string;
+  compactMode?: boolean;
+  highContrast?: boolean;
+  animationsEnabled?: boolean;
 }
 
 export interface PrinterConfigModel {
+  id?: string;
   printerName: string;
   connectionType: PrinterConnectionType;
+  paperWidth: string;
   isDefault: boolean;
   status: 'Ready' | 'Offline' | 'Error';
   lastTestedAt?: string;
@@ -38,7 +44,7 @@ export interface OrderItemModel {
   price: number;
 }
 
-export type PaymentMethodType = 'Cash' | 'UPI' | 'Card';
+export type PaymentMethodType = 'Cash' | 'UPI' | 'Credit Card' | 'Debit Card';
 
 export interface CheckoutStateModel {
   paymentMethod: PaymentMethodType;

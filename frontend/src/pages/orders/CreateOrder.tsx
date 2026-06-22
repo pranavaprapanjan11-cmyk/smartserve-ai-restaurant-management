@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import * as menuService from '../../services/menuService';
 import * as orderService from '../../services/orderService';
+import { triggerLiveActivity } from '../../utils/activityTrigger';
 
 interface SelectedItem {
   item: menuService.MenuItem;
@@ -131,6 +132,7 @@ const CreateOrder: React.FC = () => {
       };
 
       const createdOrder = await orderService.createOrder(payload, token);
+      triggerLiveActivity('orderCreated', { orderId: createdOrder.id });
       navigate(`/waiter/orders/${createdOrder.id}`);
     } catch (err: any) {
       console.error('Failed to submit order:', err);
@@ -372,7 +374,7 @@ const CreateOrder: React.FC = () => {
                   <span className="text-white">₹{subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Tax (mock 18% GST)</span>
+                  <span>Tax (18% GST)</span>
                   <span className="text-white">₹{tax.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-lg font-bold text-white pt-2 border-t border-white/5">

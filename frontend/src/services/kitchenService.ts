@@ -1,25 +1,40 @@
+import axios from 'axios';
 import * as orderService from './orderService';
 
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:4000/api';
+
 export async function getKitchenOrders(token: string) {
-  const orders = await orderService.getOrders(token);
-  const newOrders = orders.filter(o => o.status === orderService.OrderStatus.NEW);
-  const preparing = orders.filter(
-    o => o.status === orderService.OrderStatus.PREPARING || o.status === orderService.OrderStatus.SENT_TO_KITCHEN
-  );
-  const ready = orders.filter(o => o.status === orderService.OrderStatus.READY);
-  return { all: orders, newOrders, preparing, ready };
+  const res = await axios.get(`${API_BASE}/kitchen/orders`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
 }
 
 export async function startCooking(orderId: string, token: string) {
-  return orderService.updateOrderStatus(orderId, orderService.OrderStatus.PREPARING, token);
+  const res = await axios.put(
+    `${API_BASE}/kitchen/orders/${orderId}/start-cooking`,
+    {},
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return res.data;
 }
 
 export async function markReady(orderId: string, token: string) {
-  return orderService.updateOrderStatus(orderId, orderService.OrderStatus.READY, token);
+  const res = await axios.put(
+    `${API_BASE}/kitchen/orders/${orderId}/ready`,
+    {},
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return res.data;
 }
 
 export async function markServed(orderId: string, token: string) {
-  return orderService.updateOrderStatus(orderId, orderService.OrderStatus.SERVED, token);
+  const res = await axios.put(
+    `${API_BASE}/kitchen/orders/${orderId}/served`,
+    {},
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return res.data;
 }
 
 export function elapsedMinutes(order: orderService.Order) {
@@ -33,7 +48,9 @@ export function elapsedMinutes(order: orderService.Order) {
 }
 
 export function averagePrepMinutes(orders: orderService.Order[]) {
-  const samples = orders.filter(o => o.status === orderService.OrderStatus.READY || o.status === orderService.OrderStatus.SERVED);
+  const samples = orders.filter(
+    (o) => o.status === orderService.OrderStatus.READY || o.status === orderService.OrderStatus.SERVED
+  );
   if (samples.length === 0) return 0;
   const total = samples.reduce((acc, o) => {
     const then = new Date(o.created_at).getTime();

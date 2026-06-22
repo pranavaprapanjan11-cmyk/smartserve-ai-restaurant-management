@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import * as orderService from '../../services/orderService';
+import { triggerLiveActivity } from '../../utils/activityTrigger';
 
 interface TableState {
   id: string;
@@ -289,30 +290,54 @@ const DigitalTwin: React.FC = () => {
                   </div>
 
                   {activeTable.orderId && (
-                    <>
-                      <div className="rounded-3xl border border-white/5 bg-[#0c101c]/80 p-5">
-                        <p className="text-xs text-slate-400 uppercase tracking-wider">Order Value</p>
-                        <p className="mt-2 text-2xl font-semibold text-emerald-400">
-                          ₹{activeTable.totalAmount?.toFixed(2)}
-                        </p>
-                      </div>
-
-                      <button
-                        onClick={() => navigate(`/waiter/orders/${activeTable.orderId}`)}
-                        className="w-full rounded-2xl bg-cyan-500 py-3 text-center text-sm font-semibold text-slate-950 transition hover:bg-cyan-400"
-                      >
-                        Inspect Active Order
-                      </button>
-                    </>
+                    <div className="rounded-3xl border border-white/5 bg-[#0c101c]/80 p-5">
+                      <p className="text-xs text-slate-400 uppercase tracking-wider">Order Value</p>
+                      <p className="mt-2 text-2xl font-semibold text-emerald-400">
+                        ₹{activeTable.totalAmount?.toFixed(2)}
+                      </p>
+                    </div>
                   )}
 
-                  {!activeTable.orderId && (
-                    <button
-                      onClick={() => navigate(`/waiter/orders/create?table=${activeTable.number}`)}
-                      className="w-full rounded-2xl border border-cyan-400/20 bg-cyan-500/10 py-3 text-center text-sm font-semibold text-cyan-300 transition hover:bg-cyan-500/15"
-                    >
-                      Create Order
-                    </button>
+                  {!activeTable.occupied ? (
+                    <div className="grid gap-2">
+                      <button
+                        onClick={() => {
+                          triggerLiveActivity('tableOccupied', { tableNumber: activeTable.number, seats: activeTable.seats });
+                          setTables(prev => prev.map(t => t.id === activeTable.id ? { ...t, occupied: true, status: 'Occupied' } : t));
+                          setActiveTable(prev => prev ? { ...prev, occupied: true, status: 'Occupied' } : null);
+                        }}
+                        className="w-full rounded-2xl bg-emerald-500 py-3 text-center text-sm font-semibold text-slate-950 transition hover:bg-emerald-400"
+                      >
+                        Seat Guests (Simulate)
+                      </button>
+                      <button
+                        onClick={() => navigate(`/waiter/orders/create?table=${activeTable.number}`)}
+                        className="w-full rounded-2xl border border-cyan-400/20 bg-cyan-500/10 py-3 text-center text-sm font-semibold text-cyan-300 transition hover:bg-cyan-500/15"
+                      >
+                        Create Order
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="grid gap-2">
+                      {activeTable.orderId && (
+                        <button
+                          onClick={() => navigate(`/waiter/orders/${activeTable.orderId}`)}
+                          className="w-full rounded-2xl bg-cyan-500 py-3 text-center text-sm font-semibold text-slate-950 transition hover:bg-cyan-400"
+                        >
+                          Inspect Active Order
+                        </button>
+                      )}
+                      <button
+                        onClick={() => {
+                          triggerLiveActivity('tableAvailable', { tableNumber: activeTable.number });
+                          setTables(prev => prev.map(t => t.id === activeTable.id ? { ...t, occupied: false, status: 'Available', orderId: undefined, totalAmount: undefined } : t));
+                          setActiveTable(prev => prev ? { ...prev, occupied: false, status: 'Available', orderId: undefined, totalAmount: undefined } : null);
+                        }}
+                        className="w-full rounded-2xl border border-red-500/35 bg-red-500/10 py-3 text-center text-sm font-semibold text-red-200 transition hover:bg-red-500/15"
+                      >
+                        Clear Table (Simulate)
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>

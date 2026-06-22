@@ -12,6 +12,13 @@ type User = {
   role?: string;
 };
 
+const normalizeRole = (role?: string): string | undefined => {
+  if (!role) return undefined;
+  if (role === 'KITCHEN_STAFF' || role === 'CHEF') return 'CHEF';
+  if (role === 'RESTAURANT_OWNER' || role === 'OWNER') return 'OWNER';
+  return role;
+};
+
 type AuthContextValue = {
   user: User | null;
   token: string | null;
@@ -35,7 +42,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (t && u) {
       setToken(t);
       try {
-        setUser(JSON.parse(u));
+        const parsed = JSON.parse(u);
+        setUser({ ...parsed, role: normalizeRole(parsed.role) || parsed.role });
       } catch (e) {
         setUser(null);
       }
@@ -45,19 +53,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string) => {
     const { token: t, user: u } = await authService.login({ email, password });
+    const normalizedUser = { ...u, role: normalizeRole(u.role) || u.role };
     localStorage.setItem('auth_token', t);
-    localStorage.setItem('auth_user', JSON.stringify(u));
+    localStorage.setItem('auth_user', JSON.stringify(normalizedUser));
     setToken(t);
-    setUser(u);
+    setUser(normalizedUser);
     navigate('/dashboard');
   };
 
   const register = async (payload: { name: string; email: string; password: string; role: string }) => {
     const { token: t, user: u } = await authService.register(payload);
+    const normalizedUser = { ...u, role: normalizeRole(u.role) || u.role };
     localStorage.setItem('auth_token', t);
-    localStorage.setItem('auth_user', JSON.stringify(u));
+    localStorage.setItem('auth_user', JSON.stringify(normalizedUser));
     setToken(t);
-    setUser(u);
+    setUser(normalizedUser);
     navigate('/dashboard');
   };
 

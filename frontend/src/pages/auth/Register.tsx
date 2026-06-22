@@ -5,12 +5,11 @@ import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
 const roles = [
-  'SUPER_ADMIN',
-  'RESTAURANT_OWNER',
+  'OWNER',
   'MANAGER',
   'CASHIER',
   'WAITER',
-  'KITCHEN_STAFF',
+  'CHEF',
 ];
 
 const Register: React.FC = () => {

@@ -1,44 +1,49 @@
 import React from 'react'
 import { motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
 
 const OcrPanel: React.FC = () => {
-  const handleFileSelect = () => {
-    console.log('OCR upload button clicked – integration pending')
-  }
-
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 px-4 py-6 sm:px-6 lg:px-8">
       <motion.section
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-8 shadow-2xl shadow-cyan-500/5 backdrop-blur-xl"
+        className="rounded-[2rem] border border-white/10 bg-slate-950/80 p-8 shadow-2xl shadow-cyan-500/5 backdrop-blur-xl"
       >
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <p className="text-sm uppercase tracking-[0.35em] text-cyan-300/70">OCR Panel</p>
-            <h1 className="mt-4 text-4xl font-semibold text-white">Document Upload Zone</h1>
+        <div className="flex flex-col gap-8 xl:flex-row xl:items-end xl:justify-between">
+          <div className="max-w-2xl">
+            <p className="text-sm uppercase tracking-[0.35em] text-cyan-300/70">OCR Menu Import</p>
+            <h1 className="mt-4 text-4xl font-semibold text-white">Extract restaurant menus with intelligent OCR.</h1>
+            <p className="mt-4 max-w-xl text-base text-slate-400">
+              Upload a photo or PDF of a menu and let the system detect dishes, prices, and categories automatically.
+            </p>
           </div>
-          <span className="rounded-full bg-emerald-500/10 px-4 py-2 text-sm text-emerald-200 ring-1 ring-emerald-400/20">
-            UI demo only
-          </span>
+
+          <div className="rounded-full bg-cyan-500/10 px-5 py-3 text-sm text-cyan-100 ring-1 ring-cyan-400/20">
+            Production-ready OCR workflow
+          </div>
         </div>
 
-        <div className="mt-10 rounded-[1.75rem] border border-dashed border-white/10 bg-[#0c101c]/80 p-12 text-center">
-          <div className="mx-auto flex h-48 w-full max-w-2xl flex-col items-center justify-center gap-4 rounded-[1.5rem] border border-white/20 bg-slate-950/70 p-8">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-cyan-500/10 text-3xl text-cyan-300">
-              📄
-            </div>
-            <div>
-              <p className="text-xl font-semibold text-white">Upload receipts, invoices, or kitchen sheets</p>
-              <p className="mt-2 text-sm text-slate-400">No OCR processing yet — this panel is designed for future integration.</p>
-            </div>
-            <button
-              type="button"
-              onClick={handleFileSelect}
-              className="mt-4 rounded-3xl bg-cyan-500/15 px-6 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-500/25"
+        <div className="mt-10 grid gap-6 md:grid-cols-2">
+          <div className="rounded-[1.75rem] border border-white/10 bg-[#0c101c]/80 p-8">
+            <h2 className="text-lg font-semibold text-white">Fast menu capture</h2>
+            <p className="mt-3 text-slate-400">AI-assisted extraction for print and photographed menus, calibrated for restaurant pricing tables.</p>
+            <ul className="mt-6 space-y-3 text-sm text-slate-300">
+              <li>• OpenCV preprocessing for clear text</li>
+              <li>• EasyOCR extraction plus correction layer</li>
+              <li>• Structured dish, price, category output</li>
+              <li>• Editable review and import workflow</li>
+            </ul>
+          </div>
+          <div className="rounded-[1.75rem] border border-white/10 bg-[#0c101c]/80 p-8">
+            <h2 className="text-lg font-semibold text-white">Get started</h2>
+            <p className="mt-3 text-slate-400">Drop a JPG, PNG, or PDF and let the OCR pipeline return a clean menu draft for review.</p>
+            <Link
+              to="/ocr/upload"
+              className="mt-6 inline-flex rounded-3xl bg-cyan-500 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400"
             >
-              Select Files
-            </button>
+              Upload Menu Image
+            </Link>
           </div>
         </div>
       </motion.section>

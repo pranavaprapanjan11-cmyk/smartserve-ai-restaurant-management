@@ -116,7 +116,7 @@ const MenuMatrix: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-6 shadow-2xl shadow-cyan-500/5 backdrop-blur-xl">
+      <section className="rounded-[2rem] border surface-border surface-panel p-6 shadow-2xl shadow-cyan-500/5 backdrop-blur-xl">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-sm uppercase tracking-[0.35em] text-cyan-300/70">Menu Matrix</p>
@@ -133,7 +133,7 @@ const MenuMatrix: React.FC = () => {
         </div>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-[1.15fr_1fr] lg:grid-cols-[1fr_1.7fr_1.2fr]">
-          <div className="rounded-[1.75rem] border border-white/10 bg-[#0c101c]/80 p-4">
+          <div className="rounded-[1.75rem] border surface-border surface-panel p-4">
             <div className="flex items-center justify-between gap-3 px-3 py-4">
               <h2 className="text-sm font-semibold uppercase tracking-[0.35em] text-slate-400">Categories</h2>
               <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-slate-300">{categories.length}</span>

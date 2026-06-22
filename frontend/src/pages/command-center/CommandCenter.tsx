@@ -4,45 +4,108 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import * as menuService from '../../services/menuService'
 import * as orderService from '../../services/orderService'
-
-const alerts = [
-  { id: '1', type: 'Inventory', message: 'Low spice stock for Tandoori Masala', severity: 'critical' },
-  { id: '2', type: 'Kitchen', message: '2 orders delayed by over 12 minutes', severity: 'warning' },
-  { id: '3', type: 'Menu', message: 'Add seasonal items to boost Q4 revenue', severity: 'info' },
-]
-
-const notifications = [
-  { id: '1', title: 'New kitchen SOP update', subtitle: 'Check the prep workflow for tonight service.' },
-  { id: '2', title: 'Team shift reminder', subtitle: 'Waiter Mira is due for training at 6:00pm.' },
-]
+import * as tableService from '../../services/tableService'
+import * as inventoryService from '../../services/inventoryService'
 
 const CommandCenter: React.FC = () => {
   const { token } = useAuth()
   const navigate = useNavigate()
   const [stats, setStats] = useState<menuService.MenuStats | null>(null)
   const [orders, setOrders] = useState<orderService.Order[]>([])
+  const [alerts, setAlerts] = useState<{ id: string; type: string; message: string; severity: 'critical' | 'warning' | 'info' }[]>([])
+  const [notifications, setNotifications] = useState<{ id: string; title: string; subtitle: string }[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const loadStatsAndOrders = async () => {
+    const loadData = async () => {
       if (!token) return
       setIsLoading(true)
       try {
-        const [statsData, ordersData] = await Promise.all([
+        const [statsData, ordersData, lowStockItems, tablesData] = await Promise.all([
           menuService.getMenuStats(token),
-          orderService.getOrders(token)
+          orderService.getOrders(token),
+          inventoryService.getLowStockItems(token),
+          tableService.getTables(token)
         ])
         setStats(statsData)
         setOrders(ordersData)
+
+        // Process alerts
+        const now = new Date()
+        const delayedOrders = ordersData.filter(o => {
+          if (o.status === orderService.OrderStatus.PAID || o.status === orderService.OrderStatus.REFUNDED) return false
+          const activeStates = [
+            orderService.OrderStatus.NEW,
+            orderService.OrderStatus.SENT_TO_KITCHEN,
+            orderService.OrderStatus.PREPARING,
+            orderService.OrderStatus.READY
+          ]
+          if (!activeStates.includes(o.status)) return false
+          if (!o.created_at) return false
+          const createdTime = new Date(o.created_at)
+          const diffMin = (now.getTime() - createdTime.getTime()) / (1000 * 60)
+          return diffMin > 15
+        })
+
+        const liveAlerts: { id: string; type: string; message: string; severity: 'critical' | 'warning' | 'info' }[] = [
+          ...lowStockItems.map(item => ({
+            id: `inv-${item.id}`,
+            type: 'Inventory',
+            message: `${item.name} is low (On hand: ${item.quantity_on_hand} ${item.unit})`,
+            severity: 'critical' as const
+          })),
+          ...delayedOrders.map(o => ({
+            id: `order-${o.id}`,
+            type: 'Kitchen',
+            message: `Order #${o.id.substring(0, 8)} for Table ${o.table_number} is delayed (> 15 mins)`,
+            severity: 'warning' as const
+          }))
+        ]
+
+        if (liveAlerts.length === 0) {
+          liveAlerts.push({
+            id: 'info-1',
+            type: 'System',
+            message: 'All kitchen prep stations operating within target duration.',
+            severity: 'info' as const
+          })
+        }
+        setAlerts(liveAlerts)
+
+        // Process notifications
+        const cleaningTables = tablesData.filter(t => t.status === tableService.TableStatus.CLEANING)
+        const reservedTables = tablesData.filter(t => t.status === tableService.TableStatus.RESERVED)
+
+        const liveNotifications = [
+          ...cleaningTables.map(t => ({
+            id: `cleaning-${t.id}`,
+            title: `Table ${t.table_number} needs cleaning`,
+            subtitle: `Ready for bussing and sanitation.`
+          })),
+          ...reservedTables.map(t => ({
+            id: `reserved-${t.id}`,
+            title: `Reservation: Table ${t.table_number}`,
+            subtitle: `Reserved for ${t.reserved_for || 'Guest'} at ${t.reservation_time ? new Date(t.reservation_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}.`
+          }))
+        ]
+
+        if (liveNotifications.length === 0) {
+          liveNotifications.push(
+            { id: 'note-1', title: 'New kitchen SOP update', subtitle: 'Check the prep workflow for tonight service.' },
+            { id: 'note-2', title: 'Team shift reminder', subtitle: 'Waiter Mira is due for training at 6:00pm.' }
+          )
+        }
+        setNotifications(liveNotifications)
+
       } catch (err) {
-        console.error('Failed to load command center stats and orders', err)
+        console.error('Failed to load command center data', err)
       } finally {
         setIsLoading(false)
       }
     }
 
-    loadStatsAndOrders()
-    const onOrdersUpdated = () => loadStatsAndOrders()
+    loadData()
+    const onOrdersUpdated = () => loadData()
     window.addEventListener('ordersUpdated', onOrdersUpdated)
     return () => window.removeEventListener('ordersUpdated', onOrdersUpdated)
   }, [token])
@@ -64,7 +127,7 @@ const CommandCenter: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-6 shadow-2xl shadow-cyan-500/5 backdrop-blur-xl"
+          className="rounded-[2rem] border surface-border surface-panel p-6 shadow-2xl shadow-cyan-500/5 backdrop-blur-xl"
         >
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -105,7 +168,7 @@ const CommandCenter: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-6 shadow-2xl shadow-amber-500/5 backdrop-blur-xl"
+          className="rounded-[2rem] border surface-border surface-panel p-6 shadow-2xl shadow-amber-500/5 backdrop-blur-xl"
         >
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -132,7 +195,7 @@ const CommandCenter: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-6 shadow-2xl shadow-emerald-500/5 backdrop-blur-xl"
+          className="rounded-[2rem] border surface-border surface-panel p-6 shadow-2xl shadow-emerald-500/5 backdrop-blur-xl"
         >
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -167,7 +230,7 @@ const CommandCenter: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-6 shadow-2xl shadow-blue-500/5 backdrop-blur-xl"
+          className="rounded-[2rem] border surface-border surface-panel p-6 shadow-2xl shadow-blue-500/5 backdrop-blur-xl"
         >
           <p className="text-sm uppercase tracking-[0.35em] text-cyan-300/70">Quick Actions</p>
           <h3 className="mt-4 text-2xl font-semibold text-white">Runbook</h3>

@@ -13,6 +13,7 @@ const STATUS_SEQUENCE = [
   orderService.OrderStatus.PREPARING,
   orderService.OrderStatus.READY,
   orderService.OrderStatus.SERVED,
+  orderService.OrderStatus.BILL_REQUESTED,
   orderService.OrderStatus.PAID,
 ];
 
@@ -22,7 +23,11 @@ const STATUS_LABELS: { [key in orderService.OrderStatus]: string } = {
   [orderService.OrderStatus.PREPARING]: 'Preparing',
   [orderService.OrderStatus.READY]: 'Ready',
   [orderService.OrderStatus.SERVED]: 'Served',
+  [orderService.OrderStatus.BILL_REQUESTED]: 'Bill Requested',
+  [orderService.OrderStatus.CHECKOUT_OPEN]: 'Checkout In Progress',
+  [orderService.OrderStatus.ON_HOLD]: 'On Hold',
   [orderService.OrderStatus.PAID]: 'Paid',
+  [orderService.OrderStatus.REFUNDED]: 'Refunded',
 };
 
 const OrderDetails: React.FC = () => {
@@ -130,8 +135,16 @@ const OrderDetails: React.FC = () => {
         return 'text-emerald-400 border-emerald-400/20 bg-emerald-500/10';
       case orderService.OrderStatus.SERVED:
         return 'text-purple-400 border-purple-400/20 bg-purple-500/10';
+      case orderService.OrderStatus.BILL_REQUESTED:
+        return 'text-amber-400 border-amber-400/20 bg-amber-500/10';
+      case orderService.OrderStatus.CHECKOUT_OPEN:
+        return 'text-cyan-400 border-cyan-400/20 bg-cyan-500/10';
+      case orderService.OrderStatus.ON_HOLD:
+        return 'text-slate-400 border-slate-400/20 bg-slate-500/10';
       case orderService.OrderStatus.PAID:
         return 'text-emerald-400 border-emerald-400/20 bg-emerald-500/10';
+      case orderService.OrderStatus.REFUNDED:
+        return 'text-rose-400 border-rose-500/20 bg-rose-500/10';
     }
   };
 
@@ -282,7 +295,7 @@ const OrderDetails: React.FC = () => {
               <span className="text-white">₹{subtotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
-              <span>Tax (mock 18% GST)</span>
+              <span>Tax (18% GST)</span>
               <span className="text-white">₹{tax.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-lg font-bold text-white pt-2 border-t border-white/5">

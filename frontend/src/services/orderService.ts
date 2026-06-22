@@ -11,7 +11,11 @@ export enum OrderStatus {
   PREPARING = 'PREPARING',
   READY = 'READY',
   SERVED = 'SERVED',
+  BILL_REQUESTED = 'BILL_REQUESTED',
+  CHECKOUT_OPEN = 'CHECKOUT_OPEN',
+  ON_HOLD = 'ON_HOLD',
   PAID = 'PAID',
+  REFUNDED = 'REFUNDED',
 }
 
 export interface OrderItem {
@@ -109,4 +113,17 @@ export async function deleteOrder(id: string, token: string): Promise<void> {
   await axios.delete(`${API_BASE}/orders/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
+}
+
+export async function updateOrderItems(
+  id: string,
+  items: { menu_item_id: string; quantity: number }[],
+  token: string
+): Promise<Order> {
+  const res = await axios.put<Order>(
+    `${API_BASE}/orders/${id}/items`,
+    { items },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return normalizeOrder(res.data);
 }
