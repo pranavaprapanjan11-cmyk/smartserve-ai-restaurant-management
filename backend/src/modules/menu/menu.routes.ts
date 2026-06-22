@@ -20,7 +20,8 @@ import {
   validateCreateMenuCategory,
   validateToggleAvailability,
 } from './menu.validation';
-import { authenticateJWT } from '../auth/auth.middleware';
+import { authenticateJWT, authorizeRoles } from '../auth/auth.middleware';
+import { Role } from '../auth/auth.types';
 import { getRestaurantId } from '../orders/orders.service';
 
 const router = Router();
@@ -57,26 +58,54 @@ router.get('/search', searchMenuItems);
 router.get('/categories', getCategories);
 
 // POST /api/menu/categories - Create category
-router.post('/categories', validateCreateMenuCategory, createMenuCategory);
+router.post(
+  '/categories',
+  authorizeRoles(Role.OWNER, Role.MANAGER, Role.SUPER_ADMIN),
+  validateCreateMenuCategory,
+  createMenuCategory
+);
 
 // ==================== STATISTICS ====================
 
 // GET /api/menu/stats - Get menu statistics
-router.get('/stats', getMenuStats);
+router.get(
+  '/stats',
+  authorizeRoles(Role.OWNER, Role.MANAGER, Role.SUPER_ADMIN),
+  getMenuStats
+);
 
 // POST /api/menu - Create menu item
-router.post('/', validateCreateMenuItem, createMenuItem);
+router.post(
+  '/',
+  authorizeRoles(Role.OWNER, Role.MANAGER, Role.SUPER_ADMIN),
+  validateCreateMenuItem,
+  createMenuItem
+);
 
 // GET /api/menu/:id - Get menu item by ID
 router.get('/:id', getMenuItemById);
 
 // PUT /api/menu/:id - Update menu item
-router.put('/:id', validateUpdateMenuItem, updateMenuItem);
+router.put(
+  '/:id',
+  authorizeRoles(Role.OWNER, Role.MANAGER, Role.SUPER_ADMIN),
+  validateUpdateMenuItem,
+  updateMenuItem
+);
 
 // DELETE /api/menu/:id - Delete menu item
-router.delete('/:id', deleteMenuItem);
+router.delete(
+  '/:id',
+  authorizeRoles(Role.OWNER, Role.MANAGER, Role.SUPER_ADMIN),
+  deleteMenuItem
+);
 
 // PATCH /api/menu/:id/availability - Toggle availability
-router.patch('/:id/availability', validateToggleAvailability, toggleMenuItemAvailability);
+router.patch(
+  '/:id/availability',
+  authorizeRoles(Role.OWNER, Role.MANAGER, Role.SUPER_ADMIN),
+  validateToggleAvailability,
+  toggleMenuItemAvailability
+);
 
 export default router;

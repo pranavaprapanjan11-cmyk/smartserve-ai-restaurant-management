@@ -7,7 +7,11 @@ export enum OrderStatus {
   PREPARING = 'PREPARING',
   READY = 'READY',
   SERVED = 'SERVED',
+  BILL_REQUESTED = 'BILL_REQUESTED',
+  CHECKOUT_OPEN = 'CHECKOUT_OPEN',
+  ON_HOLD = 'ON_HOLD',
   PAID = 'PAID',
+  REFUNDED = 'REFUNDED',
 }
 
 export interface OrderItem {
@@ -28,6 +32,7 @@ export interface Order {
   restaurant_id: string;
   waiter_id: string;
   table_number: number;
+  table_id?: string | null;
   guest_count: number;
   status: OrderStatus;
   total_amount: number;

@@ -4,7 +4,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { findUserById } from './auth.service';
-import { Role } from './auth.types';
+import { Role, normalizeRole } from './auth.types';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'please-set-a-secure-secret';
 
@@ -16,11 +16,11 @@ export async function authenticateJWT(req: Request, res: Response, next: NextFun
   const token = authHeader.split(' ')[1];
   try {
     const payload: any = jwt.verify(token, JWT_SECRET);
-    // payload.sub is user id
     const user = await findUserById(payload.sub);
     if (!user) return res.status(401).json({ message: 'Invalid token (user not found)' });
-    // attach minimal user info
-    (req as any).user = { id: user.id, role: user.role, email: user.email };
+    const normalizedRole = normalizeRole(user.role) || user.role;
+    (req as any).user = { id: user.id, role: normalizedRole, email: user.email };
+    // authentication successful
     next();
   } catch (err) {
     console.error('authenticateJWT error', err);

@@ -14,7 +14,7 @@ export async function createOrder(req: RequestWithUser, res: Response) {
       return res.status(401).json({ message: 'Not authenticated' });
     }
 
-    const payload: CreateOrderPayload = req.body;
+    const payload = req.body as unknown as CreateOrderPayload;
     const order = await ordersService.createOrder(waiterId, waiterRole, payload);
     return res.status(201).json(order);
   } catch (err: any) {
@@ -43,7 +43,7 @@ export async function getOrderById(req: RequestWithUser, res: Response) {
   try {
     const userId = req.user?.id;
     const role = req.user?.role;
-    const { id } = req.params;
+    const { id } = req.params as { id: string };
 
     if (!userId || !role) {
       return res.status(401).json({ message: 'Not authenticated' });
@@ -65,7 +65,7 @@ export async function getOrdersByTable(req: RequestWithUser, res: Response) {
   try {
     const userId = req.user?.id;
     const role = req.user?.role;
-    const tableNumber = parseInt(req.params.tableNumber);
+    const tableNumber = parseInt(String((req.params as Record<string, unknown>).tableNumber));
 
     if (!userId || !role) {
       return res.status(401).json({ message: 'Not authenticated' });
@@ -87,8 +87,8 @@ export async function updateOrderStatus(req: RequestWithUser, res: Response) {
   try {
     const userId = req.user?.id;
     const role = req.user?.role;
-    const { id } = req.params;
-    const { status }: UpdateOrderStatusPayload = req.body;
+    const { id } = req.params as { id: string };
+    const { status } = req.body as unknown as UpdateOrderStatusPayload;
 
     if (!userId || !role) {
       return res.status(401).json({ message: 'Not authenticated' });
@@ -109,7 +109,7 @@ export async function deleteOrder(req: RequestWithUser, res: Response) {
   try {
     const userId = req.user?.id;
     const role = req.user?.role;
-    const { id } = req.params;
+    const { id } = req.params as { id: string };
 
     if (!userId || !role) {
       return res.status(401).json({ message: 'Not authenticated' });
@@ -123,5 +123,27 @@ export async function deleteOrder(req: RequestWithUser, res: Response) {
       return res.status(404).json({ message: err.message });
     }
     return res.status(500).json({ message: 'Failed to delete order' });
+  }
+}
+
+export async function updateOrderItems(req: RequestWithUser, res: Response) {
+  try {
+    const userId = req.user?.id;
+    const role = req.user?.role;
+    const { id } = req.params as { id: string };
+    const { items } = req.body as { items: any[] };
+
+    if (!userId || !role) {
+      return res.status(401).json({ message: 'Not authenticated' });
+    }
+    if (!items || !Array.isArray(items)) {
+      return res.status(400).json({ message: 'Items list is required' });
+    }
+
+    const updated = await ordersService.updateOrderItems(userId, role, id, items);
+    return res.json(updated);
+  } catch (err: any) {
+    console.error('updateOrderItems error:', err);
+    return res.status(500).json({ message: err.message || 'Failed to update order items' });
   }
 }

@@ -2,7 +2,7 @@
 // Express router for auth module
 
 import { Router } from 'express';
-import { register, login, me } from './auth.controller';
+import { register, login, me, validateManagerPin } from './auth.controller';
 import { validateRegister, validateLogin } from './auth.validation';
 import { authenticateJWT } from './auth.middleware';
 
@@ -16,5 +16,8 @@ router.post('/login', validateLogin, login);
 
 // GET /api/auth/me - returns current user
 router.get('/me', authenticateJWT, me);
+
+// POST /api/auth/validate-manager-pin
+router.post('/validate-manager-pin', validateManagerPin);
 
 export default router;
