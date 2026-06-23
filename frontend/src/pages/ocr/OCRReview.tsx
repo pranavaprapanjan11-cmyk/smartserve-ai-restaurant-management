@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { API_BASE } from '../../config';
 
 interface Item {
   name: string;
@@ -43,8 +44,7 @@ export default function OCRReview() {
   const [tesseractConfidence, setTesseractConfidence] = useState<number>(0);
   const [healthStatus, setHealthStatus] = useState<any>(null);
 
-  const apiBase = import.meta.env.VITE_API_BASE || 'http://localhost:4000/api';
-  const serverBase = apiBase.replace(/\/api$/, '');
+  const serverBase = API_BASE.replace(/\/api$/, '');
 
   const getImageUrl = (pathStr: string) => {
     if (!pathStr) return '';
@@ -56,8 +56,7 @@ export default function OCRReview() {
   useEffect(() => {
     (async () => {
       try {
-        const base = import.meta.env.VITE_API_BASE || 'http://localhost:4000/api';
-        const res = await axios.get(`${base}/ocr/health`);
+        const res = await axios.get(`${API_BASE}/ocr/health`);
         setHealthStatus(res.data);
       } catch (err) {
         console.error('Failed to fetch OCR pipeline health status:', err);
@@ -71,8 +70,7 @@ export default function OCRReview() {
       setLoading(true);
       setErrors([]);
       try {
-        const base = import.meta.env.VITE_API_BASE || 'http://localhost:4000/api';
-        const res = await axios.post(`${base}/ocr/parse`, { fileId });
+        const res = await axios.post(`${API_BASE}/ocr/parse`, { fileId });
         if (res.data && Array.isArray(res.data.items)) {
           setItems(res.data.items.map((item: any) => ({
             name: String(item.name || '').trim(),
@@ -136,9 +134,8 @@ export default function OCRReview() {
   async function handleImport() {
     if (items.length === 0) return alert('No items to import');
     try {
-      const base = import.meta.env.VITE_API_BASE || 'http://localhost:4000/api';
       const token = localStorage.getItem('auth_token');
-      const res = await axios.post(`${base}/ocr/import`, { items }, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await axios.post(`${API_BASE}/ocr/import`, { items }, { headers: { Authorization: `Bearer ${token}` } });
       alert(`Imported ${res.data.created.length} items`);
       navigate('/menu');
     } catch (err: any) {

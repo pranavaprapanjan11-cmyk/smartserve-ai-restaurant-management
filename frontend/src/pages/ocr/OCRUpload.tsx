@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE } from '../../config';
 
 export default function OCRUpload() {
   const [file, setFile] = useState<File | null>(null);
@@ -47,8 +48,7 @@ export default function OCRUpload() {
     const fd = new FormData();
     fd.append('file', file);
     try {
-      const base = import.meta.env.VITE_API_BASE || 'http://localhost:4000/api';
-      const res = await axios.post(`${base}/ocr/upload`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+      const res = await axios.post(`${API_BASE}/ocr/upload`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       const fileId = res.data.fileId;
       navigate('/ocr/review', { state: { fileId, previewUrl, fileName: file.name, fileType: file.type } });
     } catch (err: any) {

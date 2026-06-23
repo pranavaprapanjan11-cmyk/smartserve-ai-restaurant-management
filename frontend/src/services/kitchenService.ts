@@ -1,7 +1,6 @@
 import axios from 'axios';
 import * as orderService from './orderService';
-
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:4000/api';
+import { API_BASE } from '../config';
 
 export async function getKitchenOrders(token: string) {
   const res = await axios.get(`${API_BASE}/kitchen/orders`, {

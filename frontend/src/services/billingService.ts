@@ -1,7 +1,6 @@
 import axios from 'axios'
 import { PaymentMethodType } from '../types/foundation'
-
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:4000/api'
+import { API_BASE } from '../config'
 
 export interface BillableOrderItem {
   id: string
