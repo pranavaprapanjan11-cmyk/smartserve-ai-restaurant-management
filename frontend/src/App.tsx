@@ -1,5 +1,5 @@
 import React from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, Link } from 'react-router-dom'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
 import ProtectedRoute from './routes/ProtectedRoute'
@@ -75,12 +75,12 @@ const Welcome: React.FC = () => {
           <h1 className="mt-6 text-5xl font-semibold">Restaurant Operating System</h1>
           <p className="mt-4 text-lg text-slate-400">The new unified restaurant control interface for menu, operations, and service flow.</p>
           <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <a href="/auth/login" className="rounded-3xl bg-cyan-500/15 px-8 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-500/25">
+            <Link to="/auth/login" className="rounded-3xl bg-cyan-500/15 px-8 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-500/25">
               Sign In
-            </a>
-            <a href="/auth/register" className="rounded-3xl bg-amber-500/15 px-8 py-3 text-sm font-semibold text-amber-100 transition hover:bg-amber-500/25">
+            </Link>
+            <Link to="/auth/register" className="rounded-3xl bg-amber-500/15 px-8 py-3 text-sm font-semibold text-amber-100 transition hover:bg-amber-500/25">
               Create Account
-            </a>
+            </Link>
           </div>
         </div>
       </div>
