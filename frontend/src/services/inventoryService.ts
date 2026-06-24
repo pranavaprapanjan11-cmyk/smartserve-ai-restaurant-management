@@ -10,6 +10,8 @@ export interface InventoryItem {
   quantity_on_hand: number
   reorder_threshold: number
   is_active: boolean
+  expiry_date?: string
+  supplier_id?: string
   created_at: string
   updated_at: string
 }

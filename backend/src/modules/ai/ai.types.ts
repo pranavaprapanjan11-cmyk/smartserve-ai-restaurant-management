@@ -4,6 +4,7 @@ export interface SalesForecast {
   weeklyRevenue: number;
   predictedTomorrowRevenue: number;
   predictedWeeklyRevenue: number;
+  revenueTrend: string | null;
 }
 
 export interface InventoryForecastItem {
@@ -23,6 +24,7 @@ export interface MenuInsights {
   worstSeller: MenuItemInsight | null;
   highestRevenueItem: MenuItemInsight | null;
   totalQuantitySold: number;
+  peakSalesPeriod: string | null;
 }
 
 export interface Recommendation {

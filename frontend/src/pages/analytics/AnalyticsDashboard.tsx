@@ -65,10 +65,26 @@ const AnalyticsDashboard: React.FC = () => {
             <h1 className="mt-4 text-4xl font-semibold text-white">Restaurant performance overview</h1>
             <p className="mt-2 max-w-2xl text-slate-400">Revenue, orders, kitchen flow, inventory status, and restaurant health score in one place.</p>
           </div>
-          <div className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-6 text-right">
+          <div className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-6 text-right w-64">
             <p className="text-sm uppercase tracking-[0.35em] text-slate-400">Health score</p>
-            <p className="mt-4 text-5xl font-semibold text-white">{dashboard?.healthScore.score ?? '--'}</p>
-            <p className="mt-2 text-sm text-slate-400">{dashboard?.healthScore.label ?? healthBadge}</p>
+            <p className="mt-2 text-5xl font-semibold text-white">{dashboard?.healthScore.score ?? '--'}</p>
+            <p className="mt-1 text-sm text-slate-400">{dashboard?.healthScore.label ?? healthBadge}</p>
+            {dashboard && (
+              <div className="mt-4 pt-3 border-t border-white/5 flex flex-col gap-1.5 text-xs text-left">
+                <div className="flex justify-between items-center text-slate-400">
+                  <span>Revenue Score:</span>
+                  <span className="font-semibold text-white">{dashboard.healthScore.revenueScore}%</span>
+                </div>
+                <div className="flex justify-between items-center text-slate-400">
+                  <span>Fulfillment:</span>
+                  <span className="font-semibold text-white">{dashboard.healthScore.fulfillmentScore}%</span>
+                </div>
+                <div className="flex justify-between items-center text-slate-400">
+                  <span>Inventory:</span>
+                  <span className="font-semibold text-white">{dashboard.healthScore.inventoryScore}%</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -100,19 +116,29 @@ const AnalyticsDashboard: React.FC = () => {
       <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(360px,0.75fr)]">
         <div className="grid gap-6">
           <div className="rounded-[2rem] border surface-border surface-panel p-8 shadow-2xl shadow-cyan-500/5 backdrop-blur-xl">
-            <h2 className="text-xl font-semibold text-white">Order status snapshot</h2>
-            <div className="mt-8 grid gap-4 sm:grid-cols-3">
-              <div className="rounded-[1.75rem] border surface-border surface-panel p-6">
-                <p className="text-sm uppercase tracking-[0.35em] text-slate-400">Orders Today</p>
-                <p className="mt-4 text-4xl font-semibold text-white">{dashboard?.orders.today ?? '--'}</p>
+            <h2 className="text-xl font-semibold text-white">Order analytics & status</h2>
+            <div className="mt-8 grid gap-4 grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
+              <div className="rounded-[1.75rem] border surface-border surface-panel p-5">
+                <p className="text-4xs font-extrabold uppercase tracking-widest text-slate-500">Orders Today</p>
+                <p className="mt-2 text-2xl font-bold text-white">{dashboard?.orders.today ?? '--'}</p>
               </div>
-              <div className="rounded-[1.75rem] border surface-border surface-panel p-6">
-                <p className="text-sm uppercase tracking-[0.35em] text-slate-400">Completed Orders</p>
-                <p className="mt-4 text-4xl font-semibold text-white">{dashboard?.orders.completed ?? '--'}</p>
+              <div className="rounded-[1.75rem] border surface-border surface-panel p-5">
+                <p className="text-4xs font-extrabold uppercase tracking-widest text-slate-500">Completed Orders</p>
+                <p className="mt-2 text-2xl font-bold text-white">{dashboard?.orders.completed ?? '--'}</p>
               </div>
-              <div className="rounded-[1.75rem] border surface-border surface-panel p-6">
-                <p className="text-sm uppercase tracking-[0.35em] text-slate-400">Pending Orders</p>
-                <p className="mt-4 text-4xl font-semibold text-white">{dashboard?.orders.pending ?? '--'}</p>
+              <div className="rounded-[1.75rem] border surface-border surface-panel p-5">
+                <p className="text-4xs font-extrabold uppercase tracking-widest text-slate-500">Cancelled Orders</p>
+                <p className="mt-2 text-2xl font-bold text-red-400">{dashboard?.orders.cancelled ?? '--'}</p>
+              </div>
+              <div className="rounded-[1.75rem] border surface-border surface-panel p-5">
+                <p className="text-4xs font-extrabold uppercase tracking-widest text-slate-500">Total Orders</p>
+                <p className="mt-2 text-2xl font-bold text-white">{dashboard?.orders.total ?? '--'}</p>
+              </div>
+              <div className="rounded-[1.75rem] border surface-border surface-panel p-5 col-span-2 md:col-span-1">
+                <p className="text-4xs font-extrabold uppercase tracking-widest text-slate-500">Avg Order Value</p>
+                <p className="mt-2 text-2xl font-bold text-emerald-400">
+                  ₹{dashboard ? dashboard.orders.averageOrderValue.toLocaleString(undefined, { maximumFractionDigits: 2 }) : '--'}
+                </p>
               </div>
             </div>
           </div>
@@ -263,6 +289,90 @@ const AnalyticsDashboard: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Menu Intelligence Section */}
+      {dashboard && (
+        <section className="grid gap-6 md:grid-cols-3">
+          {/* Top Selling Items */}
+          <div className="rounded-[2rem] border surface-border surface-panel p-8 shadow-2xl shadow-violet-500/5 backdrop-blur-xl">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-violet-400">Menu Performance</p>
+                <h2 className="mt-1 text-xl font-semibold text-white">Top Selling Items</h2>
+              </div>
+            </div>
+            <div className="mt-6 w-full">
+              <div className="space-y-4">
+                {(dashboard.topSellingItems ?? []).map((it, idx) => (
+                  <div key={it.id || idx} className="flex items-center justify-between gap-3 border-b border-white/5 pb-2 last:border-0 last:pb-0">
+                    <div>
+                      <p className="truncate text-sm font-semibold text-white">{it.name}</p>
+                      <p className="text-xs text-slate-400">Sold: {it.sold} units</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-bold text-emerald-400">₹{it.revenue.toLocaleString()}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Least Selling Items */}
+          <div className="rounded-[2rem] border surface-border surface-panel p-8 shadow-2xl shadow-rose-500/5 backdrop-blur-xl">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-rose-400">Menu Performance</p>
+                <h2 className="mt-1 text-xl font-semibold text-white">Least Selling Items</h2>
+              </div>
+            </div>
+            <div className="mt-6 w-full">
+              <div className="space-y-4">
+                {(dashboard.leastSellingItems ?? []).map((it, idx) => (
+                  <div key={it.id || idx} className="flex items-center justify-between gap-3 border-b border-white/5 pb-2 last:border-0 last:pb-0">
+                    <div>
+                      <p className="truncate text-sm font-semibold text-white">{it.name}</p>
+                      <p className="text-xs text-slate-400">Sold: {it.sold} units</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-bold text-slate-400">₹{it.revenue.toLocaleString()}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Category Performance */}
+          <div className="rounded-[2rem] border surface-border surface-panel p-8 shadow-2xl shadow-cyan-500/5 backdrop-blur-xl">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-cyan-400">Menu Performance</p>
+                <h2 className="mt-1 text-xl font-semibold text-white">Category Analytics</h2>
+              </div>
+            </div>
+            <div className="mt-6 w-full">
+              <div className="space-y-4">
+                {(dashboard.categoryPerformance ?? []).map((cat, idx) => {
+                  const max = Math.max(...(dashboard.categoryPerformance?.map((c) => c.revenue) ?? [1]));
+                  const pct = max > 0 ? Math.round((cat.revenue / max) * 100) : 0;
+                  return (
+                    <div key={idx} className="space-y-1">
+                      <div className="flex justify-between text-xs items-end">
+                        <span className="font-semibold text-white">{cat.category}</span>
+                        <span className="text-slate-400">{cat.sold} sold (₹{cat.revenue.toLocaleString()})</span>
+                      </div>
+                      <div className="w-full bg-white/5 rounded-full h-2">
+                        <div style={{ width: `${pct}%` }} className="h-2 rounded-full bg-cyan-400/80" />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Table & Service Performance Section */}
       {dashboard?.tableAnalytics && (

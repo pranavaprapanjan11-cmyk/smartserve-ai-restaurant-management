@@ -67,8 +67,13 @@ app.use('/api/ai-operations', aiOperationsRouter);
 // Mount CRM routes
 app.use('/api/crm', crmRouter);
 
+import { sseHandler } from './modules/workspace/workspace.sse';
+
 // Health check
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
+
+// Workspace updates endpoint
+app.get('/api/workspace/updates', sseHandler);
 
 const PORT = Number(process.env.PORT) || 4000;
 app.listen(PORT, () => {

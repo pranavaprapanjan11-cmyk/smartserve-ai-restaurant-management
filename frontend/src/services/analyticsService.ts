@@ -13,6 +13,8 @@ export interface OrdersMetrics {
   completed: number;
   pending: number;
   cancelled: number;
+  total: number;
+  averageOrderValue: number;
 }
 
 export interface MenuItemMetrics {
@@ -52,6 +54,9 @@ export interface HealthScore {
   score: number;
   label: string;
   grade: string;
+  revenueScore: number;
+  fulfillmentScore: number;
+  inventoryScore: number;
 }
 
 export interface TableRevenuePoint {
@@ -91,6 +96,12 @@ export interface TableAnalytics {
   waiterPerformance: WaiterPerformancePoint[];
 }
 
+export interface CategoryPerformancePoint {
+  category: string;
+  sold: number;
+  revenue: number;
+}
+
 export interface AnalyticsDashboard {
   revenue: RevenueMetrics;
   orders: OrdersMetrics;
@@ -105,6 +116,8 @@ export interface AnalyticsDashboard {
   revenueTrend: ChartPoint[];
   ordersTrend: OrderTrendPoint[];
   topSellingItems: MenuItemMetrics[];
+  leastSellingItems: MenuItemMetrics[];
+  categoryPerformance: CategoryPerformancePoint[];
   inventoryHealth: InventoryHealthPoint[];
   tableAnalytics?: TableAnalytics;
 }

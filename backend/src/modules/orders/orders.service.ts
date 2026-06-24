@@ -20,14 +20,26 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
  * If the user is a waiter, we find the first RESTAURANT_OWNER user in the DB.
  */
 export async function getRestaurantId(userId: string, role: string): Promise<string> {
+  // Try to find the workspace owner's user_id first
+  const { rows } = await pool.query(
+    `SELECT w.owner_id 
+     FROM users u
+     JOIN workspaces w ON u.workspace_id = w.id
+     WHERE u.id = $1 LIMIT 1`,
+    [userId]
+  );
+  if (rows.length > 0 && rows[0].owner_id) {
+    return rows[0].owner_id;
+  }
+
   if (role === 'RESTAURANT_OWNER' || role === 'OWNER' || role === 'SUPER_ADMIN') {
     return userId;
   }
-  const { rows } = await pool.query(
-    "SELECT id FROM users WHERE role = 'RESTAURANT_OWNER' ORDER BY created_at ASC LIMIT 1"
+  const { rows: firstOwner } = await pool.query(
+    "SELECT id FROM users WHERE role IN ('RESTAURANT_OWNER', 'OWNER') ORDER BY created_at ASC LIMIT 1"
   );
-  if (rows.length > 0) {
-    return rows[0].id;
+  if (firstOwner.length > 0) {
+    return firstOwner[0].id;
   }
   return userId;
 }
@@ -164,6 +176,13 @@ export async function createOrder(
       }
     } catch (e) {
       console.error('Failed to log order events:', e);
+    }
+
+    try {
+      const { notifyWorkspaceByRestaurantId } = require('../workspace/workspace.sse');
+      notifyWorkspaceByRestaurantId(restaurantId, 'ordersUpdated');
+    } catch (e) {
+      console.error('Failed to notify workspace of order creation:', e);
     }
 
     return {
@@ -346,6 +365,13 @@ export async function updateOrderStatus(
   `;
   const { rows: itemsRows } = await pool.query(itemsSql, [orderId]);
 
+  try {
+    const { notifyWorkspaceByRestaurantId } = require('../workspace/workspace.sse');
+    notifyWorkspaceByRestaurantId(restaurantId, 'ordersUpdated');
+  } catch (e) {
+    console.error('Failed to notify workspace of order status update:', e);
+  }
+
   return {
     ...orderRecord,
     total_amount: parseFloat(orderRecord.total_amount),
@@ -372,6 +398,13 @@ export async function deleteOrder(
 
   if (result.rowCount === 0) {
     throw new Error('Order not found or unauthorized');
+  }
+
+  try {
+    const { notifyWorkspaceByRestaurantId } = require('../workspace/workspace.sse');
+    notifyWorkspaceByRestaurantId(restaurantId, 'ordersUpdated');
+  } catch (e) {
+    console.error('Failed to notify workspace of order deletion:', e);
   }
 }
 
@@ -494,6 +527,13 @@ export async function updateOrderItems(
     await client.query('DELETE FROM invoices WHERE order_id = $1', [orderId]);
 
     await client.query('COMMIT');
+
+    try {
+      const { notifyWorkspaceByRestaurantId } = require('../workspace/workspace.sse');
+      notifyWorkspaceByRestaurantId(restaurantId, 'ordersUpdated');
+    } catch (e) {
+      console.error('Failed to notify workspace of order items update:', e);
+    }
 
     // Return the updated order details
     const orderSql = `SELECT o.*, u.name as waiter_name FROM orders o LEFT JOIN users u ON o.waiter_id = u.id WHERE o.id = $1 LIMIT 1`;

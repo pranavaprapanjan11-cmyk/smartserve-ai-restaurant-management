@@ -52,6 +52,13 @@ export async function createTable(
     payload.position_y || 0,
   ]);
 
+  try {
+    const { notifyWorkspaceByRestaurantId } = require('../workspace/workspace.sse');
+    notifyWorkspaceByRestaurantId(restaurantId, 'tablesUpdated');
+  } catch (e) {
+    console.error('Failed to notify tablesUpdated', e);
+  }
+
   return rows[0] as RestaurantTable;
 }
 
@@ -142,6 +149,13 @@ export async function updateTable(
     }
   }
 
+  try {
+    const { notifyWorkspaceByRestaurantId } = require('../workspace/workspace.sse');
+    notifyWorkspaceByRestaurantId(restaurantId, 'tablesUpdated');
+  } catch (e) {
+    console.error('Failed to notify tablesUpdated', e);
+  }
+
   return updatedTable;
 }
 
@@ -155,6 +169,13 @@ export async function deleteTable(userId: string, role: string, id: string): Pro
   const result = await pool.query(sql, [id, restaurantId]);
   if (result.rowCount === 0) {
     throw new Error('Table not found or unauthorized');
+  }
+
+  try {
+    const { notifyWorkspaceByRestaurantId } = require('../workspace/workspace.sse');
+    notifyWorkspaceByRestaurantId(restaurantId, 'tablesUpdated');
+  } catch (e) {
+    console.error('Failed to notify tablesUpdated', e);
   }
 }
 

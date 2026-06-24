@@ -14,7 +14,7 @@ function safeNumber(value: any): number {
   return value === null || value === undefined ? 0 : Number(value);
 }
 
-function getHealthScore(score: number): HealthScore {
+function getHealthScore(score: number): { score: number; label: string; grade: string } {
   const clamped = Math.max(0, Math.min(100, Math.round(score)));
   if (clamped >= 95) {
     return { score: clamped, label: 'Excellent', grade: 'Excellent' };
@@ -47,7 +47,9 @@ export async function getAnalyticsDashboard(userId: string, role: string): Promi
       COUNT(*) FILTER (WHERE created_at >= CURRENT_DATE) AS today,
       COUNT(*) FILTER (WHERE status IN ('SERVED','PAID')) AS completed,
       COUNT(*) FILTER (WHERE status IN ('NEW','SENT_TO_KITCHEN','PREPARING','READY')) AS pending,
-      COUNT(*) FILTER (WHERE status = 'CANCELLED') AS cancelled
+      COUNT(*) FILTER (WHERE status = 'CANCELLED') AS cancelled,
+      COUNT(*) AS total,
+      COALESCE(AVG(total_amount), 0) AS average_order_value
     FROM orders
     WHERE restaurant_id = $1`,
     [restaurantId]
@@ -124,6 +126,32 @@ export async function getAnalyticsDashboard(userId: string, role: string): Promi
     [restaurantId]
   );
 
+  const leastItemRows = await pool.query(
+    `SELECT mi.id, mi.name,
+      COALESCE(SUM(oi.quantity), 0) AS sold,
+      COALESCE(SUM(oi.subtotal), 0) AS revenue
+    FROM menu_items mi
+    LEFT JOIN order_items oi ON oi.menu_item_id = mi.id
+    WHERE mi.restaurant_id = $1
+    GROUP BY mi.id, mi.name
+    ORDER BY COALESCE(SUM(oi.quantity), 0) ASC NULLS FIRST
+    LIMIT 5`,
+    [restaurantId]
+  );
+
+  const categoryPerfRows = await pool.query(
+    `SELECT mc.name AS category,
+      COALESCE(SUM(oi.quantity), 0) AS sold,
+      COALESCE(SUM(oi.subtotal), 0) AS revenue
+    FROM menu_categories mc
+    LEFT JOIN menu_items mi ON mi.category_id = mc.id
+    LEFT JOIN order_items oi ON oi.menu_item_id = mi.id
+    WHERE mc.restaurant_id = $1
+    GROUP BY mc.id, mc.name
+    ORDER BY revenue DESC`,
+    [restaurantId]
+  );
+
   const orderRow = ordersResult.rows[0] || {};
   const revenueRow = revenueResult.rows[0] || {};
   const kitchenRow = kitchenResult.rows[0] || {};
@@ -142,6 +170,8 @@ export async function getAnalyticsDashboard(userId: string, role: string): Promi
     completed: safeNumber(orderRow.completed),
     pending: safeNumber(orderRow.pending),
     cancelled: safeNumber(orderRow.cancelled),
+    total: safeNumber(orderRow.total),
+    averageOrderValue: safeNumber(orderRow.average_order_value),
   };
 
   const menuItems: MenuItemMetrics[] = menuRows.rows.map((row: any) => ({
@@ -180,7 +210,12 @@ export async function getAnalyticsDashboard(userId: string, role: string): Promi
   const kitchenScore = Math.min(25, Math.round(kitchenHealthRatio * 25));
   const inventoryScore = Math.min(25, Math.round(inventoryHealthRatio * 25));
 
-  const healthScore = getHealthScore(revenueScore + ordersScore + kitchenScore + inventoryScore);
+  const healthScore = {
+    ...getHealthScore(revenueScore + ordersScore + kitchenScore + inventoryScore),
+    revenueScore: Math.min(100, Math.round(revenueHealthRatio * 100)),
+    fulfillmentScore: Math.min(100, Math.round(completedRatio * 100)),
+    inventoryScore: Math.min(100, Math.round(inventoryHealthRatio * 100)),
+  };
 
   // Fetch Table Revenue by Table
   const revenueByTableRes = await pool.query(
@@ -338,6 +373,17 @@ export async function getAnalyticsDashboard(userId: string, role: string): Promi
     topSellingItems: topItemRows.rows.map((row: any) => ({
       id: row.id,
       name: row.name,
+      sold: safeNumber(row.sold),
+      revenue: safeNumber(row.revenue),
+    })),
+    leastSellingItems: leastItemRows.rows.map((row: any) => ({
+      id: row.id,
+      name: row.name,
+      sold: safeNumber(row.sold),
+      revenue: safeNumber(row.revenue),
+    })),
+    categoryPerformance: categoryPerfRows.rows.map((row: any) => ({
+      category: row.category,
       sold: safeNumber(row.sold),
       revenue: safeNumber(row.revenue),
     })),

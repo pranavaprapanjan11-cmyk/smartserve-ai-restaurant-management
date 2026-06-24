@@ -38,6 +38,7 @@ import CRMDashboard from './pages/crm/CRMDashboard'
 import CustomersList from './pages/crm/CustomersList'
 import ReservationsManager from './pages/crm/ReservationsManager'
 import WaitlistManager from './pages/crm/WaitlistManager'
+import EmployeesPage from './pages/employees/EmployeesPage'
 
 const Analytics: React.FC = () => (
   <div className="rounded-[2rem] border surface-border surface-panel p-10 text-white shadow-2xl shadow-cyan-500/5 backdrop-blur-xl">
@@ -53,12 +54,7 @@ const Billing: React.FC = () => (
   </div>
 )
 
-const Employees: React.FC = () => (
-  <div className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-10 text-white shadow-2xl shadow-blue-500/5 backdrop-blur-xl">
-    <h1 className="text-3xl font-semibold">Employees</h1>
-    <p className="mt-4 text-slate-400">Manage employee records and access placeholder.</p>
-  </div>
-)
+
 
 const Welcome: React.FC = () => {
   const { user } = useAuth()
@@ -135,7 +131,7 @@ const App: React.FC = () => {
         <Route path="/crm/customers" element={<ProtectedRoute roles={["OWNER","RESTAURANT_OWNER","MANAGER","SUPER_ADMIN"]}><CustomersList /></ProtectedRoute>} />
         <Route path="/crm/reservations" element={<ProtectedRoute roles={["OWNER","RESTAURANT_OWNER","MANAGER","SUPER_ADMIN","WAITER"]}><ReservationsManager /></ProtectedRoute>} />
         <Route path="/crm/waitlist" element={<ProtectedRoute roles={["OWNER","RESTAURANT_OWNER","MANAGER","SUPER_ADMIN","WAITER"]}><WaitlistManager /></ProtectedRoute>} />
-        <Route path="/employees" element={<ProtectedRoute roles={["OWNER","RESTAURANT_OWNER","MANAGER","SUPER_ADMIN"]}><Employees /></ProtectedRoute>} />
+        <Route path="/employees" element={<ProtectedRoute roles={["OWNER","RESTAURANT_OWNER","MANAGER","SUPER_ADMIN"]}><EmployeesPage /></ProtectedRoute>} />
         <Route path="/kitchen" element={<ProtectedRoute roles={["CHEF","MANAGER","OWNER","RESTAURANT_OWNER","SUPER_ADMIN"]}><KitchenDashboard/></ProtectedRoute>} />
       </Route>
 

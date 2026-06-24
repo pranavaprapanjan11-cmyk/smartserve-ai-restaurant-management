@@ -42,3 +42,24 @@ export async function updateWaitlistStatus(id: string, status: string, token: st
   });
   return res.data;
 }
+
+export async function createCustomer(payload: any, token: string): Promise<any> {
+  const res = await axios.post(`${API_BASE}/crm/customers`, payload, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return res.data;
+}
+
+export async function createReservation(payload: any, token: string): Promise<any> {
+  const res = await axios.post(`${API_BASE}/crm/reservations`, payload, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return res.data;
+}
+
+export async function updateReservation(id: string, payload: any, token: string): Promise<any> {
+  const res = await axios.put(`${API_BASE}/crm/reservations/${id}`, payload, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return res.data;
+}

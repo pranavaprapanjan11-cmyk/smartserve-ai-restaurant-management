@@ -9,12 +9,12 @@ export interface AuthResponse {
   user: any;
 }
 
-export async function register(payload: { name: string; email: string; password: string; role: string }) {
+export async function register(payload: any) {
   const res = await axios.post<AuthResponse>(`${API_BASE}/auth/register`, payload);
   return res.data;
 }
 
-export async function login(payload: { email: string; password: string }) {
+export async function login(payload: any) {
   const res = await axios.post<AuthResponse>(`${API_BASE}/auth/login`, payload);
   return res.data;
 }

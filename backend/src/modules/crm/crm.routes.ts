@@ -17,6 +17,7 @@ router.put('/customers/:id', authorizeRoles(Role.OWNER, Role.MANAGER, Role.RESTA
 router.get('/reservations', authorizeRoles(Role.OWNER, Role.MANAGER, Role.RESTAURANT_OWNER, Role.WAITER, Role.SUPER_ADMIN), crmController.listReservations);
 router.post('/reservations', authorizeRoles(Role.OWNER, Role.MANAGER, Role.RESTAURANT_OWNER, Role.WAITER, Role.SUPER_ADMIN), crmController.createReservation);
 router.patch('/reservations/:id/status', authorizeRoles(Role.OWNER, Role.MANAGER, Role.RESTAURANT_OWNER, Role.WAITER, Role.SUPER_ADMIN), crmController.updateReservationStatus);
+router.put('/reservations/:id', authorizeRoles(Role.OWNER, Role.MANAGER, Role.RESTAURANT_OWNER, Role.WAITER, Role.SUPER_ADMIN), crmController.updateReservation);
 
 // Waitlist
 router.get('/waitlist', authorizeRoles(Role.OWNER, Role.MANAGER, Role.RESTAURANT_OWNER, Role.WAITER, Role.SUPER_ADMIN), crmController.listWaitlist);

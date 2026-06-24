@@ -156,32 +156,30 @@ export async function recordCustomerVisit(
     [restaurantId, phone]
   );
   
+  let customerId: string;
+  let newVisits = 1;
+  let newSpend = spend;
+  let earnedPoints = Math.floor(spend / 100);
+
   if (rows.length === 0) {
     // create new
-    await createCustomerInternal(restaurantId, {
+    const cust = await createCustomerInternal(restaurantId, {
       phone_number: phone,
       name: name,
     });
-    // fetch again to get id
-    const { rows: newRows } = await pool.query(
-      `SELECT * FROM customers WHERE restaurant_id = $1 AND phone_number = $2 LIMIT 1`,
-      [restaurantId, phone]
+    customerId = cust.id;
+    await pool.query(
+      `UPDATE customers SET total_visits = 1, total_spend = $1, avg_bill_value = $1, last_visit = NOW(), reward_points = $2 WHERE id = $3`,
+      [spend, earnedPoints, customerId]
     );
-    if (newRows.length > 0) {
-      await pool.query(
-        `UPDATE customers SET total_visits = 1, total_spend = $1, avg_bill_value = $1, last_visit = NOW() WHERE id = $2`,
-        [spend, newRows[0].id]
-      );
-    }
   } else {
     // update existing
     const c = rows[0];
-    const newVisits = (c.total_visits || 0) + 1;
-    const newSpend = parseFloat(c.total_spend || '0') + spend;
+    customerId = c.id;
+    newVisits = (c.total_visits || 0) + 1;
+    newSpend = parseFloat(c.total_spend || '0') + spend;
     const newAvg = newSpend / newVisits;
-    
-    // Add points: 1 point per 100 spent
-    const earnedPoints = Math.floor(spend / 100);
+    earnedPoints = Math.floor(spend / 100);
     const newPoints = (c.reward_points || 0) + earnedPoints;
 
     await pool.query(
@@ -193,7 +191,7 @@ export async function recordCustomerVisit(
          last_visit = NOW(),
          name = COALESCE($5, name)
        WHERE id = $6`,
-      [newVisits, newSpend, newAvg, newPoints, name || null, c.id]
+      [newVisits, newSpend, newAvg, newPoints, name || null, customerId]
     );
 
     // Check milestones
@@ -201,9 +199,24 @@ export async function recordCustomerVisit(
       await logEvent(restaurantId, OperationalEventType.AI_INSIGHT_GENERATED, `Customer ${name || phone} reached Frequent Visitor milestone (5 visits)`);
     }
     if (newSpend > 50000 && !c.vip_status) {
-      await pool.query(`UPDATE customers SET vip_status = true WHERE id = $1`, [c.id]);
+      await pool.query(`UPDATE customers SET vip_status = true WHERE id = $1`, [customerId]);
       await logEvent(restaurantId, OperationalEventType.AI_INSIGHT_GENERATED, `Customer ${name || phone} unlocked VIP Status`);
     }
+  }
+
+  // Insert visit record
+  await pool.query(
+    `INSERT INTO customer_visits (restaurant_id, customer_id, spend_amount) VALUES ($1, $2, $3)`,
+    [restaurantId, customerId, spend]
+  );
+
+  // Insert loyalty transaction record
+  if (earnedPoints > 0) {
+    await pool.query(
+      `INSERT INTO loyalty_transactions (restaurant_id, customer_id, points, transaction_type, description)
+       VALUES ($1, $2, $3, 'EARNED', $4)`,
+      [restaurantId, customerId, earnedPoints, `Earned from visit: spend ₹${spend}`]
+    );
   }
 }
 
@@ -248,6 +261,13 @@ export async function createReservation(
   const r = rows[0];
   await logEvent(restaurantId, OperationalEventType.TABLE_RESERVED, `Reservation created for ${payload.guest_count} guests on ${payload.reservation_date} at ${payload.reservation_time}`);
   
+  try {
+    const { notifyWorkspaceByRestaurantId } = require('../workspace/workspace.sse');
+    notifyWorkspaceByRestaurantId(restaurantId, 'reservationsUpdated');
+  } catch (e) {
+    console.error('Failed to notify reservationsUpdated', e);
+  }
+
   return r;
 }
 
@@ -277,9 +297,88 @@ export async function updateReservationStatus(
       `UPDATE restaurant_tables SET status = 'OCCUPIED' WHERE id = $1 AND restaurant_id = $2`,
       [r.requested_table, restaurantId]
     );
+    try {
+      const { notifyWorkspaceByRestaurantId } = require('../workspace/workspace.sse');
+      notifyWorkspaceByRestaurantId(restaurantId, 'tablesUpdated');
+    } catch (e) {}
   }
   
+  try {
+    const { notifyWorkspaceByRestaurantId } = require('../workspace/workspace.sse');
+    notifyWorkspaceByRestaurantId(restaurantId, 'reservationsUpdated');
+  } catch (e) {
+    console.error('Failed to notify reservationsUpdated', e);
+  }
+
   return r;
+}
+
+export async function updateReservation(
+  userId: string,
+  role: string,
+  id: string,
+  payload: any
+): Promise<Reservation> {
+  const restaurantId = await getRestaurantId(userId, role);
+  
+  const updates: string[] = [];
+  const values: any[] = [id, restaurantId];
+  let valIdx = 3;
+
+  const addField = (name: string, value: any) => {
+    updates.push(`${name} = $${valIdx}`);
+    values.push(value);
+    valIdx++;
+  };
+
+  if (payload.reservation_date !== undefined) addField('reservation_date', payload.reservation_date);
+  if (payload.reservation_time !== undefined) addField('reservation_time', payload.reservation_time);
+  if (payload.guest_count !== undefined) addField('guest_count', payload.guest_count);
+  if (payload.requested_table !== undefined) addField('requested_table', payload.requested_table || null);
+  if (payload.notes !== undefined) addField('notes', payload.notes || null);
+  if (payload.status !== undefined) addField('status', payload.status);
+
+  if (updates.length === 0) {
+    const { rows } = await pool.query(`SELECT r.*, c.name as customer_name, c.phone_number FROM reservations r JOIN customers c ON r.customer_id = c.id WHERE r.id = $1 AND r.restaurant_id = $2`, [id, restaurantId]);
+    return rows[0];
+  }
+
+  addField('updated_at', new Date());
+
+  const sql = `UPDATE reservations SET ${updates.join(', ')} WHERE id = $1 AND restaurant_id = $2 RETURNING *`;
+  const { rows } = await pool.query(sql, values);
+  if (rows.length === 0) throw new Error('Reservation not found');
+  
+  const r = rows[0];
+  
+  if (payload.status === ReservationStatus.SEATED && r.requested_table) {
+    await pool.query(
+      `UPDATE restaurant_tables SET status = 'OCCUPIED' WHERE id = $1 AND restaurant_id = $2`,
+      [r.requested_table, restaurantId]
+    );
+    try {
+      const { notifyWorkspaceByRestaurantId } = require('../workspace/workspace.sse');
+      notifyWorkspaceByRestaurantId(restaurantId, 'tablesUpdated');
+    } catch (e) {}
+  }
+  
+  try {
+    const { notifyWorkspaceByRestaurantId } = require('../workspace/workspace.sse');
+    notifyWorkspaceByRestaurantId(restaurantId, 'reservationsUpdated');
+  } catch (e) {
+    console.error('Failed to notify reservationsUpdated', e);
+  }
+
+  // Fetch complete record with customer details for response
+  const { rows: completeRecord } = await pool.query(
+    `SELECT r.*, c.name as customer_name, c.phone_number 
+     FROM reservations r 
+     JOIN customers c ON r.customer_id = c.id 
+     WHERE r.id = $1 AND r.restaurant_id = $2`,
+    [id, restaurantId]
+  );
+
+  return completeRecord[0] || r;
 }
 
 // --- Waitlist ---

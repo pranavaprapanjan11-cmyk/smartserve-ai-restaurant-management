@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
 interface RoleGateProps {
   children: React.ReactNode;
@@ -99,7 +99,7 @@ const RoleGate: React.FC<RoleGateProps> = ({
   }
 
   // Check role-based access
-  if (requiredRoles.length > 0 && !requiredRoles.includes(user.role)) {
+  if (requiredRoles.length > 0 && !requiredRoles.includes(user.role || '')) {
     return (
       <div className="role-gate-forbidden">
         <p>You don't have permission to access this page.</p>
@@ -110,7 +110,7 @@ const RoleGate: React.FC<RoleGateProps> = ({
 
   // Check permission-based access
   if (permissions.length > 0) {
-    const userPermissions = ROLE_PERMISSIONS[user.role] || [];
+    const userPermissions = ROLE_PERMISSIONS[user.role || ''] || [];
     const hasRequiredPermission = permissions.every((perm) =>
       userPermissions.includes(perm)
     );
@@ -134,7 +134,7 @@ const RoleGate: React.FC<RoleGateProps> = ({
  */
 export const useHasRole = (roles: string[]): boolean => {
   const { user } = useAuth();
-  return user ? roles.includes(user.role) : false;
+  return user && user.role ? roles.includes(user.role) : false;
 };
 
 /**
@@ -145,7 +145,7 @@ export const useHasPermission = (permissions: string[]): boolean => {
   const { user } = useAuth();
   if (!user) return false;
 
-  const userPermissions = ROLE_PERMISSIONS[user.role] || [];
+  const userPermissions = ROLE_PERMISSIONS[user.role || ''] || [];
   return permissions.every((perm) => userPermissions.includes(perm));
 };
 

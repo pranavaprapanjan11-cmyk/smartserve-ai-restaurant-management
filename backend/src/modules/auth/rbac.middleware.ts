@@ -31,7 +31,9 @@ export const RBAC_ROLES = {
   WAITER: 'WAITER',
   CHEF: 'CHEF',
   KITCHEN_STAFF: 'KITCHEN_STAFF',
+  KITCHEN: 'KITCHEN',
   CASHIER: 'CASHIER',
+  EMPLOYEE: 'EMPLOYEE',
 };
 
 export const ROLE_PERMISSIONS = {
@@ -86,18 +88,29 @@ export const ROLE_PERMISSIONS = {
     'update.orders',
     'view.inventory',
   ],
+  KITCHEN: [
+    'view.kitchen',
+    'view.orders',
+    'update.orders',
+    'view.inventory',
+  ],
   CASHIER: [
     'view.billing',
     'view.payments',
     'manage.billing',
     'view.invoices',
   ],
+  EMPLOYEE: [
+    'view.orders',
+    'view.tables',
+    'view.menu',
+  ],
 };
 
 /**
  * Authenticate JWT token
  */
-export const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const authenticate = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
@@ -105,13 +118,32 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as any;
-    const normalizedRole = normalizeRole(decoded.role);
+    const normalizedRole = normalizeRole(decoded.role) || decoded.role;
+    const userId = decoded.sub || decoded.id;
+
+    // Resolve restaurant ID using the orders.service helper
+    const { getRestaurantId } = require('../orders/orders.service');
+    const rId = await getRestaurantId(userId, normalizedRole);
+
+    // Resolve workspaceId
+    let workspaceId = decoded.workspaceId;
+    if (!workspaceId) {
+      const { Pool } = require('pg');
+      const tempPool = new Pool({ connectionString: process.env.DATABASE_URL });
+      const { rows } = await tempPool.query('SELECT workspace_id FROM users WHERE id = $1 LIMIT 1', [userId]);
+      await tempPool.end();
+      if (rows.length > 0) {
+        workspaceId = rows[0].workspace_id;
+      }
+    }
+
     req.user = {
-      id: decoded.id,
+      id: userId,
       email: decoded.email,
-      role: normalizedRole || decoded.role,
-      restaurantId: decoded.restaurantId,
-    };
+      role: normalizedRole,
+      restaurantId: rId,
+      workspaceId: workspaceId,
+    } as any;
 
     next();
   } catch (error) {
@@ -218,11 +250,12 @@ export const optionalAuth = (req: AuthRequest, res: Response, next: NextFunction
     const token = req.headers.authorization?.split(' ')[1];
     if (token) {
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as any;
+      const normalizedRole = normalizeRole(decoded.role) || decoded.role;
       req.user = {
-        id: decoded.id,
+        id: decoded.sub || decoded.id,
         email: decoded.email,
-        role: decoded.role,
-        restaurantId: decoded.restaurantId,
+        role: normalizedRole,
+        restaurantId: decoded.restaurantId || decoded.sub || decoded.id,
       };
     }
   } catch (error) {

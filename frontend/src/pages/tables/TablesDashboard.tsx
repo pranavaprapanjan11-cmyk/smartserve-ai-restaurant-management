@@ -677,10 +677,7 @@ const TablesDashboard: React.FC = () => {
         {/* Details Panel Sidebar (Right) */}
         <div>
           <div className="rounded-[2.5rem] border border-white/10 bg-slate-950/70 p-6 shadow-2xl backdrop-blur-xl h-full flex flex-col justify-between">
-            {selectedTable ? {
-              // Extract order details for display
-              activeOrder: getActiveOrderForTable(selectedTable.table_number, selectedTable.current_order_id)
-            } && (() => {
+            {selectedTable ? (() => {
               const activeOrder = getActiveOrderForTable(selectedTable.table_number, selectedTable.current_order_id);
               
               return (

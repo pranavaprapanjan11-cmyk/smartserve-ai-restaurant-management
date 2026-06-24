@@ -4,27 +4,32 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import * as authService from '../services/authService';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE } from '../config';
 
 type User = {
   id: string;
   name?: string;
   email?: string;
   role?: string;
+  workspace_id?: string | null;
+  workspace_code?: string | null;
+  restaurantId?: string;
 };
 
 const normalizeRole = (role?: string): string | undefined => {
   if (!role) return undefined;
-  if (role === 'KITCHEN_STAFF' || role === 'CHEF') return 'CHEF';
-  if (role === 'RESTAURANT_OWNER' || role === 'OWNER') return 'OWNER';
-  return role;
+  const upper = role.toUpperCase();
+  if (upper === 'KITCHEN_STAFF' || upper === 'CHEF' || upper === 'KITCHEN') return 'CHEF';
+  if (upper === 'RESTAURANT_OWNER' || upper === 'OWNER') return 'OWNER';
+  return upper;
 };
 
 type AuthContextValue = {
   user: User | null;
   token: string | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (payload: { name: string; email: string; password: string; role: string }) => Promise<void>;
+  login: (email: string, password: string, workspaceCode?: string) => Promise<void>;
+  register: (payload: any) => Promise<void>;
   logout: () => void;
 };
 
@@ -51,8 +56,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(false);
   }, []);
 
-  const login = async (email: string, password: string) => {
-    const { token: t, user: u } = await authService.login({ email, password });
+  const login = async (email: string, password: string, workspaceCode?: string) => {
+    const { token: t, user: u } = await authService.login({ email, password, workspaceCode });
     const normalizedUser = { ...u, role: normalizeRole(u.role) || u.role };
     localStorage.setItem('auth_token', t);
     localStorage.setItem('auth_user', JSON.stringify(normalizedUser));
@@ -61,7 +66,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     navigate('/dashboard');
   };
 
-  const register = async (payload: { name: string; email: string; password: string; role: string }) => {
+  const register = async (payload: any) => {
     const { token: t, user: u } = await authService.register(payload);
     const normalizedUser = { ...u, role: normalizeRole(u.role) || u.role };
     localStorage.setItem('auth_token', t);
@@ -70,6 +75,53 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(normalizedUser);
     navigate('/dashboard');
   };
+
+  useEffect(() => {
+    if (!token || !user?.workspace_id) return;
+    
+    const sseUrl = `${API_BASE}/workspace/updates?token=${token}`;
+    console.log('Connecting to SSE Updates at:', sseUrl);
+    
+    let eventSource: EventSource | null = null;
+    try {
+      eventSource = new EventSource(sseUrl);
+      
+      eventSource.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          console.log('SSE update received:', payload.type, payload.data);
+          
+          window.dispatchEvent(new CustomEvent(payload.type, { detail: payload.data }));
+          
+          if (payload.type === 'ordersUpdated') {
+            window.dispatchEvent(new CustomEvent('ordersUpdated'));
+          } else if (payload.type === 'tablesUpdated') {
+            window.dispatchEvent(new CustomEvent('tablesUpdated'));
+          } else if (payload.type === 'reservationsUpdated') {
+            window.dispatchEvent(new CustomEvent('reservationsUpdated'));
+          } else if (payload.type === 'employeesUpdated') {
+            window.dispatchEvent(new CustomEvent('employeesUpdated'));
+          } else if (payload.type === 'inventoryUpdated') {
+            window.dispatchEvent(new CustomEvent('inventoryUpdated'));
+          }
+        } catch (e) {
+          // ignore heartbeats
+        }
+      };
+
+      eventSource.onerror = (err) => {
+        console.error('SSE EventSource error:', err);
+      };
+    } catch (err) {
+      console.error('Failed to create EventSource:', err);
+    }
+    
+    return () => {
+      if (eventSource) {
+        eventSource.close();
+      }
+    };
+  }, [token, user?.workspace_id]);
 
   const logout = () => {
     localStorage.removeItem('auth_token');

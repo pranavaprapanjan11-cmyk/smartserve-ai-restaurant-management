@@ -123,7 +123,7 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({ events }) => {
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-900 border border-white/5 relative">
                     <motion.span
                       animate={details.animate}
-                      transition={details.transition}
+                      transition={details.transition as any}
                       className="text-lg"
                     >
                       {details.icon}

@@ -9,7 +9,7 @@ type Props = {
   columnType: 'NEW' | 'COOKING' | 'READY';
 };
 
-const OrderCard: React.FC<Props> = ({ order, onAction, columnType }) => {
+const OrderCard: React.FC<Props> = ({ order, onAction, onRemake, columnType }) => {
   // Format the creation time to local time (e.g. "12:35 PM")
   const formatTime = (dateStr: string) => {
     try {

@@ -6,7 +6,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 type ProtectedRouteProps = {
-  children: JSX.Element;
+  children: React.ReactElement;
   roles?: string[]; // allowed roles
 };
 

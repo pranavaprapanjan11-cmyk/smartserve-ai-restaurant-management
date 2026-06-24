@@ -76,6 +76,15 @@ export async function updateReservationStatus(req: RequestWithUser, res: Respons
   }
 }
 
+export async function updateReservation(req: RequestWithUser, res: Response) {
+  try {
+    const reservation = await crmService.updateReservation(req.user!.id, req.user!.role, (req.params as { id: string }).id, req.body);
+    return res.json(reservation);
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
 // --- Waitlist ---
 
 export async function listWaitlist(req: RequestWithUser, res: Response) {

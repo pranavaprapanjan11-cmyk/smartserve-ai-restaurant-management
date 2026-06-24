@@ -97,6 +97,20 @@ const AIDashboard: React.FC = () => {
                 </div>
               ))}
             </div>
+            {salesForecast && (
+              <div className="mt-6 p-4 border border-white/5 bg-slate-950/70 rounded-2xl flex justify-between items-center text-xs">
+                <span className="text-slate-400">Revenue Trend (7d comparison):</span>
+                <span className={`font-semibold px-2.5 py-0.5 rounded-full ${
+                  salesForecast.revenueTrend?.includes('Increasing') 
+                    ? 'bg-emerald-500/10 text-emerald-300' 
+                    : salesForecast.revenueTrend?.includes('Decreasing') 
+                    ? 'bg-rose-500/10 text-rose-300' 
+                    : 'bg-slate-500/10 text-slate-300'
+                }`}>
+                  {salesForecast.revenueTrend ?? 'Stable'}
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="rounded-[2rem] border surface-border surface-panel p-8 shadow-2xl shadow-emerald-500/5 backdrop-blur-xl">
@@ -123,20 +137,29 @@ const AIDashboard: React.FC = () => {
           <div className="rounded-[2rem] border surface-border surface-panel p-8 shadow-2xl shadow-violet-500/5 backdrop-blur-xl">
             <h2 className="text-xl font-semibold text-white">Menu insights</h2>
             <div className="mt-6 space-y-4">
-              <div className="rounded-3xl border border-white/10 bg-slate-950/70 p-5">
-                <p className="text-sm text-slate-400">Best seller</p>
-                <p className="mt-2 text-lg font-semibold text-white">{menuInsights?.bestSeller?.name ?? '--'}</p>
-                <p className="mt-1 text-sm text-slate-400">Sold: {menuInsights?.bestSeller?.quantitySold ?? '--'}</p>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="rounded-3xl border border-white/10 bg-slate-950/70 p-5">
+                  <p className="text-sm text-slate-400">Best seller</p>
+                  <p className="mt-2 text-lg font-semibold text-white">{menuInsights?.bestSeller?.name ?? '--'}</p>
+                  <p className="mt-1 text-sm text-slate-400">Sold: {menuInsights?.bestSeller?.quantitySold ?? '--'}</p>
+                </div>
+                <div className="rounded-3xl border border-white/10 bg-slate-950/70 p-5">
+                  <p className="text-sm text-slate-400">Worst seller (Slow moving)</p>
+                  <p className="mt-2 text-lg font-semibold text-white">{menuInsights?.worstSeller?.name ?? '--'}</p>
+                  <p className="mt-1 text-sm text-slate-400">Sold: {menuInsights?.worstSeller?.quantitySold ?? '--'}</p>
+                </div>
               </div>
-              <div className="rounded-3xl border border-white/10 bg-slate-950/70 p-5">
-                <p className="text-sm text-slate-400">Worst seller</p>
-                <p className="mt-2 text-lg font-semibold text-white">{menuInsights?.worstSeller?.name ?? '--'}</p>
-                <p className="mt-1 text-sm text-slate-400">Sold: {menuInsights?.worstSeller?.quantitySold ?? '--'}</p>
-              </div>
-              <div className="rounded-3xl border border-white/10 bg-slate-950/70 p-5">
-                <p className="text-sm text-slate-400">Highest revenue item</p>
-                <p className="mt-2 text-lg font-semibold text-white">{menuInsights?.highestRevenueItem?.name ?? '--'}</p>
-                <p className="mt-1 text-sm text-slate-400">Revenue: ₹{menuInsights?.highestRevenueItem?.revenue.toFixed(2) ?? '--'}</p>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="rounded-3xl border border-white/10 bg-slate-950/70 p-5">
+                  <p className="text-sm text-slate-400">Highest revenue item</p>
+                  <p className="mt-2 text-lg font-semibold text-white">{menuInsights?.highestRevenueItem?.name ?? '--'}</p>
+                  <p className="mt-1 text-sm text-slate-400">Revenue: ₹{menuInsights?.highestRevenueItem?.revenue.toFixed(2) ?? '--'}</p>
+                </div>
+                <div className="rounded-3xl border border-white/10 bg-slate-950/70 p-5">
+                  <p className="text-sm text-slate-400">Peak sales period</p>
+                  <p className="mt-2 text-lg font-semibold text-cyan-400">{menuInsights?.peakSalesPeriod ?? '--'}</p>
+                  <p className="mt-1 text-sm text-slate-400">Hour of maximum order volume</p>
+                </div>
               </div>
             </div>
           </div>

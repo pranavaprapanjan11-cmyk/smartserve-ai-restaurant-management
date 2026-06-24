@@ -10,23 +10,27 @@ export enum Role {
   WAITER = 'WAITER',
   KITCHEN_STAFF = 'KITCHEN_STAFF',
   CHEF = 'CHEF',
+  KITCHEN = 'KITCHEN',
+  EMPLOYEE = 'EMPLOYEE',
 }
 
 export function normalizeRole(role: string | undefined): Role | undefined {
   if (!role) return undefined;
-  if (role === Role.KITCHEN_STAFF || role === Role.CHEF) return Role.CHEF;
-  if (role === Role.RESTAURANT_OWNER || role === Role.OWNER) return Role.OWNER;
-  if (role === Role.SUPER_ADMIN) return Role.SUPER_ADMIN;
-  if (role === Role.MANAGER) return Role.MANAGER;
-  if (role === Role.CASHIER) return Role.CASHIER;
-  if (role === Role.WAITER) return Role.WAITER;
+  const upper = role.toUpperCase();
+  if (upper === 'RESTAURANT_OWNER' || upper === 'OWNER') return Role.OWNER;
+  if (upper === 'MANAGER') return Role.MANAGER;
+  if (upper === 'KITCHEN' || upper === 'CHEF' || upper === 'KITCHEN_STAFF') return Role.KITCHEN;
+  if (upper === 'WAITER') return Role.WAITER;
+  if (upper === 'CASHIER') return Role.CASHIER;
+  if (upper === 'EMPLOYEE') return Role.EMPLOYEE;
+  if (upper === 'SUPER_ADMIN') return Role.SUPER_ADMIN;
   return undefined;
 }
 
 export function storageRole(role: string | undefined): Role | undefined {
   const normalized = normalizeRole(role);
-  if (normalized === Role.CHEF) return Role.KITCHEN_STAFF;
-  if (normalized === Role.OWNER) return Role.RESTAURANT_OWNER;
+  if (normalized === Role.KITCHEN) return Role.KITCHEN;
+  if (normalized === Role.OWNER) return Role.OWNER;
   return normalized;
 }
 
@@ -35,6 +39,7 @@ export interface UserRecord {
   name: string;
   email: string;
   role: Role;
+  workspace_id?: string | null;
   created_at: string;
 }
 
@@ -43,6 +48,7 @@ export interface NewUserPayload {
   email: string;
   password: string;
   role: Role;
+  workspace_id?: string | null;
 }
 
 import { Request } from 'express';
@@ -54,5 +60,7 @@ export interface RequestWithUser extends Request<Record<string, unknown>, unknow
     id: string;
     role: Role;
     email?: string;
+    restaurantId?: string;
+    workspaceId?: string;
   };
 }

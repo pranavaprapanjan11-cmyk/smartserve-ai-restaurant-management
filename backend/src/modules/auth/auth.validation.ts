@@ -12,6 +12,9 @@ const registerSchema = Joi.object({
   role: Joi.string()
     .valid(...Object.values(Role))
     .required(),
+  workspaceName: Joi.string().allow('', null).optional(),
+  restaurantName: Joi.string().allow('', null).optional(),
+  workspaceCode: Joi.string().allow('', null).optional(),
 });
 
 const loginSchema = Joi.object({

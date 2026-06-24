@@ -51,12 +51,28 @@ export async function getSalesForecast(userId: string, role: string): Promise<Sa
   const predictedTomorrowRevenue = Math.max(0, averageDailyRevenue);
   const predictedWeeklyRevenue = Math.max(0, average(recentDaily) * 7);
 
+  // Compare first 7 days vs last 7 days to calculate trend
+  const firstWeekRevenue = daily.slice(0, 7).reduce((sum, row) => sum + row.revenue, 0);
+  const secondWeekRevenue = daily.slice(7, 14).reduce((sum, row) => sum + row.revenue, 0);
+  let revenueTrend = 'Stable';
+  if (firstWeekRevenue > 0) {
+    const change = ((secondWeekRevenue - firstWeekRevenue) / firstWeekRevenue) * 100;
+    if (change > 5) {
+      revenueTrend = `Increasing (+${change.toFixed(1)}%)`;
+    } else if (change < -5) {
+      revenueTrend = `Decreasing (${change.toFixed(1)}%)`;
+    }
+  } else if (secondWeekRevenue > 0) {
+    revenueTrend = 'Increasing (New Sales Activity)';
+  }
+
   return {
     todayRevenue,
     yesterdayRevenue,
     weeklyRevenue,
     predictedTomorrowRevenue: parseFloat(predictedTomorrowRevenue.toFixed(2)),
     predictedWeeklyRevenue: parseFloat(predictedWeeklyRevenue.toFixed(2)),
+    revenueTrend,
   };
 }
 
@@ -142,11 +158,30 @@ export async function getMenuInsights(userId: string, role: string): Promise<Men
     return highest;
   }, null as any);
 
+  // Peak sales period calculation
+  const peakHourRes = await pool.query(
+    `SELECT EXTRACT(HOUR FROM created_at) AS hour, COUNT(*) AS count
+     FROM orders
+     WHERE restaurant_id = $1
+     GROUP BY hour
+     ORDER BY count DESC
+     LIMIT 1`,
+    [restaurantId]
+  );
+  let peakSalesPeriod = 'No Orders Logged';
+  if (peakHourRes.rows.length > 0) {
+    const hr = safeNumber(peakHourRes.rows[0].hour);
+    const startStr = `${hr.toString().padStart(2, '0')}:00`;
+    const endStr = `${((hr + 1) % 24).toString().padStart(2, '0')}:00`;
+    peakSalesPeriod = `${startStr} - ${endStr}`;
+  }
+
   return {
     bestSeller,
     worstSeller,
     highestRevenueItem,
     totalQuantitySold,
+    peakSalesPeriod,
   };
 }
 
