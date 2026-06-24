@@ -179,8 +179,29 @@ export async function createOrder(
     }
 
     try {
-      const { notifyWorkspaceByRestaurantId } = require('../workspace/workspace.sse');
-      notifyWorkspaceByRestaurantId(restaurantId, 'ordersUpdated');
+      const { notifyWorkspace } = require('../workspace/workspace.sse');
+      let workspaceId = orderRecord.workspace_id;
+      if (!workspaceId) {
+        const { rows: userRows } = await client.query(
+          `SELECT workspace_id FROM users WHERE id = $1 LIMIT 1`,
+          [restaurantId]
+        );
+        workspaceId = userRows[0]?.workspace_id;
+      }
+      if (workspaceId) {
+        const fullOrder = {
+          ...orderRecord,
+          total_amount: parseFloat(orderRecord.total_amount),
+          items: insertedItems.map((item) => ({
+            ...item,
+            unit_price: parseFloat(item.unit_price as any),
+            subtotal: parseFloat(item.subtotal as any),
+          })),
+        };
+        console.log(`[ORDER CREATED]\n${orderRecord.id}\n${workspaceId}`);
+        notifyWorkspace(workspaceId, 'order_created', fullOrder);
+        notifyWorkspace(workspaceId, 'ordersUpdated', fullOrder);
+      }
     } catch (e) {
       console.error('Failed to notify workspace of order creation:', e);
     }
@@ -366,8 +387,36 @@ export async function updateOrderStatus(
   const { rows: itemsRows } = await pool.query(itemsSql, [orderId]);
 
   try {
-    const { notifyWorkspaceByRestaurantId } = require('../workspace/workspace.sse');
-    notifyWorkspaceByRestaurantId(restaurantId, 'ordersUpdated');
+    const { notifyWorkspace } = require('../workspace/workspace.sse');
+    let workspaceId = orderRecord.workspace_id;
+    if (!workspaceId) {
+      const { rows: userRows } = await pool.query(
+        `SELECT workspace_id FROM users WHERE id = $1 LIMIT 1`,
+        [restaurantId]
+      );
+      workspaceId = userRows[0]?.workspace_id;
+    }
+    if (workspaceId) {
+      const fullOrder = {
+        ...orderRecord,
+        total_amount: parseFloat(orderRecord.total_amount),
+        items: itemsRows.map((item: any) => ({
+          ...item,
+          unit_price: parseFloat(item.unit_price as any),
+          subtotal: parseFloat(item.subtotal as any),
+        })),
+      };
+      
+      let specificEvent = 'order_updated';
+      if (status === OrderStatus.PAID) {
+        specificEvent = 'order_completed';
+      } else if (status === OrderStatus.REFUNDED) {
+        specificEvent = 'order_cancelled';
+      }
+
+      notifyWorkspace(workspaceId, specificEvent, fullOrder);
+      notifyWorkspace(workspaceId, 'ordersUpdated', fullOrder);
+    }
   } catch (e) {
     console.error('Failed to notify workspace of order status update:', e);
   }
@@ -401,8 +450,16 @@ export async function deleteOrder(
   }
 
   try {
-    const { notifyWorkspaceByRestaurantId } = require('../workspace/workspace.sse');
-    notifyWorkspaceByRestaurantId(restaurantId, 'ordersUpdated');
+    const { notifyWorkspace } = require('../workspace/workspace.sse');
+    const { rows: userRows } = await pool.query(
+      `SELECT workspace_id FROM users WHERE id = $1 LIMIT 1`,
+      [restaurantId]
+    );
+    const workspaceId = userRows[0]?.workspace_id;
+    if (workspaceId) {
+      notifyWorkspace(workspaceId, 'order_cancelled', { id: orderId });
+      notifyWorkspace(workspaceId, 'ordersUpdated', { id: orderId });
+    }
   } catch (e) {
     console.error('Failed to notify workspace of order deletion:', e);
   }
@@ -528,16 +585,36 @@ export async function updateOrderItems(
 
     await client.query('COMMIT');
 
-    try {
-      const { notifyWorkspaceByRestaurantId } = require('../workspace/workspace.sse');
-      notifyWorkspaceByRestaurantId(restaurantId, 'ordersUpdated');
-    } catch (e) {
-      console.error('Failed to notify workspace of order items update:', e);
-    }
-
     // Return the updated order details
     const orderSql = `SELECT o.*, u.name as waiter_name FROM orders o LEFT JOIN users u ON o.waiter_id = u.id WHERE o.id = $1 LIMIT 1`;
     const { rows: orderRows } = await pool.query(orderSql, [orderId]);
+    const updatedOrder = {
+      ...orderRows[0],
+      total_amount: totalAmount,
+      items: insertedItems.map(item => ({
+        ...item,
+        unit_price: parseFloat(item.unit_price),
+        subtotal: parseFloat(item.subtotal),
+      }))
+    };
+
+    try {
+      const { notifyWorkspace } = require('../workspace/workspace.sse');
+      let workspaceId = orderRows[0]?.workspace_id;
+      if (!workspaceId) {
+        const { rows: userRows } = await pool.query(
+          `SELECT workspace_id FROM users WHERE id = $1 LIMIT 1`,
+          [restaurantId]
+        );
+        workspaceId = userRows[0]?.workspace_id;
+      }
+      if (workspaceId) {
+        notifyWorkspace(workspaceId, 'order_updated', updatedOrder);
+        notifyWorkspace(workspaceId, 'ordersUpdated', updatedOrder);
+      }
+    } catch (e) {
+      console.error('Failed to notify workspace of order items update:', e);
+    }
     return {
       ...orderRows[0],
       total_amount: totalAmount,

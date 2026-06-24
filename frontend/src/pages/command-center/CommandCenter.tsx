@@ -8,7 +8,7 @@ import * as tableService from '../../services/tableService'
 import * as inventoryService from '../../services/inventoryService'
 
 const CommandCenter: React.FC = () => {
-  const { token } = useAuth()
+  const { token, sseActive } = useAuth()
   const navigate = useNavigate()
   const [stats, setStats] = useState<menuService.MenuStats | null>(null)
   const [orders, setOrders] = useState<orderService.Order[]>([])
@@ -17,9 +17,9 @@ const CommandCenter: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const loadData = async () => {
+    const loadData = async (showLoading = true) => {
       if (!token) return
-      setIsLoading(true)
+      if (showLoading) setIsLoading(true)
       try {
         const [statsData, ordersData, lowStockItems, tablesData] = await Promise.all([
           menuService.getMenuStats(token),
@@ -100,15 +100,30 @@ const CommandCenter: React.FC = () => {
       } catch (err) {
         console.error('Failed to load command center data', err)
       } finally {
-        setIsLoading(false)
+        if (showLoading) setIsLoading(false)
       }
     }
 
-    loadData()
-    const onOrdersUpdated = () => loadData()
+    loadData(true)
+    const onOrdersUpdated = () => loadData(false)
     window.addEventListener('ordersUpdated', onOrdersUpdated)
-    return () => window.removeEventListener('ordersUpdated', onOrdersUpdated)
-  }, [token])
+    window.addEventListener('order_created', onOrdersUpdated)
+    window.addEventListener('order_updated', onOrdersUpdated)
+    window.addEventListener('order_completed', onOrdersUpdated)
+    window.addEventListener('order_cancelled', onOrdersUpdated)
+
+    const pollInterval = sseActive ? 10000 : 2000
+    const iv = setInterval(() => loadData(false), pollInterval)
+
+    return () => {
+      window.removeEventListener('ordersUpdated', onOrdersUpdated)
+      window.removeEventListener('order_created', onOrdersUpdated)
+      window.removeEventListener('order_updated', onOrdersUpdated)
+      window.removeEventListener('order_completed', onOrdersUpdated)
+      window.removeEventListener('order_cancelled', onOrdersUpdated)
+      clearInterval(iv)
+    }
+  }, [token, sseActive])
 
   const activeOrdersCount = orders.filter(o => o.status !== orderService.OrderStatus.PAID).length
   const preparingOrdersCount = orders.filter(

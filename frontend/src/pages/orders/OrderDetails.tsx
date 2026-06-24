@@ -33,7 +33,7 @@ const STATUS_LABELS: { [key in orderService.OrderStatus]: string } = {
 const OrderDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { token, sseActive } = useAuth();
   
   const [order, setOrder] = useState<orderService.Order | null>(null);
   const [loading, setLoading] = useState(true);
@@ -41,10 +41,10 @@ const OrderDetails: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchOrderDetails = async () => {
+    const fetchOrderDetails = async (showLoading = true) => {
       if (!token || !id) return;
       try {
-        setLoading(true);
+        if (showLoading) setLoading(true);
         const data = await orderService.getOrderById(id, token);
         setOrder(data);
         setError(null);
@@ -52,12 +52,41 @@ const OrderDetails: React.FC = () => {
         console.error('Failed to load order:', err);
         setError('Failed to fetch order details. It might have been deleted.');
       } finally {
-        setLoading(false);
+        if (showLoading) setLoading(false);
       }
     };
 
-    fetchOrderDetails();
-  }, [token, id]);
+    fetchOrderDetails(true);
+
+    const onUpdate = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      if (customEvent.type === 'order_cancelled' && customEvent.detail?.id === id) {
+        navigate('/waiter/dashboard');
+        return;
+      }
+      if (customEvent.type === 'ordersUpdated' || !customEvent.detail || customEvent.detail.id === id) {
+        fetchOrderDetails(false);
+      }
+    };
+
+    window.addEventListener('ordersUpdated', onUpdate);
+    window.addEventListener('order_created', onUpdate);
+    window.addEventListener('order_updated', onUpdate);
+    window.addEventListener('order_completed', onUpdate);
+    window.addEventListener('order_cancelled', onUpdate);
+
+    const pollInterval = sseActive ? 10000 : 2000;
+    const iv = setInterval(() => fetchOrderDetails(false), pollInterval);
+
+    return () => {
+      window.removeEventListener('ordersUpdated', onUpdate);
+      window.removeEventListener('order_created', onUpdate);
+      window.removeEventListener('order_updated', onUpdate);
+      window.removeEventListener('order_completed', onUpdate);
+      window.removeEventListener('order_cancelled', onUpdate);
+      clearInterval(iv);
+    };
+  }, [token, id, navigate, sseActive]);
 
   const handleUpdateStatus = async (newStatus: orderService.OrderStatus) => {
     if (!token || !id) return;

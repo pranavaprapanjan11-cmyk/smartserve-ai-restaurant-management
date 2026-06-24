@@ -7,9 +7,10 @@ type Props = {
   onAction: (order: orderService.Order) => void;
   onRemake: (orderId: string, itemId: string, reason: string) => void;
   columnType: 'NEW' | 'COOKING' | 'READY';
+  isNew?: boolean;
 };
 
-const OrderCard: React.FC<Props> = ({ order, onAction, onRemake, columnType }) => {
+const OrderCard: React.FC<Props> = ({ order, onAction, onRemake, columnType, isNew }) => {
   // Format the creation time to local time (e.g. "12:35 PM")
   const formatTime = (dateStr: string) => {
     try {
@@ -57,7 +58,20 @@ const OrderCard: React.FC<Props> = ({ order, onAction, onRemake, columnType }) =
     <motion.div
       layout
       initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
+      animate={isNew ? {
+        opacity: 1,
+        scale: 1,
+        borderColor: ["rgba(56, 189, 248, 0.2)", "rgba(56, 189, 248, 0.9)", "rgba(56, 189, 248, 0.2)"],
+        boxShadow: [
+          "0 0 15px rgba(56,189,248,0.05)",
+          "0 0 25px rgba(56,189,248,0.35)",
+          "0 0 15px rgba(56,189,248,0.05)"
+        ],
+        transition: {
+          repeat: Infinity,
+          duration: 1.5
+        }
+      } : { opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.2 }}
       className={`relative overflow-hidden rounded-3xl border bg-white/[0.02] backdrop-blur-md p-5 ${config.glow} transition-colors duration-300`}
@@ -69,7 +83,14 @@ const OrderCard: React.FC<Props> = ({ order, onAction, onRemake, columnType }) =
       <div className="flex items-center justify-between">
         <div>
           <span className="text-xs font-semibold tracking-wider text-slate-400 uppercase">Order ID</span>
-          <h4 className="text-lg font-bold text-white">#{shortId}</h4>
+          <h4 className="text-lg font-bold text-white flex items-center gap-2">
+            #{shortId}
+            {isNew && (
+              <span className="inline-flex items-center rounded-full bg-cyan-400/20 px-2.5 py-0.5 text-xs font-bold text-cyan-300 animate-pulse ring-1 ring-cyan-400/30">
+                NEW
+              </span>
+            )}
+          </h4>
         </div>
         <div className="text-right">
           <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset ${config.badge}`}>

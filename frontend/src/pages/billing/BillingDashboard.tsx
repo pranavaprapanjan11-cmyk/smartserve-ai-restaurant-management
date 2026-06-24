@@ -22,7 +22,7 @@ const defaultBillingTemplate = {
 }
 
 const BillingDashboard: React.FC = () => {
-  const { token } = useAuth()
+  const { token, sseActive } = useAuth()
   const navigate = useNavigate()
 
   // State
@@ -39,9 +39,9 @@ const BillingDashboard: React.FC = () => {
   const [reprintMessage, setReprintMessage] = useState('')
 
   // Load all dashboard metrics
-  const loadDashboardData = async () => {
+  const loadDashboardData = async (showLoading = true) => {
     if (!token) return
-    setLoading(true)
+    if (showLoading) setLoading(true)
     setError(null)
     try {
       const [met, invs, pays, ords] = await Promise.all([
@@ -58,13 +58,33 @@ const BillingDashboard: React.FC = () => {
       console.error(err)
       setError(err?.response?.data?.message || 'Failed to load dashboard billing details.')
     } finally {
-      setLoading(false)
+      if (showLoading) setLoading(false)
     }
   }
 
   useEffect(() => {
-    loadDashboardData()
-  }, [token])
+    loadDashboardData(true)
+
+    const onUpdate = () => loadDashboardData(false)
+
+    window.addEventListener('ordersUpdated', onUpdate)
+    window.addEventListener('order_created', onUpdate)
+    window.addEventListener('order_updated', onUpdate)
+    window.addEventListener('order_completed', onUpdate)
+    window.addEventListener('order_cancelled', onUpdate)
+
+    const pollInterval = sseActive ? 10000 : 2000
+    const iv = setInterval(onUpdate, pollInterval)
+
+    return () => {
+      window.removeEventListener('ordersUpdated', onUpdate)
+      window.removeEventListener('order_created', onUpdate)
+      window.removeEventListener('order_updated', onUpdate)
+      window.removeEventListener('order_completed', onUpdate)
+      window.removeEventListener('order_cancelled', onUpdate)
+      clearInterval(iv)
+    }
+  }, [token, sseActive])
 
   // Compute daily totals and payment method breakdowns dynamically from payments
   const revenueBreakdown = useMemo(() => {

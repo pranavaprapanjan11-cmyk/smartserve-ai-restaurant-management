@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import * as kitchenService from '../../services/kitchenService';
@@ -46,42 +46,116 @@ const EmptyColumnState: React.FC<{ type: 'NEW' | 'COOKING' | 'READY' }> = ({ typ
   );
 };
 
+const playNotificationSound = () => {
+  try {
+    const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const playChime = (time: number, freq: number, duration: number) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, time);
+      
+      gain.gain.setValueAtTime(0, time);
+      gain.gain.linearRampToValueAtTime(0.3, time + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + duration);
+      
+      osc.start(time);
+      osc.stop(time + duration);
+    };
+    
+    const now = audioCtx.currentTime;
+    playChime(now, 587.33, 0.4);
+    playChime(now + 0.15, 880, 0.5);
+  } catch (e) {
+    console.error('Failed to play notification sound', e);
+  }
+};
+
 const KitchenDashboard: React.FC = () => {
-  const { token } = useAuth();
+  const { token, sseActive } = useAuth();
   const [loading, setLoading] = useState(true);
   const [newOrders, setNewOrders] = useState<any[]>([]);
   const [preparing, setPreparing] = useState<any[]>([]);
   const [ready, setReady] = useState<any[]>([]);
   const [lastUpdated, setLastUpdated] = useState<string>('');
+  const [highlightedOrderIds, setHighlightedOrderIds] = useState<string[]>([]);
+  const prevOrderIdsRef = useRef<Set<string>>(new Set());
+  const isFirstLoadRef = useRef<boolean>(true);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (showLoading = true) => {
     if (!token) return;
-    setLoading(true);
+    if (showLoading) setLoading(true);
     try {
       const res = await kitchenService.getKitchenOrders(token);
-      setNewOrders(res.newOrders || []);
-      setPreparing(res.preparing || []);
-      setReady(res.ready || []);
+      const incomingNewOrders = res.newOrders || [];
+      const incomingPreparing = res.preparing || [];
+      const incomingReady = res.ready || [];
+
+      const currentIncomingIds = new Set([
+        ...incomingNewOrders.map((o: any) => o.id),
+        ...incomingPreparing.map((o: any) => o.id),
+        ...incomingReady.map((o: any) => o.id)
+      ]);
+
+      if (!isFirstLoadRef.current) {
+        const newlyArrivedIds: string[] = [];
+        incomingNewOrders.forEach((o: any) => {
+          if (!prevOrderIdsRef.current.has(o.id)) {
+            newlyArrivedIds.push(o.id);
+          }
+        });
+
+        if (newlyArrivedIds.length > 0) {
+          playNotificationSound();
+          setHighlightedOrderIds((prev) => [...prev, ...newlyArrivedIds]);
+          
+          setTimeout(() => {
+            setHighlightedOrderIds((prev) => prev.filter((id) => !newlyArrivedIds.includes(id)));
+          }, 8000);
+        }
+      } else {
+        isFirstLoadRef.current = false;
+      }
+
+      prevOrderIdsRef.current = currentIncomingIds;
+
+      setNewOrders(incomingNewOrders);
+      setPreparing(incomingPreparing);
+      setReady(incomingReady);
       
       const now = new Date();
       setLastUpdated(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
     } catch (err) {
       console.error('Failed to load kitchen orders', err);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   }, [token]);
 
   useEffect(() => {
-    load();
-    const onUpdate = () => load();
+    load(true);
+    const onUpdate = () => load(false);
     window.addEventListener('ordersUpdated', onUpdate);
-    const iv = setInterval(load, 10000);
+    window.addEventListener('order_created', onUpdate);
+    window.addEventListener('order_updated', onUpdate);
+    window.addEventListener('order_completed', onUpdate);
+    window.addEventListener('order_cancelled', onUpdate);
+
+    const pollInterval = sseActive ? 10000 : 2000;
+    const iv = setInterval(() => load(false), pollInterval);
+
     return () => {
       window.removeEventListener('ordersUpdated', onUpdate);
+      window.removeEventListener('order_created', onUpdate);
+      window.removeEventListener('order_updated', onUpdate);
+      window.removeEventListener('order_completed', onUpdate);
+      window.removeEventListener('order_cancelled', onUpdate);
       clearInterval(iv);
     };
-  }, [load]);
+  }, [load, sseActive]);
 
   const handleAction = async (order: any) => {
     if (!token) return;
@@ -175,7 +249,7 @@ const KitchenDashboard: React.FC = () => {
                 ) : (
                   <AnimatePresence mode="popLayout">
                     {newOrders.map((o) => (
-                      <OrderCard key={o.id} order={o} onAction={handleAction} onRemake={handleRemake} columnType="NEW" />
+                      <OrderCard key={o.id} order={o} onAction={handleAction} onRemake={handleRemake} columnType="NEW" isNew={highlightedOrderIds.includes(o.id)} />
                     ))}
                   </AnimatePresence>
                 )}
@@ -199,7 +273,7 @@ const KitchenDashboard: React.FC = () => {
                 ) : (
                   <AnimatePresence mode="popLayout">
                     {preparing.map((o) => (
-                      <OrderCard key={o.id} order={o} onAction={handleAction} onRemake={handleRemake} columnType="COOKING" />
+                      <OrderCard key={o.id} order={o} onAction={handleAction} onRemake={handleRemake} columnType="COOKING" isNew={highlightedOrderIds.includes(o.id)} />
                     ))}
                   </AnimatePresence>
                 )}
@@ -223,7 +297,7 @@ const KitchenDashboard: React.FC = () => {
                 ) : (
                   <AnimatePresence mode="popLayout">
                     {ready.map((o) => (
-                      <OrderCard key={o.id} order={o} onAction={handleAction} onRemake={handleRemake} columnType="READY" />
+                      <OrderCard key={o.id} order={o} onAction={handleAction} onRemake={handleRemake} columnType="READY" isNew={highlightedOrderIds.includes(o.id)} />
                     ))}
                   </AnimatePresence>
                 )}

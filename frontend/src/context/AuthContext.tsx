@@ -28,6 +28,7 @@ type AuthContextValue = {
   user: User | null;
   token: string | null;
   loading: boolean;
+  sseActive: boolean;
   login: (email: string, password: string, workspaceCode?: string) => Promise<void>;
   register: (payload: any) => Promise<void>;
   logout: () => void;
@@ -39,6 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sseActive, setSseActive] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -77,48 +79,92 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    if (!token || !user?.workspace_id) return;
-    
-    const sseUrl = `${API_BASE}/workspace/updates?token=${token}`;
-    console.log('Connecting to SSE Updates at:', sseUrl);
-    
-    let eventSource: EventSource | null = null;
-    try {
-      eventSource = new EventSource(sseUrl);
-      
-      eventSource.onmessage = (event) => {
-        try {
-          const payload = JSON.parse(event.data);
-          console.log('SSE update received:', payload.type, payload.data);
-          
-          window.dispatchEvent(new CustomEvent(payload.type, { detail: payload.data }));
-          
-          if (payload.type === 'ordersUpdated') {
-            window.dispatchEvent(new CustomEvent('ordersUpdated'));
-          } else if (payload.type === 'tablesUpdated') {
-            window.dispatchEvent(new CustomEvent('tablesUpdated'));
-          } else if (payload.type === 'reservationsUpdated') {
-            window.dispatchEvent(new CustomEvent('reservationsUpdated'));
-          } else if (payload.type === 'employeesUpdated') {
-            window.dispatchEvent(new CustomEvent('employeesUpdated'));
-          } else if (payload.type === 'inventoryUpdated') {
-            window.dispatchEvent(new CustomEvent('inventoryUpdated'));
-          }
-        } catch (e) {
-          // ignore heartbeats
-        }
-      };
-
-      eventSource.onerror = (err) => {
-        console.error('SSE EventSource error:', err);
-      };
-    } catch (err) {
-      console.error('Failed to create EventSource:', err);
+    if (!token || !user?.workspace_id) {
+      setSseActive(false);
+      return;
     }
     
+    let eventSource: EventSource | null = null;
+    let reconnectTimeout: any = null;
+    let reconnectDelay = 1000;
+    let active = true;
+
+    const connect = () => {
+      if (!active) return;
+      const sseUrl = `${API_BASE}/workspace/updates?token=${token}`;
+      console.log('Connecting to SSE Updates at:', sseUrl);
+      
+      try {
+        eventSource = new EventSource(sseUrl);
+        
+        eventSource.onopen = () => {
+          console.log('SSE connection opened successfully');
+          setSseActive(true);
+          reconnectDelay = 1000;
+        };
+
+        eventSource.onmessage = (event) => {
+          try {
+            const payload = JSON.parse(event.data);
+            console.log('SSE update received:', payload.type, payload.data);
+            console.log(`[SSE RECEIVED]\n${payload.type}\n${user?.workspace_id || 'unknown'}`);
+            
+            setSseActive(true);
+            window.dispatchEvent(new CustomEvent(payload.type, { detail: payload.data }));
+            
+            if (
+              payload.type === 'ordersUpdated' ||
+              payload.type === 'order_created' ||
+              payload.type === 'order_updated' ||
+              payload.type === 'order_completed' ||
+              payload.type === 'order_cancelled'
+            ) {
+              window.dispatchEvent(new CustomEvent('ordersUpdated'));
+            } else if (payload.type === 'tablesUpdated') {
+              window.dispatchEvent(new CustomEvent('tablesUpdated'));
+            } else if (payload.type === 'reservationsUpdated') {
+              window.dispatchEvent(new CustomEvent('reservationsUpdated'));
+            } else if (payload.type === 'employeesUpdated') {
+              window.dispatchEvent(new CustomEvent('employeesUpdated'));
+            } else if (payload.type === 'inventoryUpdated') {
+              window.dispatchEvent(new CustomEvent('inventoryUpdated'));
+            }
+          } catch (e) {
+            // ignore heartbeats
+          }
+        };
+
+        eventSource.onerror = (err) => {
+          console.error('SSE EventSource error, scheduling reconnect:', err);
+          setSseActive(false);
+          if (eventSource) {
+            eventSource.close();
+          }
+          if (active) {
+            reconnectTimeout = setTimeout(() => {
+              reconnectDelay = Math.min(reconnectDelay * 2, 30000);
+              connect();
+            }, reconnectDelay);
+          }
+        };
+      } catch (err) {
+        console.error('Failed to create EventSource:', err);
+        setSseActive(false);
+        if (active) {
+          reconnectTimeout = setTimeout(connect, 5000);
+        }
+      }
+    };
+
+    connect();
+    
     return () => {
+      active = false;
       if (eventSource) {
         eventSource.close();
+      }
+      if (reconnectTimeout) {
+        clearTimeout(reconnectTimeout);
       }
     };
   }, [token, user?.workspace_id]);
@@ -132,7 +178,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, sseActive, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

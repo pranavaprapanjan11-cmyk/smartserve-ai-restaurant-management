@@ -19,16 +19,16 @@ interface Table {
 
 const WaiterDashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { token, sseActive } = useAuth();
   const [tables, setTables] = useState<Table[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchOrdersAndBuildTables = async () => {
+    const fetchOrdersAndBuildTables = async (showLoading = true) => {
       if (!token) return;
       try {
-        setLoading(true);
+        if (showLoading) setLoading(true);
         const orders = await orderService.getOrders(token);
 
         // Find the latest active order for each table
@@ -77,12 +77,32 @@ const WaiterDashboard: React.FC = () => {
         console.error('Error fetching orders:', err);
         setError('Failed to load table statuses');
       } finally {
-        setLoading(false);
+        if (showLoading) setLoading(false);
       }
     };
 
-    fetchOrdersAndBuildTables();
-  }, [token]);
+    fetchOrdersAndBuildTables(true);
+
+    const onUpdate = () => fetchOrdersAndBuildTables(false);
+
+    window.addEventListener('ordersUpdated', onUpdate);
+    window.addEventListener('order_created', onUpdate);
+    window.addEventListener('order_updated', onUpdate);
+    window.addEventListener('order_completed', onUpdate);
+    window.addEventListener('order_cancelled', onUpdate);
+
+    const pollInterval = sseActive ? 10000 : 2000;
+    const iv = setInterval(() => fetchOrdersAndBuildTables(false), pollInterval);
+
+    return () => {
+      window.removeEventListener('ordersUpdated', onUpdate);
+      window.removeEventListener('order_created', onUpdate);
+      window.removeEventListener('order_updated', onUpdate);
+      window.removeEventListener('order_completed', onUpdate);
+      window.removeEventListener('order_cancelled', onUpdate);
+      clearInterval(iv);
+    };
+  }, [token, sseActive]);
 
   const handleTableClick = (table: Table) => {
     if (table.orderId) {

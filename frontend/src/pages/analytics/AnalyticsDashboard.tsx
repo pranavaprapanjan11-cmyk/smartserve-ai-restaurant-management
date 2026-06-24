@@ -27,7 +27,7 @@ const inventoryCards = [
 ];
 
 const AnalyticsDashboard: React.FC = () => {
-  const { token } = useAuth();
+  const { token, sseActive } = useAuth();
   const [dashboard, setDashboard] = useState<AnalyticsDashboardModel | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -45,7 +45,29 @@ const AnalyticsDashboard: React.FC = () => {
     };
 
     load();
-  }, [token]);
+
+    const onUpdate = () => {
+      load();
+    };
+
+    window.addEventListener('ordersUpdated', onUpdate);
+    window.addEventListener('order_created', onUpdate);
+    window.addEventListener('order_updated', onUpdate);
+    window.addEventListener('order_completed', onUpdate);
+    window.addEventListener('order_cancelled', onUpdate);
+
+    const pollInterval = sseActive ? 10000 : 2000;
+    const iv = setInterval(onUpdate, pollInterval);
+
+    return () => {
+      window.removeEventListener('ordersUpdated', onUpdate);
+      window.removeEventListener('order_created', onUpdate);
+      window.removeEventListener('order_updated', onUpdate);
+      window.removeEventListener('order_completed', onUpdate);
+      window.removeEventListener('order_cancelled', onUpdate);
+      clearInterval(iv);
+    };
+  }, [token, sseActive]);
 
   const healthBadge = useMemo(() => {
     if (!dashboard) return 'Loading';
