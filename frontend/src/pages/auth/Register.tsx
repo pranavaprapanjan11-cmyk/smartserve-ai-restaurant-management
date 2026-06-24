@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
+import axios from 'axios';
+import { API_BASE } from '../../config';
 
 const roles = [
   'OWNER',
@@ -13,15 +15,52 @@ const roles = [
 
 const Register: React.FC = () => {
   const { register } = useAuth();
+  const [searchParams] = useSearchParams();
+  const urlWorkspaceCode = searchParams.get('workspace') || '';
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState(roles[3]); // Default to WAITER
   const [workspaceName, setWorkspaceName] = useState('');
   const [restaurantName, setRestaurantName] = useState('');
-  const [workspaceCode, setWorkspaceCode] = useState('');
+  const [workspaceCode, setWorkspaceCode] = useState(urlWorkspaceCode);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const [workspacePreview, setWorkspacePreview] = useState<{ workspace_name: string; owner_name: string } | null>(null);
+  const [checkingCode, setCheckingCode] = useState(false);
+  const [codeValid, setCodeValid] = useState(false);
+
+  useEffect(() => {
+    if (role === 'OWNER') {
+      setCodeValid(true);
+      setWorkspacePreview(null);
+      return;
+    }
+
+    if (!workspaceCode || workspaceCode.trim().length < 4) {
+      setCodeValid(false);
+      setWorkspacePreview(null);
+      return;
+    }
+
+    const delayDebounceFn = setTimeout(async () => {
+      setCheckingCode(true);
+      try {
+        const res = await axios.get(`${API_BASE}/workspace/by-code/${workspaceCode.trim()}`);
+        setWorkspacePreview(res.data);
+        setCodeValid(true);
+      } catch (err) {
+        setWorkspacePreview(null);
+        setCodeValid(false);
+      } finally {
+        setCheckingCode(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [workspaceCode, role]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -153,13 +192,31 @@ const Register: React.FC = () => {
                   placeholder="e.g. ANNAM7821"
                 />
                 <p className="mt-1.5 text-xs text-slate-400">Ask your workspace owner for their 9-digit code.</p>
+
+                {checkingCode && (
+                  <p className="mt-2 text-xs text-cyan-400 animate-pulse">Verifying workspace code...</p>
+                )}
+
+                {!checkingCode && codeValid && workspacePreview && (
+                  <div className="mt-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-3.5 text-xs text-emerald-400 animate-[bounce_0.2s_1]">
+                    <p className="font-bold">✓ Workspace Found</p>
+                    <p className="mt-1 font-semibold text-white">Restaurant: {workspacePreview.workspace_name.replace("'s Workspace", "")}</p>
+                    <p className="text-slate-400">Owner: {workspacePreview.owner_name}</p>
+                  </div>
+                )}
+
+                {!checkingCode && workspaceCode && !codeValid && (
+                  <div className="mt-3 rounded-2xl border border-red-500/20 bg-red-500/10 p-3.5 text-xs text-red-400">
+                    ✗ Workspace not found. Please check the code.
+                  </div>
+                )}
               </div>
             </div>
           )}
 
           <div className="pt-2">
             <button
-              disabled={loading}
+              disabled={loading || (role !== 'OWNER' && !codeValid)}
               className="w-full rounded-2xl bg-cyan-500 py-3 text-sm font-semibold text-white transition hover:bg-cyan-600 focus:outline-none disabled:opacity-50"
             >
               {loading ? 'Registering...' : 'Register Account'}

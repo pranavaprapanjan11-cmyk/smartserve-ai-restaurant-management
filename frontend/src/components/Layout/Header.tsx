@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import ThemeSwitcher from './ThemeSwitcher'
+import axios from 'axios'
+import { API_BASE } from '../../config'
 
 interface HeaderProps {
   onToggleSidebar: () => void
@@ -17,11 +19,37 @@ interface NotificationItem {
 }
 
 const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
-  const { user, logout } = useAuth()
+  const { user, token, logout } = useAuth()
   const location = useLocation()
   const [profileOpen, setProfileOpen] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [bellShaking, setBellShaking] = useState(false)
+  
+  const [workspaceInfo, setWorkspaceInfo] = useState<{ code: string; name: string } | null>(null)
+
+  useEffect(() => {
+    if (token) {
+      axios.get(`${API_BASE}/workspace/current`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then(res => {
+        setWorkspaceInfo({
+          code: res.data.workspace_code,
+          name: res.data.workspace_name
+        })
+      })
+      .catch(err => {
+        if (user?.workspace_code) {
+          setWorkspaceInfo({
+            code: user.workspace_code,
+            name: ''
+          })
+        }
+      })
+    } else {
+      setWorkspaceInfo(null)
+    }
+  }, [token, user?.workspace_code])
   
   const [notifications, setNotifications] = useState<NotificationItem[]>([
     { id: '1', title: 'New kitchen SOP update', subtitle: 'Check prep workflow for tonight service.', time: '10m ago', unread: true },
@@ -134,6 +162,18 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
             <span className="ml-2 text-2xs text-slate-400 font-medium tracking-wider uppercase opacity-80">(Restaurant OS)</span>
           </div>
         </div>
+
+        {workspaceInfo && (
+          <div className="hidden lg:flex items-center gap-2 border-l border-white/10 pl-3">
+            <span className="text-2xs font-semibold uppercase tracking-wider text-slate-500">Workspace:</span>
+            <span className="text-xs font-bold text-cyan-400 font-mono bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 rounded">{workspaceInfo.code}</span>
+            {workspaceInfo.name && (
+              <span className="text-xs text-slate-400 max-w-[120px] truncate" title={workspaceInfo.name}>
+                ({workspaceInfo.name.replace("'s Workspace", "")})
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Center: Dynamic Current Page Title */}

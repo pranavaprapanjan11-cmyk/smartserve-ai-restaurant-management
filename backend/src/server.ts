@@ -19,6 +19,7 @@ import employeesRouter from './modules/employees/employees.controller';
 import tablesRouter from './modules/tables/tables.routes';
 import aiOperationsRouter from './modules/ai-operations/aiOperations.routes';
 import crmRouter from './modules/crm/crm.routes';
+import workspaceRouter from './modules/workspace/workspace.routes';
 
 const app = express();
 app.use(cors());
@@ -66,6 +67,9 @@ app.use('/api/ai-operations', aiOperationsRouter);
 
 // Mount CRM routes
 app.use('/api/crm', crmRouter);
+
+// Mount Workspace routes
+app.use('/api/workspace', workspaceRouter);
 
 import { sseHandler } from './modules/workspace/workspace.sse';
 
