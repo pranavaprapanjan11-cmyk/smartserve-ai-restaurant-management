@@ -75,7 +75,7 @@ const playNotificationSound = () => {
 };
 
 const KitchenDashboard: React.FC = () => {
-  const { token, sseActive } = useAuth();
+  const { token, sseActive, user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [newOrders, setNewOrders] = useState<any[]>([]);
   const [preparing, setPreparing] = useState<any[]>([]);
@@ -84,6 +84,24 @@ const KitchenDashboard: React.FC = () => {
   const [highlightedOrderIds, setHighlightedOrderIds] = useState<string[]>([]);
   const prevOrderIdsRef = useRef<Set<string>>(new Set());
   const isFirstLoadRef = useRef<boolean>(true);
+  const newOrdersEndRef = useRef<HTMLDivElement>(null);
+
+  // SSE connection status logging
+  useEffect(() => {
+    if (sseActive && user) {
+      console.log('Kitchen SSE Connected');
+      console.log('Workspace ID:', user.workspace_id);
+      console.log('User Role:', user.role);
+      console.log('Connection Status:', sseActive ? 'Connected' : 'Disconnected');
+    }
+  }, [sseActive, user]);
+
+  // Scroll to newest order in NEW ORDERS column
+  useEffect(() => {
+    if (newOrdersEndRef.current) {
+      newOrdersEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [newOrders.length]);
 
   const load = useCallback(async (showLoading = true) => {
     if (!token) return;
@@ -137,25 +155,134 @@ const KitchenDashboard: React.FC = () => {
 
   useEffect(() => {
     load(true);
+    
     const onUpdate = () => load(false);
+
+    const handleOrderCreated = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const order = customEvent.detail;
+      if (!order) return;
+
+      console.log('Kitchen received order_created event:', order);
+
+      // Verify role filtering
+      const isKitchenUser = user && (
+        user.role === 'KITCHEN' ||
+        user.role === 'CHEF' ||
+        user.role === 'KITCHEN_STAFF' ||
+        user.role?.toUpperCase() === 'CHEF' ||
+        user.role?.toUpperCase() === 'KITCHEN' ||
+        user.role?.toUpperCase() === 'KITCHEN_STAFF'
+      );
+
+      if (!isKitchenUser) {
+        console.warn(`User role is not KITCHEN or CHEF. Skipping order_created event.`);
+        return;
+      }
+
+      // Verify workspace matching
+      const userWsId = user?.workspace_id;
+      const orderWsId = order.workspace_id || order.workspaceId;
+      if (!userWsId || !orderWsId || userWsId !== orderWsId) {
+        console.warn('Workspace ID mismatch. Skipping order_created event.');
+        return;
+      }
+
+      // Process and update state immediately
+      const processOrder = (prev: any[]) => {
+        if (prev.some((o) => o.id === order.id)) return prev;
+
+        // Play chime and trigger flash
+        playNotificationSound();
+        setHighlightedOrderIds((hPrev) => {
+          if (hPrev.includes(order.id)) return hPrev;
+          return [...hPrev, order.id];
+        });
+        setTimeout(() => {
+          setHighlightedOrderIds((hPrev) => hPrev.filter((id) => id !== order.id));
+        }, 8000);
+
+        return [...prev, order];
+      };
+
+      if (order.status === 'NEW') {
+        setNewOrders((prev) => processOrder(prev));
+      } else if (order.status === 'PREPARING' || order.status === 'SENT_TO_KITCHEN') {
+        setPreparing((prev) => processOrder(prev));
+      } else if (order.status === 'READY') {
+        setReady((prev) => processOrder(prev));
+      }
+    };
+
+    const handleOrderUpdated = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const order = customEvent.detail;
+      if (!order) return;
+
+      console.log('Kitchen received order_updated event:', order);
+
+      // Verify workspace matching
+      const userWsId = user?.workspace_id;
+      const orderWsId = order.workspace_id || order.workspaceId;
+      if (!userWsId || !orderWsId || userWsId !== orderWsId) return;
+
+      // Remove from all queues
+      setNewOrders((prev) => prev.filter((o) => o.id !== order.id));
+      setPreparing((prev) => prev.filter((o) => o.id !== order.id));
+      setReady((prev) => prev.filter((o) => o.id !== order.id));
+
+      // Append to the correct column
+      if (order.status === 'NEW') {
+        setNewOrders((prev) => [...prev.filter((o) => o.id !== order.id), order]);
+      } else if (order.status === 'PREPARING' || order.status === 'SENT_TO_KITCHEN') {
+        setPreparing((prev) => [...prev.filter((o) => o.id !== order.id), order]);
+      } else if (order.status === 'READY') {
+        setReady((prev) => [...prev.filter((o) => o.id !== order.id), order]);
+      }
+    };
+
+    const handleOrderCompleted = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const data = customEvent.detail;
+      if (!data) return;
+      const orderId = data.id || data;
+
+      console.log('Kitchen received order_completed event for ID:', orderId);
+      setNewOrders((prev) => prev.filter((o) => o.id !== orderId));
+      setPreparing((prev) => prev.filter((o) => o.id !== orderId));
+      setReady((prev) => prev.filter((o) => o.id !== orderId));
+    };
+
+    const handleOrderCancelled = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const data = customEvent.detail;
+      if (!data) return;
+      const orderId = data.id || data;
+
+      console.log('Kitchen received order_cancelled event for ID:', orderId);
+      setNewOrders((prev) => prev.filter((o) => o.id !== orderId));
+      setPreparing((prev) => prev.filter((o) => o.id !== orderId));
+      setReady((prev) => prev.filter((o) => o.id !== orderId));
+    };
+
     window.addEventListener('ordersUpdated', onUpdate);
-    window.addEventListener('order_created', onUpdate);
-    window.addEventListener('order_updated', onUpdate);
-    window.addEventListener('order_completed', onUpdate);
-    window.addEventListener('order_cancelled', onUpdate);
+    window.addEventListener('order_created', handleOrderCreated);
+    window.addEventListener('order_updated', handleOrderUpdated);
+    window.addEventListener('order_completed', handleOrderCompleted);
+    window.addEventListener('order_cancelled', handleOrderCancelled);
 
     const pollInterval = sseActive ? 10000 : 2000;
     const iv = setInterval(() => load(false), pollInterval);
 
     return () => {
       window.removeEventListener('ordersUpdated', onUpdate);
-      window.removeEventListener('order_created', onUpdate);
-      window.removeEventListener('order_updated', onUpdate);
-      window.removeEventListener('order_completed', onUpdate);
-      window.removeEventListener('order_cancelled', onUpdate);
+      window.removeEventListener('order_created', handleOrderCreated);
+      window.removeEventListener('order_updated', handleOrderUpdated);
+      window.removeEventListener('order_completed', handleOrderCompleted);
+      window.removeEventListener('order_cancelled', handleOrderCancelled);
       clearInterval(iv);
     };
-  }, [load, sseActive]);
+  }, [load, sseActive, user]);
 
   const handleAction = async (order: any) => {
     if (!token) return;
@@ -247,11 +374,14 @@ const KitchenDashboard: React.FC = () => {
                 ) : newOrders.length === 0 ? (
                   <EmptyColumnState type="NEW" />
                 ) : (
-                  <AnimatePresence mode="popLayout">
-                    {newOrders.map((o) => (
-                      <OrderCard key={o.id} order={o} onAction={handleAction} onRemake={handleRemake} columnType="NEW" isNew={highlightedOrderIds.includes(o.id)} />
-                    ))}
-                  </AnimatePresence>
+                  <>
+                    <AnimatePresence mode="popLayout">
+                      {newOrders.map((o) => (
+                        <OrderCard key={o.id} order={o} onAction={handleAction} onRemake={handleRemake} columnType="NEW" isNew={highlightedOrderIds.includes(o.id)} />
+                      ))}
+                    </AnimatePresence>
+                    <div ref={newOrdersEndRef} />
+                  </>
                 )}
               </div>
             </div>
