@@ -281,3 +281,241 @@ export async function getHealthScore(userId: string, role: string): Promise<Heal
 
   return { score: normalizedScore, status };
 }
+
+export async function getLiveContext(userId: string, role: string): Promise<any> {
+  const restaurantId = await getRestaurantId(userId, role);
+
+  const userWsRes = await pool.query(
+    'SELECT workspace_id FROM users WHERE id = $1 LIMIT 1',
+    [userId]
+  );
+  const workspaceId = userWsRes.rows[0]?.workspace_id;
+  if (!workspaceId) {
+    throw new Error('User does not belong to a workspace');
+  }
+
+  const [
+    workspaceRes,
+    ordersRes,
+    paymentsRes,
+    menuItemsRes,
+    categoriesRes,
+    inventoryRes,
+    reservationsRes,
+    employeesRes,
+    tablesRes,
+    crmRes,
+    recentOrdersRes
+  ] = await Promise.all([
+    pool.query('SELECT id, workspace_code, workspace_name, owner_id FROM workspaces WHERE id = $1', [workspaceId]),
+    pool.query('SELECT id, table_number, guest_count, status, total_amount, created_at FROM orders WHERE workspace_id = $1 AND created_at >= CURRENT_DATE', [workspaceId]),
+    pool.query('SELECT id, amount, payment_method, status FROM payments WHERE workspace_id = $1 AND status = \'PAID\' AND created_at >= CURRENT_DATE', [workspaceId]),
+    pool.query('SELECT id, name, price, is_available FROM menu_items WHERE workspace_id = $1', [workspaceId]),
+    pool.query('SELECT id, name FROM menu_categories WHERE workspace_id = $1', [workspaceId]),
+    pool.query('SELECT id, name, quantity_on_hand, reorder_threshold, unit FROM inventory_items WHERE workspace_id = $1', [workspaceId]),
+    pool.query('SELECT id, guest_count, reservation_date, reservation_time, status, requested_table FROM reservations WHERE workspace_id = $1 AND reservation_date = CURRENT_DATE', [workspaceId]),
+    pool.query('SELECT id, name, role, position FROM employees WHERE workspace_id = $1', [workspaceId]),
+    pool.query('SELECT id, table_number, capacity, status FROM restaurant_tables WHERE workspace_id = $1', [workspaceId]),
+    pool.query('SELECT id, name, email, reward_points FROM customers WHERE workspace_id = $1', [workspaceId]),
+    pool.query(`
+      SELECT o.id, o.table_number, o.guest_count, o.status, o.total_amount, o.created_at,
+             (SELECT json_agg(json_build_object('name', mi.name, 'quantity', oi.quantity)) 
+              FROM order_items oi 
+              JOIN menu_items mi ON oi.menu_item_id = mi.id 
+              WHERE oi.order_id = o.id) as items
+      FROM orders o
+      WHERE o.workspace_id = $1
+      ORDER BY o.created_at DESC
+      LIMIT 5
+    `, [workspaceId])
+  ]);
+
+  const workspace = workspaceRes.rows[0] || {};
+  const todayOrders = ordersRes.rows;
+  const todayRevenue = paymentsRes.rows.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
+  const menuItems = menuItemsRes.rows;
+  const categories = categoriesRes.rows;
+  const inventoryItems = inventoryRes.rows;
+  const todayReservations = reservationsRes.rows;
+  const employees = employeesRes.rows;
+  const tables = tablesRes.rows;
+  const customers = crmRes.rows;
+  const recentOrders = recentOrdersRes.rows;
+
+  const lowStockItems = inventoryItems.filter((i: any) => Number(i.quantity_on_hand) <= Number(i.reorder_threshold));
+  const activeTables = tables.filter((t: any) => t.status === 'OCCUPIED');
+  const pendingOrders = todayOrders.filter((o: any) => ['NEW', 'SENT_TO_KITCHEN', 'PREPARING'].includes(o.status));
+  const kitchenQueue = todayOrders.filter((o: any) => ['SENT_TO_KITCHEN', 'PREPARING', 'READY'].includes(o.status));
+
+  const metrics = {
+    today_revenue: todayRevenue,
+    today_orders_count: todayOrders.length,
+    active_orders_count: pendingOrders.length,
+    occupied_tables_count: activeTables.length,
+    low_stock_items_count: lowStockItems.length,
+    today_reservations_count: todayReservations.length,
+    total_customers_count: customers.length,
+    total_employees_count: employees.length
+  };
+
+  const now = new Date();
+
+  return {
+    workspace,
+    current_date: now.toISOString().split('T')[0],
+    current_time: now.toLocaleTimeString([], { hour12: false }),
+    dashboard_metrics: metrics,
+    orders: {
+      today_orders_count: todayOrders.length,
+      recent: recentOrders,
+      pending: pendingOrders,
+      kitchen_queue: kitchenQueue
+    },
+    revenue: {
+      today: todayRevenue,
+      payment_methods: paymentsRes.rows.reduce((acc: any, p: any) => {
+        acc[p.payment_method] = (acc[p.payment_method] || 0) + parseFloat(p.amount || 0);
+        return acc;
+      }, {})
+    },
+    menu: {
+      categories_count: categories.length,
+      items_count: menuItems.length,
+      categories: categories.map(c => c.name),
+      items: menuItems.slice(0, 30)
+    },
+    inventory: {
+      total_items_count: inventoryItems.length,
+      low_stock: lowStockItems,
+      all_items: inventoryItems.slice(0, 30)
+    },
+    reservations: {
+      today: todayReservations
+    },
+    employees: employees,
+    crm: {
+      total_customers: customers.length,
+      recent: customers.slice(0, 10)
+    },
+    active_tables: activeTables
+  };
+}
+
+export async function getChatResponse(
+  userId: string,
+  role: string,
+  message: string,
+  history: any[]
+): Promise<string> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error('GEMINI_API_KEY is not defined in environment variables');
+  }
+
+  const context = await getLiveContext(userId, role);
+
+  try {
+    const { GoogleGenerativeAI } = require('@google/generative-ai');
+    const genAI = new GoogleGenerativeAI(apiKey);
+    
+    let model;
+    try {
+      model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    } catch (e) {
+      model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    }
+
+    const systemInstruction = `
+You are the SmartServe-AI Assistant, a highly skilled restaurant management and business analyst AI.
+You have access to the current restaurant's live context data.
+
+Strict Guidelines:
+1. You must answer questions using ONLY the current workspace data provided in the context.
+2. Never leak or expose another workspace's information.
+3. If a question is about data not present in the context, tell the user that you don't have access to that information.
+4. Keep responses highly professional, clean, structured, and use Markdown for formatting (bold text, bullet points, code blocks where appropriate).
+5. Never invent or hallucinate metrics. If the revenue is 0, then it is 0.
+
+Live Context:
+${JSON.stringify(context, null, 2)}
+`;
+
+    const limitedHistory = history.slice(-10).map((h: any) => ({
+      role: h.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: h.text }]
+    }));
+
+    const chat = model.startChat({
+      history: limitedHistory,
+    });
+
+    const prompt = `${systemInstruction}\n\nUser Question: ${message}`;
+    const result = await chat.sendMessage(prompt);
+    return result.response.text();
+  } catch (err: any) {
+    console.error('Gemini API call failed:', err);
+    if (err?.status === 429 || err?.message?.includes('quota')) {
+      return 'AI Assistant is temporarily unavailable: API quota exceeded. Please try again later.';
+    }
+    return 'AI Assistant is temporarily unavailable.';
+  }
+}
+
+export async function getAiSummary(userId: string, role: string): Promise<string> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error('GEMINI_API_KEY is not defined');
+  }
+
+  const context = await getLiveContext(userId, role);
+
+  try {
+    const { GoogleGenerativeAI } = require('@google/generative-ai');
+    const genAI = new GoogleGenerativeAI(apiKey);
+    
+    let model;
+    try {
+      model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    } catch (e) {
+      model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    }
+
+    const prompt = `
+You are the SmartServe-AI Business Analyst. Generate a detailed "Daily Business Report" for this restaurant using ONLY the following live context data:
+
+Context:
+${JSON.stringify(context, null, 2)}
+
+Requirements:
+Generate a structured report in Markdown. Include sections for:
+1. Executive Summary: High-level overview of today's performance.
+2. Financials: Revenue totals and breakdown by payment method.
+3. Operations: Orders count, active orders, and table occupancy.
+4. Inventory Alert: Low stock items, reorder suggestions.
+5. Reservation Summary: Today's guest reservations.
+6. Employee & CRM: Active employee count, customer highlights.
+7. AI Business Recommendations: 3-5 concrete, actionable tips based on this data.
+8. Restaurant Health Score: Highlight a score from 0-100 and its rating (Excellent/Good/Needs Attention/Critical) and explain the rating.
+
+Ensure the tone is analytical, professional, and clear.
+`;
+
+    const result = await model.generateContent(prompt);
+    return result.response.text();
+  } catch (err: any) {
+    console.error('Gemini summary generation failed:', err);
+    return 'AI Summary generation is temporarily unavailable.';
+  }
+}
+
+export async function getAiReport(userId: string, role: string): Promise<any> {
+  const context = await getLiveContext(userId, role);
+  const summaryMarkdown = await getAiSummary(userId, role);
+  
+  return {
+    generated_at: new Date().toISOString(),
+    metrics: context.dashboard_metrics,
+    summary: summaryMarkdown
+  };
+}
+

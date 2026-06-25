@@ -13,6 +13,7 @@ import OCRUpload from './pages/ocr/OCRUpload'
 import OCRReview from './pages/ocr/OCRReview'
 import AiOptimizer from './pages/ai/AiOptimizer'
 import AIDashboard from './pages/ai/AIDashboard'
+import AIAssistant from './pages/ai/AIAssistant'
 import AIOperationsDashboard from './pages/ai-operations/AIOperationsDashboard'
 import AddMenuItem from './pages/menu/AddMenuItem'
 import EditMenuItem from './pages/menu/EditMenuItem'
@@ -110,6 +111,7 @@ const App: React.FC = () => {
         <Route path="/ocr/review" element={<OCRReview />} />
         <Route path="/ai-optimizer" element={<AiOptimizer />} />
         <Route path="/ai" element={<AIDashboard />} />
+        <Route path="/ai-assistant" element={<ProtectedRoute roles={["OWNER","RESTAURANT_OWNER","MANAGER","SUPER_ADMIN"]}><AIAssistant /></ProtectedRoute>} />
         <Route path="/orders" element={<Navigate to="/waiter/dashboard" replace />} />
         <Route path="/waiter/dashboard" element={<ProtectedRoute roles={["WAITER","MANAGER","OWNER","RESTAURANT_OWNER","SUPER_ADMIN"]}><WaiterDashboard /></ProtectedRoute>} />
         <Route path="/waiter/orders/create" element={<ProtectedRoute roles={["WAITER","MANAGER","OWNER","RESTAURANT_OWNER","SUPER_ADMIN"]}><CreateOrder /></ProtectedRoute>} />

@@ -12,6 +12,7 @@ const navItems = [
   { label: 'Inventory', to: '/inventory', roles: ['OWNER', 'RESTAURANT_OWNER', 'MANAGER', 'CHEF', 'SUPER_ADMIN'] },
   { label: 'Billing', to: '/billing', roles: ['OWNER', 'RESTAURANT_OWNER', 'MANAGER', 'CASHIER', 'SUPER_ADMIN'] },
   { label: 'Analytics', to: '/analytics', roles: ['OWNER', 'RESTAURANT_OWNER', 'MANAGER', 'SUPER_ADMIN'] },
+  { label: 'AI Assistant', to: '/ai-assistant', roles: ['OWNER', 'RESTAURANT_OWNER', 'MANAGER', 'SUPER_ADMIN'] },
   { label: 'AI Intelligence', to: '/ai', roles: ['OWNER', 'RESTAURANT_OWNER', 'MANAGER', 'SUPER_ADMIN'] },
   { label: 'AI Optimizer', to: '/ai-optimizer', roles: ['OWNER', 'RESTAURANT_OWNER', 'MANAGER', 'SUPER_ADMIN'] },
   { label: 'Restaurant Settings', to: '/settings', roles: ['OWNER', 'RESTAURANT_OWNER', 'SUPER_ADMIN'] },

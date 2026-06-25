@@ -110,6 +110,14 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose }) => {
       action: () => { navigate('/ai'); onClose(); }
     },
     {
+      id: 'ai-assistant',
+      title: 'Go to AI Assistant',
+      subtitle: 'Interactive AI chatbot powered by Google Gemini',
+      category: 'Navigation',
+      roles: ['OWNER', 'SUPER_ADMIN', 'MANAGER'],
+      action: () => { navigate('/ai-assistant'); onClose(); }
+    },
+    {
       id: 'employees',
       title: 'Go to Employees Management',
       subtitle: 'Manage user access, shift timing, and profiles',

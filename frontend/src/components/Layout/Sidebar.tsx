@@ -124,6 +124,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed, mobileOpen, 
       title: 'Intelligence',
       items: [
         { label: 'Analytics', to: '/analytics', icon: icons.analytics, roles: ['OWNER', 'SUPER_ADMIN', 'MANAGER'] },
+        { label: 'AI Assistant', to: '/ai-assistant', icon: icons.ai, roles: ['OWNER', 'SUPER_ADMIN', 'MANAGER'] },
         { label: 'AI Intelligence', to: '/ai', icon: icons.ai, roles: ['OWNER', 'SUPER_ADMIN', 'MANAGER'] },
         { label: 'AI Operations', to: '/ai-operations', icon: icons.ai, roles: ['OWNER', 'SUPER_ADMIN', 'MANAGER'] },
       ]

@@ -7,6 +7,9 @@ import {
   fetchMenuInsights,
   fetchRecommendations,
   fetchSalesForecast,
+  fetchAiChat,
+  fetchAiSummary,
+  fetchAiReport,
 } from './ai.controller';
 
 const router = Router();
@@ -17,5 +20,9 @@ router.get('/inventory-forecast', authorizeRoles(Role.OWNER, Role.MANAGER, Role.
 router.get('/menu-insights', authorizeRoles(Role.OWNER, Role.MANAGER, Role.SUPER_ADMIN), fetchMenuInsights);
 router.get('/recommendations', authorizeRoles(Role.OWNER, Role.MANAGER, Role.SUPER_ADMIN), fetchRecommendations);
 router.get('/health-score', authorizeRoles(Role.OWNER, Role.MANAGER, Role.SUPER_ADMIN), fetchHealthScore);
+
+router.post('/chat', authorizeRoles(Role.OWNER, Role.MANAGER, Role.SUPER_ADMIN), fetchAiChat);
+router.get('/summary', authorizeRoles(Role.OWNER, Role.MANAGER, Role.SUPER_ADMIN), fetchAiSummary);
+router.get('/report', authorizeRoles(Role.OWNER, Role.MANAGER, Role.SUPER_ADMIN), fetchAiReport);
 
 export default router;

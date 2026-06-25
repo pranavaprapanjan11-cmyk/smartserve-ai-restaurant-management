@@ -85,3 +85,27 @@ export async function fetchHealthScore(token: string): Promise<HealthScoreRespon
   })
   return res.data
 }
+
+export async function sendAiChatMessage(message: string, history: any[], token: string): Promise<string> {
+  const res = await axios.post<{ response: string }>(
+    `${API_BASE}/ai/chat`,
+    { message, history },
+    { headers: getAuthHeader(token) }
+  )
+  return res.data.response
+}
+
+export async function fetchAiSummary(token: string): Promise<string> {
+  const res = await axios.get<{ summary: string }>(`${API_BASE}/ai/summary`, {
+    headers: getAuthHeader(token),
+  })
+  return res.data.summary
+}
+
+export async function fetchAiReport(token: string): Promise<any> {
+  const res = await axios.get<any>(`${API_BASE}/ai/report`, {
+    headers: getAuthHeader(token),
+  })
+  return res.data
+}
+
