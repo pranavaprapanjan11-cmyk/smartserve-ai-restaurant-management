@@ -141,6 +141,14 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose }) => {
       roles: ['OWNER', 'SUPER_ADMIN'],
       action: () => { navigate('/ocr'); onClose(); }
     },
+    {
+      id: 'ai-import',
+      title: 'Go to AI Smart Import Center',
+      subtitle: 'Upload menus, invoices, and handwritten sheets using Gemini Vision',
+      category: 'Navigation',
+      roles: ['OWNER', 'SUPER_ADMIN', 'MANAGER'],
+      action: () => { navigate('/ai-import'); onClose(); }
+    },
     // Simulation commands
     {
       id: 'sim-new-order',

@@ -17,6 +17,7 @@ const navItems = [
   { label: 'AI Optimizer', to: '/ai-optimizer', roles: ['OWNER', 'RESTAURANT_OWNER', 'MANAGER', 'SUPER_ADMIN'] },
   { label: 'Restaurant Settings', to: '/settings', roles: ['OWNER', 'RESTAURANT_OWNER', 'SUPER_ADMIN'] },
   { label: 'OCR Panel', to: '/ocr', roles: ['OWNER', 'RESTAURANT_OWNER', 'MANAGER', 'WAITER', 'CHEF', 'SUPER_ADMIN'] },
+  { label: 'AI Smart Import', to: '/ai-import', roles: ['OWNER', 'RESTAURANT_OWNER', 'MANAGER', 'SUPER_ADMIN'] },
 ]
 
 const TopNav: React.FC = () => {

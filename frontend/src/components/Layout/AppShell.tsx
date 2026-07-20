@@ -44,7 +44,8 @@ const AppShell: React.FC = () => {
       'ai-optimizer': 'Intelligence',
       employees: 'Administration',
       settings: 'Administration',
-      ocr: 'Tools'
+      ocr: 'Tools',
+      'ai-import': 'Tools'
     }
 
     const nameMap: Record<string, string> = {
@@ -61,6 +62,7 @@ const AppShell: React.FC = () => {
       employees: 'Employees',
       settings: 'Settings',
       ocr: 'OCR Import',
+      'ai-import': 'AI Smart Import',
       create: 'Create Order',
       items: 'Items',
       recipes: 'Recipes',
