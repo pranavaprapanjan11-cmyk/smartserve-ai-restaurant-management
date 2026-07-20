@@ -84,8 +84,8 @@ CREATE TABLE IF NOT EXISTS inventory_items (
   CONSTRAINT chk_inventory_quantity_non_negative CHECK (quantity_on_hand >= 0),
   CONSTRAINT chk_inventory_reorder_threshold_non_negative CHECK (reorder_threshold >= 0),
   FOREIGN KEY (restaurant_id) REFERENCES users(id) ON DELETE CASCADE,
-  FOREIGN KEY (category_id) REFERENCES inventory_categories(id) ON DELETE CASCADE,
-  FOREIGN KEY (supplier_id) REFERENCES suppliers(id) ON DELETE CASCADE,
+  FOREIGN KEY (category_id) REFERENCES inventory_categories(id) ON DELETE RESTRICT,
+  FOREIGN KEY (supplier_id) REFERENCES suppliers(id) ON DELETE RESTRICT,
   UNIQUE (restaurant_id, name)
 );
 

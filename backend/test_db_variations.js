@@ -19,7 +19,6 @@ const variations = [
     try {
       const res = await pool.query('SELECT NOW()');
       console.log(`Variation ${i + 1} SUCCESS! Database time:`, res.rows[0].now);
-      await pool.end();
       break;
     } catch (err) {
       console.log(`Variation ${i + 1} FAILED:`, err.message);

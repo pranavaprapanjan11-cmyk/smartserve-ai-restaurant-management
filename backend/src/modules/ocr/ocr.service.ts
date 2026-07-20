@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { spawnSync } from 'child_process';
+import { spawnSync, spawn } from 'child_process';
 import Tesseract from 'tesseract.js';
 import { ExtractedItem, OCRParseResult } from './ocr.types';
 
@@ -66,34 +66,62 @@ export async function saveUpload(file: any) {
   return dest;
 }
 
-function runPythonOCR(filePath: string) {
+function runSubprocessAsync(command: string, args: string[], envs?: Record<string, string>): Promise<{ stdout: string; stderr: string; status: number }> {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, {
+      env: { ...process.env, ...envs }
+    });
+
+    let stdout = '';
+    let stderr = '';
+
+    child.stdout.on('data', (data) => {
+      stdout += data.toString();
+    });
+
+    child.stderr.on('data', (data) => {
+      stderr += data.toString();
+    });
+
+    child.on('error', (err) => {
+      reject(err);
+    });
+
+    child.on('close', (code) => {
+      resolve({ stdout, stderr, status: code ?? 0 });
+    });
+  });
+}
+
+async function runPythonOCR(filePath: string) {
   const tempJson = path.join(uploadDir, `${Date.now()}-${path.basename(filePath)}.ocr.json`);
-  const result = spawnSync(
-    pythonCmd,
-    [pythonScript, filePath, tempJson],
-    {
-      encoding: 'utf-8',
-      env: { ...process.env, OCR_LANGS: 'en' },
-      maxBuffer: 20 * 1024 * 1024,
+  
+  try {
+    const result = await runSubprocessAsync(
+      pythonCmd,
+      [pythonScript, filePath, tempJson],
+      { OCR_LANGS: 'en' }
+    );
+
+    if (result.status !== 0) {
+      throw new Error(result.stderr || result.stdout || 'Python OCR failed');
     }
-  );
+    if (!fs.existsSync(tempJson)) {
+      throw new Error('Python OCR output file missing');
+    }
 
-  if (result.error) {
-    throw result.error;
+    const output = JSON.parse(fs.readFileSync(tempJson, 'utf-8'));
+    fs.unlinkSync(tempJson);
+    if (output.error) {
+      throw new Error(output.error);
+    }
+    return output;
+  } catch (err: any) {
+    if (fs.existsSync(tempJson)) {
+      try { fs.unlinkSync(tempJson); } catch (e) {}
+    }
+    throw err;
   }
-  if (result.status !== 0) {
-    throw new Error(result.stderr || result.stdout || 'Python OCR failed');
-  }
-  if (!fs.existsSync(tempJson)) {
-    throw new Error('Python OCR output file missing');
-  }
-
-  const output = JSON.parse(fs.readFileSync(tempJson, 'utf-8'));
-  fs.unlinkSync(tempJson);
-  if (output.error) {
-    throw new Error(output.error);
-  }
-  return output;
 }
 
 function normalizeLine(line: string) {
@@ -301,44 +329,40 @@ function levenshtein(a: string, b: string) {
 }
 
 export async function checkOCRHealth() {
-  const result = spawnSync(
-    pythonCmd,
-    [pythonScript, '--health'],
-    {
-      encoding: 'utf-8',
-      env: { ...process.env, PYTHONIOENCODING: 'utf-8' },
-      maxBuffer: 5 * 1024 * 1024,
-    }
-  );
-
-  if (result.error) {
-    return {
-      easyocr: false,
-      tesseract: false,
-      torch: false,
-      easyocrVersion: "Unknown",
-      tesseractVersion: "Unknown",
-      torchVersion: "Unknown",
-      pythonVersion: "Unknown",
-      error: `Python command invocation failed: ${result.error.message}`
-    };
-  }
-
-  if (result.status !== 0) {
-    return {
-      easyocr: false,
-      tesseract: false,
-      torch: false,
-      easyocrVersion: "Unknown",
-      tesseractVersion: "Unknown",
-      torchVersion: "Unknown",
-      pythonVersion: "Unknown",
-      error: `Python health check failed: ${result.stderr || result.stdout}`
-    };
-  }
-
   try {
-    return JSON.parse(result.stdout.trim());
+    const result = await runSubprocessAsync(
+      pythonCmd,
+      [pythonScript, '--health'],
+      { PYTHONIOENCODING: 'utf-8' }
+    );
+
+    if (result.status !== 0) {
+      return {
+        easyocr: false,
+        tesseract: false,
+        torch: false,
+        easyocrVersion: "Unknown",
+        tesseractVersion: "Unknown",
+        torchVersion: "Unknown",
+        pythonVersion: "Unknown",
+        error: `Python health check failed: ${result.stderr || result.stdout}`
+      };
+    }
+
+    try {
+      return JSON.parse(result.stdout.trim());
+    } catch (err: any) {
+      return {
+        easyocr: false,
+        tesseract: false,
+        torch: false,
+        easyocrVersion: "Unknown",
+        tesseractVersion: "Unknown",
+        torchVersion: "Unknown",
+        pythonVersion: "Unknown",
+        error: `Failed to parse health check response: ${err.message}. Raw: ${result.stdout}`
+      };
+    }
   } catch (err: any) {
     return {
       easyocr: false,
@@ -348,14 +372,14 @@ export async function checkOCRHealth() {
       tesseractVersion: "Unknown",
       torchVersion: "Unknown",
       pythonVersion: "Unknown",
-      error: `Failed to parse health check response: ${err.message}. Raw: ${result.stdout}`
+      error: `Python command invocation failed: ${err.message}`
     };
   }
 }
 
 export async function parseImageFile(filePath: string): Promise<OCRParseResult> {
   try {
-    const output: any = runPythonOCR(filePath);
+    const output: any = await runPythonOCR(filePath);
     const lines = Array.isArray(output.lines)
       ? output.lines.map((line: any) => ({ text: String(line.text || ''), confidence: Number(line.confidence ?? 0) }))
       : [];

@@ -83,3 +83,30 @@ CREATE INDEX IF NOT EXISTS idx_reservations_date ON reservations(reservation_dat
 CREATE INDEX IF NOT EXISTS idx_waitlist_restaurant_id ON waitlist_entries(restaurant_id);
 CREATE INDEX IF NOT EXISTS idx_waitlist_status ON waitlist_entries(status);
 CREATE INDEX IF NOT EXISTS idx_orders_customer_id ON orders(customer_id);
+
+-- Customer Visits Table
+CREATE TABLE IF NOT EXISTS customer_visits (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  restaurant_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+  spend_amount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  visit_date TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- Loyalty Transactions Table
+CREATE TABLE IF NOT EXISTS loyalty_transactions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  restaurant_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+  points INTEGER NOT NULL DEFAULT 0,
+  transaction_type VARCHAR(50) NOT NULL CHECK (transaction_type IN ('EARNED', 'REDEEMED')),
+  description TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- Indexes for performance
+CREATE INDEX IF NOT EXISTS idx_customer_visits_restaurant_id ON customer_visits(restaurant_id);
+CREATE INDEX IF NOT EXISTS idx_customer_visits_customer_id ON customer_visits(customer_id);
+CREATE INDEX IF NOT EXISTS idx_loyalty_transactions_restaurant_id ON loyalty_transactions(restaurant_id);
+CREATE INDEX IF NOT EXISTS idx_loyalty_transactions_customer_id ON loyalty_transactions(customer_id);

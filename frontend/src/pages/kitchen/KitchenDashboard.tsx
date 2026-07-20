@@ -271,8 +271,10 @@ const KitchenDashboard: React.FC = () => {
     window.addEventListener('order_completed', handleOrderCompleted);
     window.addEventListener('order_cancelled', handleOrderCancelled);
 
-    const pollInterval = sseActive ? 10000 : 2000;
-    const iv = setInterval(() => load(false), pollInterval);
+    let iv: any = null;
+    if (!sseActive) {
+      iv = setInterval(() => load(false), 2000);
+    }
 
     return () => {
       window.removeEventListener('ordersUpdated', onUpdate);
@@ -280,7 +282,7 @@ const KitchenDashboard: React.FC = () => {
       window.removeEventListener('order_updated', handleOrderUpdated);
       window.removeEventListener('order_completed', handleOrderCompleted);
       window.removeEventListener('order_cancelled', handleOrderCancelled);
-      clearInterval(iv);
+      if (iv) clearInterval(iv);
     };
   }, [load, sseActive, user]);
 
@@ -338,7 +340,7 @@ const KitchenDashboard: React.FC = () => {
             </span>
           )}
           <button
-            onClick={load}
+            onClick={() => load()}
             className="rounded-2xl bg-cyan-500/10 px-5 py-2.5 text-sm font-semibold text-cyan-200 ring-1 ring-cyan-400/20 hover:bg-cyan-500/15 transition-all active:scale-[0.97]"
           >
             Refresh

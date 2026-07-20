@@ -1,6 +1,7 @@
+import pool from '../../config/db';
 // File: backend/src/modules/billing/billing.service.ts
 
-import { Pool } from 'pg';
+
 import { getRestaurantId } from '../orders/orders.service';
 import { OrderStatus } from '../orders/orders.types';
 import {
@@ -15,7 +16,7 @@ import { logEvent } from '../ai-operations/aiOperations.service';
 import { OperationalEventType } from '../ai-operations/aiOperations.types';
 import { recordCustomerVisit } from '../crm/crm.service';
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
 
 function formatInvoiceNumber(date: Date, seq: number): string {
   const y = date.getFullYear();

@@ -5,6 +5,7 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { createUser, findUserByEmail, verifyPassword } from './auth.service';
 import { Role, normalizeRole, storageRole } from './auth.types';
+import pool from '../../config/db';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'please-set-a-secure-secret';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
@@ -39,9 +40,6 @@ export async function register(req: Request, res: Response) {
       return res.status(409).json({ message: 'Email already in use' });
     }
 
-    const { Pool } = require('pg');
-    const dbPool = new Pool({ connectionString: process.env.DATABASE_URL });
-
     let workspaceId: string | null = null;
     let generatedCode: string | null = null;
 
@@ -51,26 +49,24 @@ export async function register(req: Request, res: Response) {
     if (normalized === 'OWNER') {
       const rName = restaurantName || workspaceName || 'My Restaurant';
       const wName = workspaceName || `${name}'s Workspace`;
-      generatedCode = await generateUniqueWorkspaceCode(dbPool, rName);
+      generatedCode = await generateUniqueWorkspaceCode(pool, rName);
       
-      const { rows: ws } = await dbPool.query(
+      const { rows: ws } = await pool.query(
         `INSERT INTO workspaces (workspace_code, workspace_name, created_at)
          VALUES ($1, $2, NOW())
          RETURNING id`,
-        [generatedCode, wName]
+         [generatedCode, wName]
       );
       workspaceId = ws[0].id;
     } else {
       if (!workspaceCode) {
-        await dbPool.end();
         return res.status(400).json({ message: 'Workspace Code is required' });
       }
-      const { rows: ws } = await dbPool.query(
+      const { rows: ws } = await pool.query(
         `SELECT id FROM workspaces WHERE workspace_code = $1 LIMIT 1`,
         [workspaceCode.trim().toUpperCase()]
       );
       if (ws.length === 0) {
-        await dbPool.end();
         return res.status(404).json({ message: 'Workspace not found. Check the workspace code.' });
       }
       workspaceId = ws[0].id;
@@ -85,13 +81,13 @@ export async function register(req: Request, res: Response) {
     });
 
     if (normalized === 'OWNER') {
-      await dbPool.query(
+      await pool.query(
         `UPDATE workspaces SET owner_id = $1 WHERE id = $2`,
         [user.id, workspaceId]
       );
       
       // Auto seed default categories for this workspace
-      await dbPool.query(
+      await pool.query(
         `INSERT INTO menu_categories (restaurant_id, workspace_id, name, description, color_code, icon_emoji, display_order)
          VALUES 
            ($1, $2, 'Beverages', 'Cold and hot drinks', '#3b82f6', '🥤', 1),
@@ -104,7 +100,7 @@ export async function register(req: Request, res: Response) {
     }
 
     if (!generatedCode && workspaceId) {
-      const { rows: wsData } = await dbPool.query(
+      const { rows: wsData } = await pool.query(
         `SELECT workspace_code FROM workspaces WHERE id = $1 LIMIT 1`,
         [workspaceId]
       );
@@ -112,8 +108,6 @@ export async function register(req: Request, res: Response) {
         generatedCode = wsData[0].workspace_code;
       }
     }
-
-    await dbPool.end();
 
     const normalizedRole = normalizeRole(user.role) || user.role;
     const token = jwt.sign(
@@ -153,26 +147,22 @@ export async function login(req: Request, res: Response) {
     let workspaceId = (user as any).workspace_id;
     let currentCode = null;
 
-    const { Pool } = require('pg');
-    const dbPool = new Pool({ connectionString: process.env.DATABASE_URL });
-
     if (workspaceCode) {
-      const wResult = await dbPool.query(
+      const wResult = await pool.query(
         `SELECT id FROM workspaces WHERE workspace_code = $1 LIMIT 1`,
         [workspaceCode.trim().toUpperCase()]
       );
       if (wResult.rows.length === 0) {
-        await dbPool.end();
         return res.status(404).json({ message: 'Invalid Workspace Code' });
       }
       workspaceId = wResult.rows[0].id;
-      await dbPool.query(
+      await pool.query(
         `UPDATE users SET workspace_id = $1 WHERE id = $2`,
         [workspaceId, user.id]
       );
       currentCode = workspaceCode.trim().toUpperCase();
     } else if (workspaceId) {
-      const wResult = await dbPool.query(
+      const wResult = await pool.query(
         `SELECT workspace_code FROM workspaces WHERE id = $1 LIMIT 1`,
         [workspaceId]
       );
@@ -180,8 +170,6 @@ export async function login(req: Request, res: Response) {
         currentCode = wResult.rows[0].workspace_code;
       }
     }
-
-    await dbPool.end();
 
     const normalizedRole = normalizeRole(user.role) || user.role;
     const token = jwt.sign(
@@ -212,9 +200,7 @@ export async function me(req: Request, res: Response) {
     const user = (req as any).user;
     if (!user) return res.status(401).json({ message: 'Not authenticated' });
 
-    const { Pool } = require('pg');
-    const dbPool = new Pool({ connectionString: process.env.DATABASE_URL });
-    const { rows } = await dbPool.query(
+    const { rows } = await pool.query(
       `SELECT u.id, u.name, u.email, u.role, u.workspace_id, w.workspace_code, u.created_at 
        FROM users u
        LEFT JOIN workspaces w ON u.workspace_id = w.id
@@ -226,8 +212,6 @@ export async function me(req: Request, res: Response) {
     const { getRestaurantId } = require('../orders/orders.service');
     const normalizedRole = normalizeRole(user.role) || user.role;
     const rId = await getRestaurantId(user.id, normalizedRole);
-
-    await dbPool.end();
 
     if (rows.length === 0) return res.status(401).json({ message: 'User not found' });
 
@@ -258,18 +242,13 @@ export async function validateManagerPin(req: Request, res: Response) {
       return res.status(400).json({ message: 'PIN is required' });
     }
 
-    const { Pool } = require('pg');
-    const localPool = new Pool({ connectionString: process.env.DATABASE_URL });
-
-    const { rows } = await localPool.query(
+    const { rows } = await pool.query(
       `SELECT name, role FROM users 
        WHERE role IN ('OWNER', 'RESTAURANT_OWNER', 'MANAGER', 'SUPER_ADMIN') 
          AND pin = $1 
        LIMIT 1`,
       [pin]
     );
-
-    await localPool.end();
 
     if (rows.length > 0) {
       return res.json({ approved: true, managerName: rows[0].name, role: rows[0].role });

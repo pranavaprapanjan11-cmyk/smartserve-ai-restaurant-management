@@ -52,6 +52,8 @@ SELECT add_workspace_id_column('leave_requests');
 SELECT add_workspace_id_column('salary');
 SELECT add_workspace_id_column('performance_reviews');
 SELECT add_workspace_id_column('disciplinary_actions');
+SELECT add_workspace_id_column('customer_visits');
+SELECT add_workspace_id_column('loyalty_transactions');
 
 DROP FUNCTION add_workspace_id_column(text);
 
@@ -101,5 +103,7 @@ SELECT add_workspace_trigger('leave_requests');
 SELECT add_workspace_trigger('salary');
 SELECT add_workspace_trigger('performance_reviews');
 SELECT add_workspace_trigger('disciplinary_actions');
+SELECT add_workspace_trigger('customer_visits');
+SELECT add_workspace_trigger('loyalty_transactions');
 
 DROP FUNCTION add_workspace_trigger(text);

@@ -1,7 +1,8 @@
-import { Pool } from 'pg';
+import pool from '../../config/db';
+
 import { v4 as uuidv4 } from 'uuid';
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
 
 export interface Employee {
   id: string;

@@ -112,8 +112,10 @@ const CommandCenter: React.FC = () => {
     window.addEventListener('order_completed', onOrdersUpdated)
     window.addEventListener('order_cancelled', onOrdersUpdated)
 
-    const pollInterval = sseActive ? 10000 : 2000
-    const iv = setInterval(() => loadData(false), pollInterval)
+    let iv: any = null;
+    if (!sseActive) {
+      iv = setInterval(() => loadData(false), 2000);
+    }
 
     return () => {
       window.removeEventListener('ordersUpdated', onOrdersUpdated)
@@ -121,7 +123,7 @@ const CommandCenter: React.FC = () => {
       window.removeEventListener('order_updated', onOrdersUpdated)
       window.removeEventListener('order_completed', onOrdersUpdated)
       window.removeEventListener('order_cancelled', onOrdersUpdated)
-      clearInterval(iv)
+      if (iv) clearInterval(iv)
     }
   }, [token, sseActive])
 

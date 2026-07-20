@@ -9,6 +9,7 @@ import { authenticateJWT, authorizeRoles } from '../auth/auth.middleware';
 import { Role } from '../auth/auth.types';
 
 const router = express.Router();
+router.use(authenticateJWT);
 const uploadDir = path.join(process.cwd(), 'backend', 'uploads');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 

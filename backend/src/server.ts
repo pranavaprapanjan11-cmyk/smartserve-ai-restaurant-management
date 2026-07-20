@@ -20,6 +20,7 @@ import tablesRouter from './modules/tables/tables.routes';
 import aiOperationsRouter from './modules/ai-operations/aiOperations.routes';
 import crmRouter from './modules/crm/crm.routes';
 import workspaceRouter from './modules/workspace/workspace.routes';
+import aiImportRouter from './modules/ai-import/aiImport.routes';
 
 const app = express();
 app.use(cors());
@@ -70,6 +71,9 @@ app.use('/api/crm', crmRouter);
 
 // Mount Workspace routes
 app.use('/api/workspace', workspaceRouter);
+
+// Mount AI Import routes
+app.use('/api/ai-import', aiImportRouter);
 
 import { sseHandler } from './modules/workspace/workspace.sse';
 

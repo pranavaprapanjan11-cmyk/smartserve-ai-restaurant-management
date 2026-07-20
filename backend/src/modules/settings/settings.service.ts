@@ -1,6 +1,7 @@
+import pool from '../../config/db';
 // File: backend/src/modules/settings/settings.service.ts
 
-import { Pool } from 'pg';
+
 import { getRestaurantId } from '../orders/orders.service';
 import {
   PrinterSettingsPayload,
@@ -9,7 +10,7 @@ import {
   RestaurantSettingsRecord,
 } from './settings.types';
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
 
 export async function getRestaurantSettings(userId: string, role: string): Promise<RestaurantSettingsRecord | null> {
   const restaurantId = await getRestaurantId(userId, role);

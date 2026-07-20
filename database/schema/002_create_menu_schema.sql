@@ -56,8 +56,8 @@ CREATE TABLE IF NOT EXISTS menu_item_analytics (
 );
 
 -- Indexes for performance
-CREATE INDEX idx_menu_items_restaurant_id ON menu_items(restaurant_id);
-CREATE INDEX idx_menu_items_category_id ON menu_items(category_id);
-CREATE INDEX idx_menu_items_is_available ON menu_items(is_available);
-CREATE INDEX idx_menu_categories_restaurant_id ON menu_categories(restaurant_id);
-CREATE INDEX idx_menu_item_analytics_menu_item_id ON menu_item_analytics(menu_item_id);
+CREATE INDEX IF NOT EXISTS idx_menu_items_restaurant_id ON menu_items(restaurant_id);
+CREATE INDEX IF NOT EXISTS idx_menu_items_category_id ON menu_items(category_id);
+CREATE INDEX IF NOT EXISTS idx_menu_items_is_available ON menu_items(is_available);
+CREATE INDEX IF NOT EXISTS idx_menu_categories_restaurant_id ON menu_categories(restaurant_id);
+CREATE INDEX IF NOT EXISTS idx_menu_item_analytics_menu_item_id ON menu_item_analytics(menu_item_id);

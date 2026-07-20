@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { normalizeRole } from './auth.types';
+import pool from '../../config/db';
 
 export interface AuthRequest extends Request {
   user?: {
@@ -129,10 +130,7 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
     // Resolve workspaceId
     let workspaceId = decoded.workspaceId;
     if (!workspaceId) {
-      const { Pool } = require('pg');
-      const tempPool = new Pool({ connectionString: process.env.DATABASE_URL });
-      const { rows } = await tempPool.query('SELECT workspace_id FROM users WHERE id = $1 LIMIT 1', [userId]);
-      await tempPool.end();
+      const { rows } = await pool.query('SELECT workspace_id FROM users WHERE id = $1 LIMIT 1', [userId]);
       if (rows.length > 0) {
         workspaceId = rows[0].workspace_id;
       }

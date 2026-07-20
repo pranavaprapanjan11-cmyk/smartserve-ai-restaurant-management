@@ -140,7 +140,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed, mobileOpen, 
     {
       title: 'Tools',
       items: [
-        { label: 'OCR Import', to: '/ocr', icon: icons.ocr, roles: ['OWNER', 'SUPER_ADMIN'] }
+        { label: 'OCR Import', to: '/ocr', icon: icons.ocr, roles: ['OWNER', 'SUPER_ADMIN'] },
+        { label: 'AI Smart Import', to: '/ai-import', icon: icons.ai, roles: ['OWNER', 'SUPER_ADMIN', 'MANAGER'] }
       ]
     }
   ]

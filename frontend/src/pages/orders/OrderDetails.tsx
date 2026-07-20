@@ -75,8 +75,10 @@ const OrderDetails: React.FC = () => {
     window.addEventListener('order_completed', onUpdate);
     window.addEventListener('order_cancelled', onUpdate);
 
-    const pollInterval = sseActive ? 10000 : 2000;
-    const iv = setInterval(() => fetchOrderDetails(false), pollInterval);
+    let iv: any = null;
+    if (!sseActive) {
+      iv = setInterval(() => fetchOrderDetails(false), 2000);
+    }
 
     return () => {
       window.removeEventListener('ordersUpdated', onUpdate);
@@ -84,7 +86,7 @@ const OrderDetails: React.FC = () => {
       window.removeEventListener('order_updated', onUpdate);
       window.removeEventListener('order_completed', onUpdate);
       window.removeEventListener('order_cancelled', onUpdate);
-      clearInterval(iv);
+      if (iv) clearInterval(iv);
     };
   }, [token, id, navigate, sseActive]);
 

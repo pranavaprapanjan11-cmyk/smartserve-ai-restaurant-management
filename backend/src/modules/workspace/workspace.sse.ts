@@ -1,4 +1,5 @@
 import { Response } from 'express';
+import pool from '../../config/db';
 
 interface SSEClient {
   id: string;
@@ -25,10 +26,7 @@ export async function sseHandler(req: any, res: Response) {
     let workspaceId = decoded.workspaceId;
 
     if (!workspaceId && decoded.sub) {
-      const { Pool } = require('pg');
-      const tempPool = new Pool({ connectionString: process.env.DATABASE_URL });
-      const { rows } = await tempPool.query('SELECT workspace_id FROM users WHERE id = $1 LIMIT 1', [decoded.sub]);
-      await tempPool.end();
+      const { rows } = await pool.query('SELECT workspace_id FROM users WHERE id = $1 LIMIT 1', [decoded.sub]);
       if (rows.length > 0 && rows[0].workspace_id) {
         workspaceId = rows[0].workspace_id;
       }
@@ -99,19 +97,16 @@ export function notifyWorkspace(workspaceId: string, eventType: string, data?: a
 export async function notifyWorkspaceByRestaurantId(restaurantId: string, eventType: string, data?: any) {
   if (!restaurantId) return;
   try {
-    const { Pool } = require('pg');
-    const tempPool = new Pool({ connectionString: process.env.DATABASE_URL });
-    const { rows } = await tempPool.query('SELECT workspace_id FROM users WHERE id = $1 LIMIT 1', [restaurantId]);
+    const { rows } = await pool.query('SELECT workspace_id FROM users WHERE id = $1 LIMIT 1', [restaurantId]);
     
     let workspaceId = rows.length > 0 ? rows[0].workspace_id : null;
     if (!workspaceId) {
-      const { rows: workspaceRows } = await tempPool.query('SELECT id FROM workspaces WHERE owner_id = $1 LIMIT 1', [restaurantId]);
+      const { rows: workspaceRows } = await pool.query('SELECT id FROM workspaces WHERE owner_id = $1 LIMIT 1', [restaurantId]);
       if (workspaceRows.length > 0) {
         workspaceId = workspaceRows[0].id;
       }
     }
     
-    await tempPool.end();
     if (workspaceId) {
       notifyWorkspace(workspaceId, eventType, data);
     }

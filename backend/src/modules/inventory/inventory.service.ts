@@ -1,4 +1,5 @@
-import { Pool } from 'pg';
+import pool from '../../config/db';
+
 import {
   InventoryItem,
   CreateInventoryItemPayload,
@@ -11,7 +12,7 @@ import {
   ForecastItem
 } from './inventory.types';
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
 
 async function resolveRestaurantId(userId: string, role: string): Promise<string> {
   if (role === 'RESTAURANT_OWNER' || role === 'OWNER' || role === 'SUPER_ADMIN') {

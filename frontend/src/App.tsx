@@ -41,6 +41,7 @@ import ReservationsManager from './pages/crm/ReservationsManager'
 import WaitlistManager from './pages/crm/WaitlistManager'
 import EmployeesPage from './pages/employees/EmployeesPage'
 import WorkspacePage from './pages/workspace/WorkspacePage'
+import AiImportCenter from './pages/ai-import/AiImportCenter'
 
 const Analytics: React.FC = () => (
   <div className="rounded-[2rem] border surface-border surface-panel p-10 text-white shadow-2xl shadow-cyan-500/5 backdrop-blur-xl">
@@ -109,6 +110,7 @@ const App: React.FC = () => {
         <Route path="/ocr" element={<OcrPanel />} />
         <Route path="/ocr/upload" element={<OCRUpload />} />
         <Route path="/ocr/review" element={<OCRReview />} />
+        <Route path="/ai-import" element={<ProtectedRoute roles={["OWNER","RESTAURANT_OWNER","MANAGER","SUPER_ADMIN"]}><AiImportCenter /></ProtectedRoute>} />
         <Route path="/ai-optimizer" element={<AiOptimizer />} />
         <Route path="/ai" element={<AIDashboard />} />
         <Route path="/ai-assistant" element={<ProtectedRoute roles={["OWNER","RESTAURANT_OWNER","MANAGER","SUPER_ADMIN"]}><AIAssistant /></ProtectedRoute>} />

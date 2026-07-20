@@ -1,4 +1,5 @@
-import { Pool } from 'pg';
+import pool from '../../config/db';
+
 import { getRestaurantId } from '../orders/orders.service';
 import {
   HealthScoreResponse,
@@ -8,7 +9,7 @@ import {
   SalesForecast,
 } from './ai.types';
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
 
 function safeNumber(value: any): number {
   return value === null || value === undefined ? 0 : Number(value);

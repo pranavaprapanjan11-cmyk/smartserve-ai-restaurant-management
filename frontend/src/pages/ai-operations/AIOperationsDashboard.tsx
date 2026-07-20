@@ -18,7 +18,7 @@ import RecommendationPanel from './RecommendationPanel';
 import { triggerLiveActivity } from '../../utils/activityTrigger';
 
 const AIOperationsDashboard: React.FC = () => {
-  const { token } = useAuth();
+  const { token, sseActive } = useAuth();
   const [data, setData] = useState<AiOperationsDashboardData | null>(null);
   const [events, setEvents] = useState<ActivityEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -46,10 +46,13 @@ const AIOperationsDashboard: React.FC = () => {
   useEffect(() => {
     loadData();
 
-    // Poll the operations analytics and events every 5 seconds to sync other sessions
-    const interval = setInterval(() => {
-      loadData(true);
-    }, 5000);
+    // Poll the operations analytics and events only if SSE fallback is needed
+    let interval: any = null;
+    if (!sseActive) {
+      interval = setInterval(() => {
+        loadData(true);
+      }, 5000);
+    }
 
     // Register listener for local custom live activity events
     const handleLocalActivity = () => {
@@ -59,10 +62,10 @@ const AIOperationsDashboard: React.FC = () => {
     window.addEventListener('liveActivityEvent', handleLocalActivity);
 
     return () => {
-      clearInterval(interval);
+      if (interval) clearInterval(interval);
       window.removeEventListener('liveActivityEvent', handleLocalActivity);
     };
-  }, [token]);
+  }, [token, sseActive]);
 
   return (
     <div className="space-y-8">

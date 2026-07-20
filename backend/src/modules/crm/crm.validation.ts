@@ -44,3 +44,23 @@ export const updateWaitlistStatusSchema = Joi.object({
   status: Joi.string().valid(...Object.values(WaitlistStatus)).required(),
   estimated_wait_mins: Joi.number().integer().optional().allow(null)
 });
+
+import { Request, Response, NextFunction } from 'express';
+
+function validate(schema: Joi.ObjectSchema) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const { error, value } = schema.validate(req.body, { abortEarly: false });
+    if (error) {
+      return res.status(400).json({ errors: error.details.map((d) => d.message) });
+    }
+    req.body = value as any;
+    next();
+  };
+}
+
+export const validateCreateCustomer = validate(createCustomerSchema);
+export const validateUpdateCustomer = validate(updateCustomerSchema);
+export const validateCreateReservation = validate(createReservationSchema);
+export const validateUpdateReservationStatus = validate(updateReservationStatusSchema);
+export const validateCreateWaitlistEntry = validate(createWaitlistEntrySchema);
+export const validateUpdateWaitlistStatus = validate(updateWaitlistStatusSchema);

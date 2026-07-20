@@ -32,7 +32,7 @@ EXECUTE PROCEDURE update_updated_at_column();
 CREATE OR REPLACE FUNCTION seed_default_categories_for_new_owner()
 RETURNS TRIGGER AS $$
 BEGIN
-  IF NEW.role = 'RESTAURANT_OWNER' THEN
+  IF NEW.role = 'RESTAURANT_OWNER' OR NEW.role = 'OWNER' THEN
     INSERT INTO menu_categories (restaurant_id, name, description, color_code, icon_emoji, display_order)
     VALUES 
       (NEW.id, 'Beverages', 'Cold and hot drinks', '#3b82f6', '🥤', 1),

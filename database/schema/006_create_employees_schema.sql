@@ -23,9 +23,9 @@ CREATE TABLE IF NOT EXISTS employees (
     updated_by UUID REFERENCES users(id)
 );
 
-CREATE INDEX idx_employees_restaurant ON employees(restaurant_id);
-CREATE INDEX idx_employees_role ON employees(role);
-CREATE INDEX idx_employees_status ON employees(status);
+CREATE INDEX IF NOT EXISTS idx_employees_restaurant ON employees(restaurant_id);
+CREATE INDEX IF NOT EXISTS idx_employees_role ON employees(role);
+CREATE INDEX IF NOT EXISTS idx_employees_status ON employees(status);
 
 -- Attendance Table
 CREATE TABLE IF NOT EXISTS attendance (
@@ -43,9 +43,9 @@ CREATE TABLE IF NOT EXISTS attendance (
     UNIQUE(employee_id, attendance_date)
 );
 
-CREATE INDEX idx_attendance_employee ON attendance(employee_id);
-CREATE INDEX idx_attendance_date ON attendance(attendance_date);
-CREATE INDEX idx_attendance_restaurant ON attendance(restaurant_id);
+CREATE INDEX IF NOT EXISTS idx_attendance_employee ON attendance(employee_id);
+CREATE INDEX IF NOT EXISTS idx_attendance_date ON attendance(attendance_date);
+CREATE INDEX IF NOT EXISTS idx_attendance_restaurant ON attendance(restaurant_id);
 
 -- Shifts Table
 CREATE TABLE IF NOT EXISTS shifts (
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS shifts (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_shifts_restaurant ON shifts(restaurant_id);
+CREATE INDEX IF NOT EXISTS idx_shifts_restaurant ON shifts(restaurant_id);
 
 -- Employee Shifts (Assignment)
 CREATE TABLE IF NOT EXISTS employee_shifts (
@@ -76,9 +76,9 @@ CREATE TABLE IF NOT EXISTS employee_shifts (
     UNIQUE(employee_id, assigned_date, shift_id)
 );
 
-CREATE INDEX idx_employee_shifts_employee ON employee_shifts(employee_id);
-CREATE INDEX idx_employee_shifts_date ON employee_shifts(assigned_date);
-CREATE INDEX idx_employee_shifts_shift ON employee_shifts(shift_id);
+CREATE INDEX IF NOT EXISTS idx_employee_shifts_employee ON employee_shifts(employee_id);
+CREATE INDEX IF NOT EXISTS idx_employee_shifts_date ON employee_shifts(assigned_date);
+CREATE INDEX IF NOT EXISTS idx_employee_shifts_shift ON employee_shifts(shift_id);
 
 -- Leave Requests Table
 CREATE TABLE IF NOT EXISTS leave_requests (
@@ -98,9 +98,9 @@ CREATE TABLE IF NOT EXISTS leave_requests (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_leave_requests_employee ON leave_requests(employee_id);
-CREATE INDEX idx_leave_requests_status ON leave_requests(status);
-CREATE INDEX idx_leave_requests_dates ON leave_requests(start_date, end_date);
+CREATE INDEX IF NOT EXISTS idx_leave_requests_employee ON leave_requests(employee_id);
+CREATE INDEX IF NOT EXISTS idx_leave_requests_status ON leave_requests(status);
+CREATE INDEX IF NOT EXISTS idx_leave_requests_dates ON leave_requests(start_date, end_date);
 
 -- Salary Table
 CREATE TABLE IF NOT EXISTS salary (
@@ -121,9 +121,9 @@ CREATE TABLE IF NOT EXISTS salary (
     UNIQUE(employee_id, month)
 );
 
-CREATE INDEX idx_salary_employee ON salary(employee_id);
-CREATE INDEX idx_salary_month ON salary(month);
-CREATE INDEX idx_salary_status ON salary(status);
+CREATE INDEX IF NOT EXISTS idx_salary_employee ON salary(employee_id);
+CREATE INDEX IF NOT EXISTS idx_salary_month ON salary(month);
+CREATE INDEX IF NOT EXISTS idx_salary_status ON salary(status);
 
 -- Performance Reviews Table
 CREATE TABLE IF NOT EXISTS performance_reviews (
@@ -148,8 +148,8 @@ CREATE TABLE IF NOT EXISTS performance_reviews (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_performance_employee ON performance_reviews(employee_id);
-CREATE INDEX idx_performance_period ON performance_reviews(review_period_start, review_period_end);
+CREATE INDEX IF NOT EXISTS idx_performance_employee ON performance_reviews(employee_id);
+CREATE INDEX IF NOT EXISTS idx_performance_period ON performance_reviews(review_period_start, review_period_end);
 
 -- Employee Warnings/Discipline
 CREATE TABLE IF NOT EXISTS disciplinary_actions (
@@ -169,5 +169,5 @@ CREATE TABLE IF NOT EXISTS disciplinary_actions (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_disciplinary_employee ON disciplinary_actions(employee_id);
-CREATE INDEX idx_disciplinary_date ON disciplinary_actions(action_date);
+CREATE INDEX IF NOT EXISTS idx_disciplinary_employee ON disciplinary_actions(employee_id);
+CREATE INDEX IF NOT EXISTS idx_disciplinary_date ON disciplinary_actions(action_date);

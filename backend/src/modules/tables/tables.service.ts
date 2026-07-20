@@ -1,5 +1,6 @@
+import pool from '../../config/db';
 // File: backend/src/modules/tables/tables.service.ts
-import { Pool } from 'pg';
+
 import { getRestaurantId } from '../orders/orders.service';
 import {
   RestaurantTable,
@@ -11,7 +12,7 @@ import {
 import { logEvent } from '../ai-operations/aiOperations.service';
 import { OperationalEventType } from '../ai-operations/aiOperations.types';
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
 
 export async function listTables(userId: string, role: string): Promise<RestaurantTable[]> {
   const restaurantId = await getRestaurantId(userId, role);

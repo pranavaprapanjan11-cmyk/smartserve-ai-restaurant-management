@@ -1,5 +1,6 @@
+import pool from '../../config/db';
 // File: backend/src/modules/crm/crm.service.ts
-import { Pool } from 'pg';
+
 import { getRestaurantId } from '../orders/orders.service';
 import {
   Customer,
@@ -18,7 +19,7 @@ import { logEvent } from '../ai-operations/aiOperations.service';
 import { OperationalEventType } from '../ai-operations/aiOperations.types';
 // Removed incorrect import: `getGeminiInsight` is not exported from ../ai/ai.service
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
 
 // --- Customers ---
 
