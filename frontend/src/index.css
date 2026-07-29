@@ -1,46 +1,47 @@
 @import "tailwindcss";
 
-/* SmartServe-AI Enterprise High-Contrast Design Tokens */
+/* SmartServe-AI Permanent Brand Tokens */
 :root {
   color-scheme: light;
   
-  /* Primary Brand Colors */
-  --primary: #0F6B4B;
-  --dark-green: #084C37;
-  --light-green: #2FA36B;
-  --accent-green: #10B981;
+  /* Main Application Canvas (Royal Green) */
+  --surface: #0F6B4B;
+  --surface-2: #145C46;
+  --surface-3: #1A7358;
 
-  /* Surfaces & Canvas */
-  --surface: #F8FAF9;
-  --surface-2: #FFFFFF;
-  --surface-3: #F3F4F6;
+  /* Sidebar (Blush Pink) */
+  --sidebar-bg: #F7D6E6;
+  --sidebar-hover: #F2C6DA;
+  --sidebar-active: #EAA8C4;
+  --sidebar-border: #E8B9CF;
+  --sidebar-icon: #6B2146;
+  --sidebar-text: #4A1D35;
+  --sidebar-active-text: #FFFFFF;
+
+  /* Card Containers (Pure White) */
   --card-bg: #FFFFFF;
-  --sidebar-bg: #083B2C;
-  --sidebar-hover: rgba(255, 255, 255, 0.12);
-  --sidebar-active: rgba(47, 163, 107, 0.25);
-  
-  /* WCAG AA Compliant High-Contrast Text Tokens */
-  --text-primary: #111827;      /* Charcoal / Slate 900 - Headings & High Emphasis */
-  --text-secondary: #4B5563;    /* Slate 600 - Subheadings, Labels, Body */
-  --text-muted: #6B7280;        /* Slate 500 - Captions, Metadata (No Low Opacity) */
-  --text-disabled: #9CA3AF;     /* Slate 400 - Disabled States Only */
-  --text-on-dark: #FFFFFF;
+  --border-color: #E5E7EB;
+  --shadow-card: 0 4px 18px rgba(0, 0, 0, 0.08);
 
-  /* Borders & Dividers */
-  --border-color: #D1D5DB;      /* Crisp Visible Border (Slate 300) */
-  --border-subtle: #E5E7EB;     /* Light Divider (Slate 200) */
-  --border-focus: #0F6B4B;
+  /* Primary Brand Buttons & Accents */
+  --primary: #0F6B4B;
+  --primary-hover: #0B563D;
+  --secondary-btn: #F7D6E6;
+  --secondary-btn-hover: #F2C6DA;
+  --secondary-btn-text: #4A1D35;
+  --secondary-btn-border: #E8B9CF;
 
-  /* Enterprise Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-card: 0 2px 8px 0 rgba(0, 0, 0, 0.06), 0 1px 2px 0 rgba(0, 0, 0, 0.04);
-  --shadow-modal: 0 12px 32px 0 rgba(0, 0, 0, 0.12), 0 4px 12px 0 rgba(0, 0, 0, 0.06);
+  /* High-Contrast Card Typography */
+  --text-primary: #111827;      /* Charcoal / Slate 900 */
+  --text-secondary: #4B5563;    /* Slate 600 */
+  --text-muted: #6B7280;        /* Slate 500 */
+  --text-disabled: #9CA3AF;     /* Slate 400 */
+  --text-on-green: #FFFFFF;
 
-  /* High-Contrast Status Text Colors */
-  --success-text: #15803D;      /* Emerald 700 */
-  --warning-text: #B45309;      /* Amber 700 */
-  --danger-text: #DC2626;       /* Red 600 */
-  --info-text: #1D4ED8;         /* Blue 700 */
+  /* Status Colors */
+  --success-text: #15803D;
+  --warning-text: #B45309;
+  --danger-text: #DC2626;
 }
 
 html, body, #root {
@@ -55,7 +56,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Typography Reset & Defaults */
+/* Form Elements Reset */
 button,
 input,
 textarea,
@@ -64,37 +65,7 @@ select {
   color: var(--text-primary);
 }
 
-/* Reusable Typography Hierarchy Tokens */
-.text-heading-lg {
-  color: #111827 !important;
-  font-weight: 800 !important;
-  letter-spacing: -0.025em !important;
-}
-
-.text-heading-md {
-  color: #111827 !important;
-  font-weight: 700 !important;
-  letter-spacing: -0.015em !important;
-}
-
-.text-heading-sm {
-  color: #111827 !important;
-  font-weight: 700 !important;
-}
-
-.text-body-primary {
-  color: #111827 !important;
-}
-
-.text-body-secondary {
-  color: #4B5563 !important;
-}
-
-.text-body-muted {
-  color: #6B7280 !important;
-}
-
-/* Utility Classes */
+/* Global Utility Classes */
 .bg-surface {
   background-color: var(--surface);
 }
@@ -103,46 +74,41 @@ select {
   background-color: var(--card-bg);
 }
 
-.border-subtle {
+.border-card {
   border-color: var(--border-color);
 }
 
-.shadow-enterprise {
+.shadow-card-enterprise {
   box-shadow: var(--shadow-card);
-}
-
-.shadow-modal-enterprise {
-  box-shadow: var(--shadow-modal);
 }
 
 .btn-royal-primary {
   background-color: var(--primary);
   color: #FFFFFF;
   font-weight: 700;
-  border-radius: 0.625rem; /* 10px */
+  border-radius: 0.625rem;
   padding: 0.625rem 1.25rem;
   transition: all 0.15s ease-in-out;
   border: 1px solid transparent;
 }
 
 .btn-royal-primary:hover {
-  background-color: var(--dark-green);
-  box-shadow: 0 2px 6px rgba(15, 107, 75, 0.25);
+  background-color: var(--primary-hover);
+  box-shadow: 0 2px 8px rgba(15, 107, 75, 0.3);
 }
 
 .btn-royal-secondary {
-  background-color: #FFFFFF;
-  color: #111827;
-  font-weight: 600;
+  background-color: var(--secondary-btn);
+  color: var(--secondary-btn-text);
+  font-weight: 700;
   border-radius: 0.625rem;
   padding: 0.625rem 1.25rem;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--secondary-btn-border);
   transition: all 0.15s ease-in-out;
 }
 
 .btn-royal-secondary:hover {
-  background-color: #F9FAFB;
-  border-color: #9CA3AF;
+  background-color: var(--secondary-btn-hover);
 }
 
 /* Custom Scrollbar */
@@ -156,15 +122,15 @@ select {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #9CA3AF;
+  background: #E8B9CF;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #6B7280;
+  background: #EAA8C4;
 }
 
 ::selection {
-  background: rgba(15, 107, 75, 0.22);
-  color: #0F6B4B;
+  background: rgba(247, 214, 230, 0.6);
+  color: #4A1D35;
 }

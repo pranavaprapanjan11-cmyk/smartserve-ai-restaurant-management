@@ -24,10 +24,10 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#F8FAF9] px-4 py-16 text-[#111827]">
-      <div className="w-full max-w-md rounded-2xl border border-[#D1D5DB] bg-white p-8 shadow-sm space-y-6">
+    <div className="flex min-h-screen items-center justify-center bg-[#0F6B4B] px-4 py-16 text-[#111827]">
+      <div className="w-full max-w-md rounded-2xl border border-[#E5E7EB] bg-white p-8 shadow-[0_4px_18px_rgba(0,0,0,0.08)] space-y-6">
         <div className="text-center space-y-2">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[#0F6B4B] text-white text-base font-extrabold shadow-sm">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[#F7D6E6] border border-[#E8B9CF] text-[#4A1D35] text-base font-extrabold shadow-sm">
             SS
           </div>
           <h2 className="text-2xl font-extrabold text-[#111827] tracking-tight">Sign in to SmartServe AI</h2>

@@ -160,7 +160,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
         {workspaceInfo && (
           <div className="hidden lg:flex items-center gap-2 border-l border-[#D1D5DB] pl-3">
             <span className="text-[11px] font-bold text-[#4B5563]">Workspace:</span>
-            <span className="text-xs font-bold text-[#0F6B4B] bg-[#0F6B4B]/10 border border-[#0F6B4B]/20 px-2 py-0.5 rounded-md font-mono">{workspaceInfo.code}</span>
+            <span className="text-xs font-bold text-[#4A1D35] bg-[#F7D6E6] border border-[#E8B9CF] px-2.5 py-0.5 rounded-md font-mono">{workspaceInfo.code}</span>
             {workspaceInfo.name && (
               <span className="text-xs text-[#4B5563] font-medium max-w-[140px] truncate" title={workspaceInfo.name}>
                 ({workspaceInfo.name.replace("'s Workspace", "")})
