@@ -89,7 +89,13 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   });
 });
 
+import { validateDatabaseSchema } from './config/schemaValidator';
+
 const PORT = Number(process.env.PORT) || 4000;
-app.listen(PORT, () => {
-  console.log(`Backend server listening on port ${PORT}`);
+
+// Perform read-only schema validation prior to starting server
+validateDatabaseSchema().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Backend server listening on port ${PORT}`);
+  });
 });

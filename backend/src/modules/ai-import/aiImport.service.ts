@@ -144,7 +144,6 @@ export async function confirmImportData(
   fileId: string,
   durationMs: number
 ): Promise<void> {
-  await ensureAiImportsTable();
   const client = await pool.connect();
   const filePath = path.join(process.cwd(), 'backend', 'uploads', fileId);
   try {
@@ -238,37 +237,7 @@ export async function confirmImportData(
   }
 }
 
-async function ensureAiImportsTable(): Promise<void> {
-  const createTableSql = `
-    CREATE TABLE IF NOT EXISTS ai_imports (
-      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      restaurant_id UUID NOT NULL,
-      workspace_id UUID,
-      import_type VARCHAR(50) NOT NULL,
-      original_file_name VARCHAR(255),
-      original_file_path TEXT,
-      ai_raw_response JSONB DEFAULT '{}'::jsonb,
-      final_imported_data JSONB DEFAULT '{}'::jsonb,
-      user_corrections JSONB DEFAULT '{}'::jsonb,
-      confidence_score DECIMAL(5,2) DEFAULT 0.00,
-      processing_time_ms INTEGER DEFAULT 0,
-      ocr_fallback_used BOOLEAN DEFAULT false,
-      status VARCHAR(50) DEFAULT 'PENDING',
-      imported_by UUID,
-      created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
-      updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
-    );
-    CREATE INDEX IF NOT EXISTS idx_ai_imports_restaurant_id ON ai_imports(restaurant_id);
-  `;
-  try {
-    await pool.query(createTableSql);
-  } catch (err) {
-    console.error('[AI Imports Auto-Healer]: Table creation check failed', err);
-  }
-}
-
 export async function getImportHistory(restaurantId: string): Promise<ImportLog[]> {
-  await ensureAiImportsTable();
   const { rows } = await pool.query(
     'SELECT * FROM ai_imports WHERE restaurant_id = $1 ORDER BY created_at DESC',
     [restaurantId]
@@ -277,7 +246,6 @@ export async function getImportHistory(restaurantId: string): Promise<ImportLog[
 }
 
 export async function getImportAnalytics(restaurantId: string): Promise<any> {
-  await ensureAiImportsTable();
   const { rows } = await pool.query(
     `SELECT 
        COALESCE(AVG(confidence_score), 0.00) as avg_accuracy,

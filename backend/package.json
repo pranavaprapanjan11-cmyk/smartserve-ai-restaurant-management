@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc -p tsconfig.json",
-    "start": "node dist/server.js",
+    "start": "node scripts/run_all_migrations.js && node dist/server.js",
     "migrate": "node scripts/run_all_migrations.js",
     "seed-analytics": "node scripts/seed_analytics_data.js"
   },
