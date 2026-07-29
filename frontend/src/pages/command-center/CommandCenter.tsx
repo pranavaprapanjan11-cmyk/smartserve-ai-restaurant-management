@@ -21,19 +21,24 @@ const CommandCenter: React.FC = () => {
       if (!token) return
       if (showLoading) setIsLoading(true)
       try {
-        const [statsData, ordersData, lowStockItems, tablesData] = await Promise.all([
-          menuService.getMenuStats(token),
-          orderService.getOrders(token),
-          inventoryService.getLowStockItems(token),
-          tableService.getTables(token)
+        const [statsData, ordersRes, lowStockRes, tablesRes] = await Promise.all([
+          menuService.getMenuStats(token).catch(() => null),
+          orderService.getOrders(token).catch(() => []),
+          inventoryService.getLowStockItems(token).catch(() => []),
+          tableService.getTables(token).catch(() => [])
         ])
+
+        const ordersData = Array.isArray(ordersRes) ? ordersRes : []
+        const lowStockItems = Array.isArray(lowStockRes) ? lowStockRes : []
+        const tablesData = Array.isArray(tablesRes) ? tablesRes : []
+
         setStats(statsData)
         setOrders(ordersData)
 
         // Process alerts
         const now = new Date()
         const delayedOrders = ordersData.filter(o => {
-          if (o.status === orderService.OrderStatus.PAID || o.status === orderService.OrderStatus.REFUNDED) return false
+          if (!o || o.status === orderService.OrderStatus.PAID || o.status === orderService.OrderStatus.REFUNDED) return false
           const activeStates = [
             orderService.OrderStatus.NEW,
             orderService.OrderStatus.SENT_TO_KITCHEN,
@@ -57,7 +62,7 @@ const CommandCenter: React.FC = () => {
           ...delayedOrders.map(o => ({
             id: `order-${o.id}`,
             type: 'Kitchen',
-            message: `Order #${o.id.substring(0, 8)} for Table ${o.table_number} is delayed (> 15 mins)`,
+            message: `Order #${(o.id || '').substring(0, 8)} for Table ${o.table_number} is delayed (> 15 mins)`,
             severity: 'warning' as const
           }))
         ]
@@ -73,8 +78,8 @@ const CommandCenter: React.FC = () => {
         setAlerts(liveAlerts)
 
         // Process notifications
-        const cleaningTables = tablesData.filter(t => t.status === tableService.TableStatus.CLEANING)
-        const reservedTables = tablesData.filter(t => t.status === tableService.TableStatus.RESERVED)
+        const cleaningTables = tablesData.filter(t => t && t.status === tableService.TableStatus.CLEANING)
+        const reservedTables = tablesData.filter(t => t && t.status === tableService.TableStatus.RESERVED)
 
         const liveNotifications = [
           ...cleaningTables.map(t => ({
