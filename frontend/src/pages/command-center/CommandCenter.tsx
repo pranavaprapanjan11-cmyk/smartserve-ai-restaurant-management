@@ -144,69 +144,69 @@ const CommandCenter: React.FC = () => {
   const status = stats?.available_items && stats.available_items > 0 ? 'Operational' : 'At Risk'
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 text-[#111827]">
       <section className="grid gap-6 lg:grid-cols-2 xl:grid-cols-[1.25fr_0.9fr]">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-[2rem] border surface-border surface-panel p-6 shadow-2xl shadow-cyan-500/5 backdrop-blur-xl"
+          className="rounded-xl border border-[#D1D5DB] bg-white p-6 shadow-sm space-y-6"
         >
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start justify-between gap-4 border-b border-[#E5E7EB] pb-4">
             <div>
-              <p className="text-sm uppercase tracking-[0.35em] text-cyan-300/70">Command Center</p>
-              <h2 className="mt-4 text-3xl font-semibold text-white">Operational Pulse</h2>
+              <p className="text-xs font-bold uppercase tracking-wider text-[#0F6B4B]">Command Center</p>
+              <h2 className="mt-1 text-2xl font-extrabold text-[#111827] tracking-tight">Operational Pulse</h2>
             </div>
-            <div className="rounded-3xl bg-cyan-500/10 px-4 py-3 text-cyan-200 ring-1 ring-cyan-400/20">
-              Live
+            <div className="rounded-full bg-[#0F6B4B]/10 px-3.5 py-1 text-xs font-bold text-[#0F6B4B] border border-[#0F6B4B]/30">
+              Live Real-Time
             </div>
           </div>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            <div className="rounded-3xl border border-white/10 bg-[#0c101c]/80 p-5">
-              <p className="text-sm text-slate-400">Revenue Velocity</p>
-              <p className="mt-3 text-4xl font-semibold text-cyan-300">₹{revenueVelocity}/day</p>
-              <p className="mt-2 text-sm text-slate-400">Projected seven-day momentum</p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-lg border border-[#D1D5DB] bg-[#F8FAF9] p-5">
+              <p className="text-xs font-bold text-[#4B5563] uppercase tracking-wide">Revenue Velocity</p>
+              <p className="mt-2 text-3xl font-extrabold text-[#0F6B4B]">₹{revenueVelocity}/day</p>
+              <p className="mt-1 text-xs text-[#4B5563] font-medium">Projected 7-day momentum</p>
             </div>
-            <div className="rounded-3xl border border-white/10 bg-[#0c101c]/80 p-5">
-              <p className="text-sm text-slate-400">Kitchen Health</p>
-              <p className="mt-3 text-4xl font-semibold text-emerald-300">{kitchenHealth}%</p>
-              <div className="mt-4 h-3 overflow-hidden rounded-full bg-white/10">
-                <div className="h-full rounded-full bg-emerald-400" style={{ width: `${kitchenHealth}%` }} />
+            <div className="rounded-lg border border-[#D1D5DB] bg-[#F8FAF9] p-5">
+              <p className="text-xs font-bold text-[#4B5563] uppercase tracking-wide">Kitchen Health</p>
+              <p className="mt-2 text-3xl font-extrabold text-[#15803D]">{kitchenHealth}%</p>
+              <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-gray-200 border border-gray-300">
+                <div className="h-full rounded-full bg-[#15803D]" style={{ width: `${kitchenHealth}%` }} />
               </div>
             </div>
-            <div className="rounded-3xl border border-white/10 bg-[#0c101c]/80 p-5">
-              <p className="text-sm text-slate-400">Inventory Alerts</p>
-              <p className="mt-3 text-4xl font-semibold text-amber-300">{alerts.length}</p>
-              <p className="mt-2 text-sm text-slate-400">Active item alerts</p>
+            <div className="rounded-lg border border-[#D1D5DB] bg-[#F8FAF9] p-5">
+              <p className="text-xs font-bold text-[#4B5563] uppercase tracking-wide">Inventory Alerts</p>
+              <p className="mt-2 text-3xl font-extrabold text-[#B45309]">{alerts.length}</p>
+              <p className="mt-1 text-xs text-[#4B5563] font-medium">Active item warnings</p>
             </div>
-            <div className="rounded-3xl border border-white/10 bg-[#0c101c]/80 p-5">
-              <p className="text-sm text-slate-400">Restaurant Status</p>
-              <p className="mt-3 text-4xl font-semibold text-white">{status}</p>
-              <p className="mt-2 text-sm text-slate-400">Live availability and service readiness</p>
+            <div className="rounded-lg border border-[#D1D5DB] bg-[#F8FAF9] p-5">
+              <p className="text-xs font-bold text-[#4B5563] uppercase tracking-wide">Restaurant Status</p>
+              <p className="mt-2 text-3xl font-extrabold text-[#111827]">{status}</p>
+              <p className="mt-1 text-xs text-[#4B5563] font-medium">Live availability & service readiness</p>
             </div>
           </div>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-[2rem] border surface-border surface-panel p-6 shadow-2xl shadow-amber-500/5 backdrop-blur-xl"
+          className="rounded-xl border border-[#D1D5DB] bg-white p-6 shadow-sm space-y-6"
         >
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center justify-between gap-4 border-b border-[#E5E7EB] pb-4">
             <div>
-              <p className="text-sm uppercase tracking-[0.35em] text-amber-300/70">Notifications</p>
-              <h3 className="mt-4 text-2xl font-semibold text-white">Action Items</h3>
+              <p className="text-xs font-bold uppercase tracking-wider text-[#B45309]">Notifications</p>
+              <h3 className="mt-1 text-2xl font-extrabold text-[#111827]">Action Items</h3>
             </div>
-            <div className="rounded-3xl bg-amber-400/10 px-4 py-3 text-amber-200 ring-1 ring-amber-300/20">
+            <div className="rounded-full bg-amber-50 px-3.5 py-1 text-xs font-bold text-[#B45309] border border-amber-300">
               {notifications.length} new
             </div>
           </div>
 
-          <div className="mt-8 space-y-4">
+          <div className="space-y-3">
             {notifications.map((note) => (
-              <div key={note.id} className="rounded-3xl border border-white/10 bg-[#09101c]/80 p-5">
-                <p className="text-sm font-semibold text-white">{note.title}</p>
-                <p className="mt-2 text-sm text-slate-400">{note.subtitle}</p>
+              <div key={note.id} className="rounded-lg border border-[#D1D5DB] bg-gray-50 p-4">
+                <p className="text-xs font-extrabold text-[#111827]">{note.title}</p>
+                <p className="mt-1 text-xs text-[#4B5563] font-medium">{note.subtitle}</p>
               </div>
             ))}
           </div>
@@ -215,68 +215,70 @@ const CommandCenter: React.FC = () => {
 
       <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-[2rem] border surface-border surface-panel p-6 shadow-2xl shadow-emerald-500/5 backdrop-blur-xl"
+          className="rounded-xl border border-[#D1D5DB] bg-white p-6 shadow-sm space-y-6"
         >
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center justify-between gap-4 border-b border-[#E5E7EB] pb-4">
             <div>
-              <p className="text-sm uppercase tracking-[0.35em] text-emerald-300/70">Live Metrics</p>
-              <h3 className="mt-4 text-2xl font-semibold text-white">Order Operations</h3>
+              <p className="text-xs font-bold uppercase tracking-wider text-[#0F6B4B]">Live Operations</p>
+              <h3 className="mt-1 text-2xl font-extrabold text-[#111827]">Order Metrics</h3>
             </div>
-            <span className="rounded-full bg-emerald-500/10 px-4 py-2 text-xs uppercase tracking-[0.25em] text-emerald-300 ring-1 ring-emerald-400/20">
-              Real-time DB data
+            <span className="rounded-full bg-[#0F6B4B]/10 px-3 py-1 text-[10px] uppercase font-bold tracking-wider text-[#0F6B4B] border border-[#0F6B4B]/30">
+              Real-Time Sync
             </span>
           </div>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            <div className="rounded-3xl border border-white/10 bg-[#0c101c]/80 p-5">
-              <p className="text-sm text-slate-400">Active Orders</p>
-              <p className="mt-3 text-4xl font-semibold text-cyan-300">{activeOrdersCount}</p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-lg border border-[#D1D5DB] bg-[#F8FAF9] p-5">
+              <p className="text-xs font-bold text-[#4B5563] uppercase tracking-wide">Active Orders</p>
+              <p className="mt-2 text-3xl font-extrabold text-[#0F6B4B]">{activeOrdersCount}</p>
             </div>
-            <div className="rounded-3xl border border-white/10 bg-[#0c101c]/80 p-5">
-              <p className="text-sm text-slate-400">Preparing Orders</p>
-              <p className="mt-3 text-4xl font-semibold text-amber-300">{preparingOrdersCount}</p>
+            <div className="rounded-lg border border-[#D1D5DB] bg-[#F8FAF9] p-5">
+              <p className="text-xs font-bold text-[#4B5563] uppercase tracking-wide">Preparing Orders</p>
+              <p className="mt-2 text-3xl font-extrabold text-[#B45309]">{preparingOrdersCount}</p>
             </div>
-            <div className="rounded-3xl border border-white/10 bg-[#0c101c]/80 p-5">
-              <p className="text-sm text-slate-400">Ready Orders</p>
-              <p className="mt-3 text-4xl font-semibold text-emerald-300">{readyOrdersCount}</p>
+            <div className="rounded-lg border border-[#D1D5DB] bg-[#F8FAF9] p-5">
+              <p className="text-xs font-bold text-[#4B5563] uppercase tracking-wide">Ready Orders</p>
+              <p className="mt-2 text-3xl font-extrabold text-[#15803D]">{readyOrdersCount}</p>
             </div>
-            <div className="rounded-3xl border border-white/10 bg-[#0c101c]/80 p-5">
-              <p className="text-sm text-slate-400">Served Orders</p>
-              <p className="mt-3 text-4xl font-semibold text-white">{servedOrdersCount}</p>
+            <div className="rounded-lg border border-[#D1D5DB] bg-[#F8FAF9] p-5">
+              <p className="text-xs font-bold text-[#4B5563] uppercase tracking-wide">Served Orders</p>
+              <p className="mt-2 text-3xl font-extrabold text-[#111827]">{servedOrdersCount}</p>
             </div>
           </div>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-[2rem] border surface-border surface-panel p-6 shadow-2xl shadow-blue-500/5 backdrop-blur-xl"
+          className="rounded-xl border border-[#D1D5DB] bg-white p-6 shadow-sm space-y-6"
         >
-          <p className="text-sm uppercase tracking-[0.35em] text-cyan-300/70">Quick Actions</p>
-          <h3 className="mt-4 text-2xl font-semibold text-white">Runbook</h3>
-          <div className="mt-8 space-y-3">
+          <div className="border-b border-[#E5E7EB] pb-4">
+            <p className="text-xs font-bold uppercase tracking-wider text-[#0F6B4B]">Quick Actions</p>
+            <h3 className="mt-1 text-2xl font-extrabold text-[#111827]">Operations Runbook</h3>
+          </div>
+          <div className="space-y-3 pt-2">
             <button
               type="button"
               onClick={() => navigate('/inventory')}
-              className="w-full rounded-3xl border border-cyan-400/20 bg-cyan-500/10 px-5 py-4 text-left text-white transition hover:border-cyan-300/30 hover:bg-cyan-500/15"
+              className="w-full rounded-lg border border-[#D1D5DB] bg-[#F8FAF9] px-4 py-3.5 text-left text-xs font-extrabold text-[#111827] hover:bg-gray-100 hover:border-[#0F6B4B] transition"
             >
-              Review pending inventory alerts
+              Review pending inventory alerts &rarr;
             </button>
             <button
               type="button"
               onClick={() => navigate('/orders')}
-              className="w-full rounded-3xl border border-amber-400/20 bg-amber-500/10 px-5 py-4 text-left text-white transition hover:border-amber-300/30 hover:bg-amber-500/15"
+              className="w-full rounded-lg border border-[#D1D5DB] bg-[#F8FAF9] px-4 py-3.5 text-left text-xs font-extrabold text-[#111827] hover:bg-gray-100 hover:border-[#0F6B4B] transition"
             >
-              Assign delayed orders to kitchen team
+              Assign delayed orders to kitchen team &rarr;
             </button>
             <button
               type="button"
               onClick={() => navigate('/menu')}
-              className="w-full rounded-3xl border border-emerald-400/20 bg-emerald-500/10 px-5 py-4 text-left text-white transition hover:border-emerald-300/30 hover:bg-emerald-500/15"
+              className="w-full rounded-lg border border-[#D1D5DB] bg-[#F8FAF9] px-4 py-3.5 text-left text-xs font-extrabold text-[#111827] hover:bg-gray-100 hover:border-[#0F6B4B] transition"
             >
-              Inspect high-margin menu items
+              Inspect high-margin menu items &rarr;
             </button>
           </div>
         </motion.div>
