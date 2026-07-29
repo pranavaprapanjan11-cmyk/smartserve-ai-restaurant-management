@@ -12,7 +12,16 @@ type ProtectedRouteProps = {
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, roles }) => {
   const { user, loading } = useAuth();
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-[#F8FAF9] text-[#111827]">
+        <div className="flex items-center gap-3">
+          <div className="h-6 w-6 animate-spin rounded-full border-3 border-[#0F6B4B] border-t-transparent"></div>
+          <span className="text-sm font-bold tracking-tight text-[#111827]">Loading SmartServe AI...</span>
+        </div>
+      </div>
+    );
+  }
   if (!user) return <Navigate to="/auth/login" replace />;
   if (roles && roles.length > 0 && !roles.includes(user.role || '')) {
     return <Navigate to="/auth/login" replace />;
