@@ -28,10 +28,9 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose }) => {
   const currentRole = user?.role || ''
 
   const commands: CommandItem[] = [
-    // Navigation
     {
       id: 'dashboard',
-      title: 'Go to Dashboard',
+      title: 'Go to Dashboard Overview',
       subtitle: 'View operational overview and active metrics',
       category: 'Navigation',
       roles: ['OWNER', 'SUPER_ADMIN', 'MANAGER'],
@@ -39,7 +38,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose }) => {
     },
     {
       id: 'orders',
-      title: 'Go to Orders',
+      title: 'Go to Orders & Service',
       subtitle: 'View all active orders and status',
       category: 'Navigation',
       roles: ['OWNER', 'SUPER_ADMIN', 'MANAGER', 'WAITER'],
@@ -79,7 +78,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose }) => {
     },
     {
       id: 'inventory',
-      title: 'Go to Inventory',
+      title: 'Go to Inventory Hub',
       subtitle: 'Monitor ingredients, stocks, and alerts',
       category: 'Navigation',
       roles: ['OWNER', 'SUPER_ADMIN', 'MANAGER'],
@@ -87,7 +86,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose }) => {
     },
     {
       id: 'billing',
-      title: 'Go to Billing',
+      title: 'Go to Billing & Invoices',
       subtitle: 'Invoicing, receipts, and checkout management',
       category: 'Navigation',
       roles: ['OWNER', 'SUPER_ADMIN', 'MANAGER', 'CASHIER'],
@@ -95,7 +94,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose }) => {
     },
     {
       id: 'analytics',
-      title: 'Go to Analytics',
+      title: 'Go to Analytics & Insights',
       subtitle: 'Deep business metrics, revenue graphs, and sales reports',
       category: 'Navigation',
       roles: ['OWNER', 'SUPER_ADMIN', 'MANAGER'],
@@ -119,7 +118,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose }) => {
     },
     {
       id: 'employees',
-      title: 'Go to Employees Management',
+      title: 'Go to Employee Directory',
       subtitle: 'Manage user access, shift timing, and profiles',
       category: 'Navigation',
       roles: ['OWNER', 'SUPER_ADMIN', 'MANAGER'],
@@ -149,7 +148,6 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose }) => {
       roles: ['OWNER', 'SUPER_ADMIN', 'MANAGER'],
       action: () => { navigate('/ai-import'); onClose(); }
     },
-    // Simulation commands
     {
       id: 'sim-new-order',
       title: 'Simulate: New Order Created',
@@ -205,33 +203,10 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose }) => {
       subtitle: 'Triggers shaking low-stock ingredient alert',
       category: 'Live Activity Simulation',
       action: () => { triggerLiveActivity('inventoryAlert', { items: ['Rice', 'Chicken', 'Tomato'] }); onClose(); }
-    },
-    {
-      id: 'sim-analytics',
-      title: 'Simulate: Analytics Loading',
-      subtitle: 'Triggers upward revenue counter animation',
-      category: 'Live Activity Simulation',
-      action: () => { triggerLiveActivity('analyticsCounter'); onClose(); }
-    },
-    {
-      id: 'sim-ai-insights',
-      title: 'Simulate: AI Recommendation Loading',
-      subtitle: 'Triggers one-by-one card reveal animation',
-      category: 'Live Activity Simulation',
-      action: () => { triggerLiveActivity('aiInsightsReveal'); onClose(); }
-    },
-    {
-      id: 'sim-notify',
-      title: 'Simulate: New Notification Badge',
-      subtitle: 'Triggers bell shaking and increments header badge',
-      category: 'Live Activity Simulation',
-      action: () => { triggerLiveActivity('notificationsBadge'); onClose(); }
     }
   ]
 
-  // Filter commands by search term and role access
   const filteredCommands = commands.filter((cmd) => {
-    // Check role access
     if (cmd.roles && !cmd.roles.includes(currentRole)) {
       return false
     }
@@ -244,7 +219,6 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose }) => {
     return matchesSearch
   })
 
-  // Autofocus input
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => inputRef.current?.focus(), 50)
@@ -253,7 +227,6 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose }) => {
     }
   }, [isOpen])
 
-  // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isOpen) return
@@ -278,7 +251,6 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose }) => {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [isOpen, selectedIndex, filteredCommands])
 
-  // Scroll selected item into view
   useEffect(() => {
     const activeEl = listRef.current?.querySelector('[data-active="true"]')
     if (activeEl) {
@@ -289,15 +261,12 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh] px-4">
-      {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-md" onClick={onClose} />
+    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[12vh] px-4">
+      <div className="fixed inset-0 bg-black/40" onClick={onClose} />
 
-      {/* Modal panel */}
-      <div className="relative w-full max-w-2xl overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/80 p-1 shadow-2xl shadow-cyan-500/10 backdrop-blur-xl">
-        {/* Search input */}
-        <div className="flex items-center gap-3 border-b border-white/5 px-5 py-4">
-          <svg className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="relative w-full max-w-xl overflow-hidden rounded-xl border border-[#E5E7EB] bg-white p-1 shadow-2xl">
+        <div className="flex items-center gap-3 border-b border-[#E5E7EB] px-4 py-3.5 bg-gray-50">
+          <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
@@ -309,27 +278,25 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose }) => {
               setSearch(e.target.value)
               setSelectedIndex(0)
             }}
-            className="flex-1 bg-transparent text-lg text-white placeholder-slate-500 outline-none"
+            className="flex-1 bg-transparent text-base font-medium text-gray-900 placeholder-gray-400 outline-none"
           />
-          <kbd className="hidden rounded-lg bg-white/5 px-2.5 py-1 text-xs font-semibold text-slate-400 border border-white/5 sm:block">
+          <kbd className="hidden rounded bg-gray-200 px-2 py-0.5 text-xs font-mono font-semibold text-gray-600 border border-gray-300 sm:block">
             ESC
           </kbd>
         </div>
 
-        {/* Results list */}
-        <div ref={listRef} className="max-h-[360px] overflow-y-auto p-2">
+        <div ref={listRef} className="max-h-[340px] overflow-y-auto p-1.5">
           {filteredCommands.length === 0 ? (
-            <div className="py-12 text-center text-slate-500">
-              No results found for &ldquo;<span className="text-slate-300">{search}</span>&rdquo;
+            <div className="py-10 text-center text-sm text-gray-500">
+              No results found for &ldquo;<span className="text-gray-900 font-semibold">{search}</span>&rdquo;
             </div>
           ) : (
             <div>
-              {/* Group by category */}
               {Array.from(new Set(filteredCommands.map((c) => c.category))).map((cat) => {
                 const catCommands = filteredCommands.filter((c) => c.category === cat)
                 return (
                   <div key={cat}>
-                    <div className="px-3 py-2 text-xs font-bold uppercase tracking-wider text-cyan-400/70">
+                    <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#0F6B4B]">
                       {cat}
                     </div>
                     <div className="grid gap-1">
@@ -344,24 +311,21 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose }) => {
                             data-active={isSelected}
                             onClick={cmd.action}
                             onMouseEnter={() => setSelectedIndex(globalIndex)}
-                            className={`flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left transition-all duration-150 ${
+                            className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left transition-all duration-100 ${
                               isSelected
-                                ? 'bg-cyan-500/15 text-white ring-1 ring-cyan-400/25'
-                                : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                                ? 'bg-[#0F6B4B]/10 text-[#0F6B4B] font-semibold border-l-3 border-[#0F6B4B]'
+                                : 'text-gray-700 hover:bg-gray-50'
                             }`}
                           >
                             <div className="min-w-0">
-                              <p className="text-sm font-semibold">{cmd.title}</p>
-                              <p className={`truncate text-xs ${isSelected ? 'text-cyan-200/75' : 'text-slate-400'}`}>
+                              <p className="text-xs font-semibold">{cmd.title}</p>
+                              <p className={`truncate text-[11px] ${isSelected ? 'text-[#0F6B4B]/80' : 'text-gray-500'}`}>
                                 {cmd.subtitle}
                               </p>
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className="rounded-full bg-white/5 border border-white/5 px-2.5 py-0.5 text-2xs text-slate-400 font-medium">
-                                {cmd.category}
-                              </span>
                               {isSelected && (
-                                <span className="text-xs text-cyan-400">
+                                <span className="text-xs text-[#0F6B4B] font-bold">
                                   &crarr;
                                 </span>
                               )}

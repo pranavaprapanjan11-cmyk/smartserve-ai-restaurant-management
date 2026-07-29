@@ -84,7 +84,6 @@ const AiImportCenter: React.FC = () => {
     setError(null);
     setCurrentStageIndex(0);
 
-    // Simulate progressive processing stages
     const stageInterval = setInterval(() => {
       setCurrentStageIndex((prev) => (prev < processingStages.length - 1 ? prev + 1 : prev));
     }, 700);
@@ -140,35 +139,36 @@ const AiImportCenter: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8 text-white">
+    <div className="space-y-6 text-gray-900">
       {/* Page Header */}
-      <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+      <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center border-b border-[#E5E7EB] pb-5">
         <div>
-          <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-            Gemini Vision Understanding
+          <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+            Gemini Vision Document Intelligence
           </h1>
-          <p className="text-slate-400 mt-1 text-sm">
-            AI-first document intelligence. Upload any menu or supplier invoice and Gemini 2.5 Flash will automatically understand, classify, and extract it.
+          <p className="text-gray-500 mt-1 text-xs sm:text-sm">
+            Upload menu photos, supplier invoices, or handwritten notes. Gemini Vision will analyze, classify, and extract structured items.
           </p>
         </div>
 
-        <div className="flex bg-slate-900/60 p-1.5 rounded-2xl border border-white/10 backdrop-blur-xl">
+        {/* Tab Toggle */}
+        <div className="flex bg-gray-100 p-1 rounded-xl border border-[#E5E7EB] self-start md:self-auto">
           <button
             onClick={() => setActiveTab('vision')}
-            className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
               activeTab === 'vision'
-                ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-400/20'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-[#0F6B4B] text-white shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
             }`}
           >
             AI Vision Upload
           </button>
           <button
             onClick={() => setActiveTab('history')}
-            className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
               activeTab === 'history'
-                ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-400/20'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-[#0F6B4B] text-white shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
             }`}
           >
             Import Telemetry
@@ -177,26 +177,26 @@ const AiImportCenter: React.FC = () => {
       </div>
 
       {activeTab === 'vision' ? (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Upload Card */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Main Upload Card */}
           <div className="lg:col-span-8 space-y-6">
-            <div className="p-8 rounded-3xl bg-slate-900/60 border border-white/10 backdrop-blur-xl space-y-6">
-              <div className="flex items-center justify-between">
+            <div className="p-6 rounded-xl bg-white border border-[#E5E7EB] shadow-sm space-y-6">
+              <div className="flex items-center justify-between border-b border-gray-100 pb-4">
                 <div>
-                  <h2 className="text-xl font-bold">Document Analyzer</h2>
-                  <p className="text-xs text-slate-400 mt-0.5">Supports JPG, PNG, WEBP, and PDF menu cards, receipts, and invoices.</p>
+                  <h2 className="text-base font-bold text-gray-900">Document Analyzer</h2>
+                  <p className="text-xs text-gray-500 mt-0.5">Supports JPG, PNG, WEBP, and PDF menu cards, receipts, and invoices.</p>
                 </div>
-                <span className="px-3 py-1 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-400/30 rounded-full text-xs font-bold text-cyan-300">
+                <span className="px-3 py-1 bg-[#0F6B4B]/10 border border-[#0F6B4B]/20 rounded-full text-xs font-bold text-[#0F6B4B]">
                   Gemini 2.5 Flash Vision
                 </span>
               </div>
 
-              {/* Drag and Drop Zone */}
+              {/* Drag and Drop Area */}
               <div
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
-                className={`border-2 border-dashed rounded-2xl p-10 text-center transition-all ${
-                  file ? 'border-cyan-400 bg-cyan-500/5' : 'border-white/10 hover:border-cyan-500/40 hover:bg-slate-950/50'
+                className={`border-2 border-dashed rounded-xl p-8 text-center transition-all ${
+                  file ? 'border-[#0F6B4B] bg-[#0F6B4B]/5' : 'border-gray-300 hover:border-[#0F6B4B]/60 hover:bg-gray-50'
                 }`}
               >
                 <input
@@ -208,50 +208,50 @@ const AiImportCenter: React.FC = () => {
                 />
 
                 {file ? (
-                  <div className="space-y-4">
-                    <div className="h-16 w-16 mx-auto rounded-2xl bg-cyan-500/10 border border-cyan-400/20 flex items-center justify-center text-cyan-400 text-2xl font-bold">
+                  <div className="space-y-3">
+                    <div className="h-12 w-12 mx-auto rounded-lg bg-[#0F6B4B]/10 border border-[#0F6B4B]/20 flex items-center justify-center text-[#0F6B4B] text-xl font-bold">
                       📄
                     </div>
                     <div>
-                      <h4 className="font-bold text-base text-white">{file.name}</h4>
-                      <p className="text-xs text-slate-400 mt-1">{(file.size / 1024).toFixed(1)} KB</p>
+                      <h4 className="font-bold text-sm text-gray-900">{file.name}</h4>
+                      <p className="text-xs text-gray-500 mt-0.5">{(file.size / 1024).toFixed(1)} KB</p>
                     </div>
                     <button
                       onClick={() => setFile(null)}
-                      className="text-xs text-red-400 hover:underline"
+                      className="text-xs text-red-600 font-semibold hover:underline"
                     >
                       Choose another file
                     </button>
                   </div>
                 ) : (
-                  <label htmlFor="vision-file-upload" className="cursor-pointer space-y-4 block">
-                    <div className="h-16 w-16 mx-auto rounded-2xl bg-slate-800/80 border border-white/10 flex items-center justify-center text-3xl">
+                  <label htmlFor="vision-file-upload" className="cursor-pointer space-y-3 block">
+                    <div className="h-12 w-12 mx-auto rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center text-xl text-gray-600">
                       📷
                     </div>
                     <div>
-                      <h4 className="font-bold text-base text-white">Drag & drop document photo or click to browse</h4>
-                      <p className="text-xs text-slate-400 mt-1">Automatic semantic classification (Menu vs Inventory)</p>
+                      <h4 className="font-bold text-sm text-gray-900">Drag & drop document photo or click to browse</h4>
+                      <p className="text-xs text-gray-500 mt-0.5">Automatic semantic classification (Menu vs Inventory)</p>
                     </div>
                   </label>
                 )}
               </div>
 
               {error && (
-                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm font-medium">
+                <div className="p-3.5 bg-red-50 border border-red-200 rounded-lg text-red-700 text-xs font-semibold">
                   {error}
                 </div>
               )}
 
-              {/* Action Button & Processing Stages */}
+              {/* Progress Indicator */}
               {isProcessing ? (
-                <div className="p-6 bg-slate-950/80 rounded-2xl border border-cyan-500/30 space-y-4">
-                  <div className="flex items-center justify-between text-sm font-bold text-cyan-400">
+                <div className="p-5 bg-gray-50 rounded-xl border border-[#E5E7EB] space-y-3">
+                  <div className="flex items-center justify-between text-xs font-bold text-[#0F6B4B]">
                     <span>{processingStages[currentStageIndex]}</span>
                     <span>Stage {currentStageIndex + 1} of {processingStages.length}</span>
                   </div>
-                  <div className="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                  <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
                     <div
-                      className="bg-gradient-to-r from-cyan-400 to-purple-500 h-full transition-all duration-500"
+                      className="bg-[#0F6B4B] h-full transition-all duration-300"
                       style={{ width: `${((currentStageIndex + 1) / processingStages.length) * 100}%` }}
                     ></div>
                   </div>
@@ -260,10 +260,10 @@ const AiImportCenter: React.FC = () => {
                 <button
                   onClick={startVisionAnalysis}
                   disabled={!file}
-                  className={`w-full py-4 rounded-2xl font-bold text-sm transition-all shadow-lg ${
+                  className={`w-full py-3 rounded-lg font-bold text-sm transition-all shadow-sm ${
                     file
-                      ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 hover:opacity-90 cursor-pointer'
-                      : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                      ? 'bg-[#0F6B4B] text-white hover:bg-[#084C37] cursor-pointer'
+                      : 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
                   }`}
                 >
                   Analyze with Gemini Vision
@@ -272,26 +272,26 @@ const AiImportCenter: React.FC = () => {
             </div>
           </div>
 
-          {/* Capabilities Info Side Card */}
+          {/* Vision Capabilities Sidebar Card */}
           <div className="lg:col-span-4 space-y-6">
-            <div className="p-6 rounded-3xl bg-slate-900/60 border border-white/10 backdrop-blur-xl space-y-4">
-              <h3 className="font-bold text-base text-white">Multimodal Vision Intelligence</h3>
-              <ul className="space-y-3 text-xs text-slate-300">
+            <div className="p-6 rounded-xl bg-white border border-[#E5E7EB] shadow-sm space-y-4">
+              <h3 className="font-bold text-sm text-gray-900">Enterprise Vision Intelligence</h3>
+              <ul className="space-y-3 text-xs text-gray-600">
                 <li className="flex items-start gap-2.5">
-                  <span className="text-cyan-400 font-bold">✓</span>
-                  <span><strong>Automatic Classification:</strong> Decides whether document is Menu or Inventory without manual tagging.</span>
+                  <span className="text-[#0F6B4B] font-bold">✓</span>
+                  <span><strong>Automatic Intent Classification:</strong> Categorizes documents into Menu or Inventory automatically.</span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <span className="text-cyan-400 font-bold">✓</span>
-                  <span><strong>Multilingual OCR:</strong> Parses Tamil, English, and transliterated food names cleanly.</span>
+                  <span className="text-[#0F6B4B] font-bold">✓</span>
+                  <span><strong>Multilingual Extraction:</strong> Parses English, Tamil, and regional food item names accurately.</span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <span className="text-cyan-400 font-bold">✓</span>
-                  <span><strong>Handwriting Recognition:</strong> Reads kitchen scribbles, price revisions, and handwritten notes.</span>
+                  <span className="text-[#0F6B4B] font-bold">✓</span>
+                  <span><strong>Handwriting Support:</strong> Recognizes kitchen notes, price overrides, and handwritten specials.</span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <span className="text-cyan-400 font-bold">✓</span>
-                  <span><strong>Table & Price Understanding:</strong> Extracts prices, quantities, and units into structured JSON.</span>
+                  <span className="text-[#0F6B4B] font-bold">✓</span>
+                  <span><strong>Structured Extraction:</strong> Formats prices, quantities, and categories into editable JSON tables.</span>
                 </li>
               </ul>
             </div>
@@ -299,25 +299,25 @@ const AiImportCenter: React.FC = () => {
         </div>
       ) : (
         /* History & Telemetry Tab */
-        <div className="p-8 rounded-3xl bg-slate-900/60 border border-white/10 backdrop-blur-xl space-y-6">
+        <div className="p-6 rounded-xl bg-white border border-[#E5E7EB] shadow-sm space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-4 bg-slate-950/60 rounded-2xl border border-white/5">
-              <span className="text-xs text-slate-400 font-bold">Avg Accuracy</span>
-              <p className="text-2xl font-extrabold text-cyan-400 mt-1">{analytics?.avgAccuracy || 95}%</p>
+            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <span className="text-xs text-gray-500 font-semibold uppercase">Avg Accuracy</span>
+              <p className="text-2xl font-extrabold text-[#0F6B4B] mt-1">{analytics?.avgAccuracy || 95}%</p>
             </div>
-            <div className="p-4 bg-slate-950/60 rounded-2xl border border-white/5">
-              <span className="text-xs text-slate-400 font-bold">Avg Response Time</span>
-              <p className="text-2xl font-extrabold text-purple-400 mt-1">{analytics?.avgTimeMs || 1200} ms</p>
+            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <span className="text-xs text-gray-500 font-semibold uppercase">Avg Response Time</span>
+              <p className="text-2xl font-extrabold text-gray-900 mt-1">{analytics?.avgTimeMs || 1200} ms</p>
             </div>
-            <div className="p-4 bg-slate-950/60 rounded-2xl border border-white/5">
-              <span className="text-xs text-slate-400 font-bold">Total Documents Analyzed</span>
-              <p className="text-2xl font-extrabold text-emerald-400 mt-1">{analytics?.totalImports || history.length}</p>
+            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <span className="text-xs text-gray-500 font-semibold uppercase">Total Documents Analyzed</span>
+              <p className="text-2xl font-extrabold text-[#2FA36B] mt-1">{analytics?.totalImports || history.length}</p>
             </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-300">
-              <thead className="bg-slate-950/50 uppercase text-[10px] tracking-wider text-slate-400 border-b border-white/10">
+          <div className="overflow-x-auto border border-[#E5E7EB] rounded-lg">
+            <table className="w-full text-left text-xs text-gray-700">
+              <thead className="bg-gray-50 uppercase text-[10px] tracking-wider text-gray-500 border-b border-[#E5E7EB]">
                 <tr>
                   <th className="p-3">File ID</th>
                   <th className="p-3">Document Type</th>
@@ -327,21 +327,27 @@ const AiImportCenter: React.FC = () => {
                   <th className="p-3 text-right">Date</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
-                {history.map((log) => (
-                  <tr key={log.id} className="hover:bg-white/[0.02]">
-                    <td className="p-3 font-mono text-slate-400">{log.original_file_name}</td>
-                    <td className="p-3 font-bold text-cyan-300">{log.import_type}</td>
-                    <td className="p-3">{log.confidence_score}%</td>
-                    <td className="p-3">{log.processing_time_ms} ms</td>
-                    <td className="p-3">
-                      <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">
-                        {log.status}
-                      </span>
-                    </td>
-                    <td className="p-3 text-right text-slate-400">{new Date(log.created_at).toLocaleDateString()}</td>
+              <tbody className="divide-y divide-[#E5E7EB]">
+                {history.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="p-6 text-center text-gray-400">No import history logs available.</td>
                   </tr>
-                ))}
+                ) : (
+                  history.map((log) => (
+                    <tr key={log.id} className="hover:bg-gray-50">
+                      <td className="p-3 font-mono text-gray-600">{log.original_file_name}</td>
+                      <td className="p-3 font-bold text-[#0F6B4B]">{log.import_type}</td>
+                      <td className="p-3">{log.confidence_score}%</td>
+                      <td className="p-3">{log.processing_time_ms} ms</td>
+                      <td className="p-3">
+                        <span className="px-2 py-0.5 rounded bg-emerald-50 text-[#0F6B4B] border border-emerald-200 text-[10px] font-bold">
+                          {log.status}
+                        </span>
+                      </td>
+                      <td className="p-3 text-right text-gray-500">{new Date(log.created_at).toLocaleDateString()}</td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

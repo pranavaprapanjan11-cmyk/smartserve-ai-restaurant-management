@@ -38,7 +38,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
           name: res.data.workspace_name
         })
       })
-      .catch(err => {
+      .catch(() => {
         if (user?.workspace_code) {
           setWorkspaceInfo({
             code: user.workspace_code,
@@ -60,11 +60,9 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
   const profileRef = useRef<HTMLDivElement>(null)
   const notificationsRef = useRef<HTMLDivElement>(null)
 
-  // Listen to simulated notification events
   useEffect(() => {
     const handleNotify = () => {
       setBellShaking(true)
-      // Play bell shaking for 1.2 seconds
       setTimeout(() => setBellShaking(false), 1200)
 
       const newNotif: NotificationItem = {
@@ -88,7 +86,6 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
     }
   }, [])
 
-  // Close dropdowns when clicking outside
   useEffect(() => {
     const clickOutside = (e: MouseEvent) => {
       if (profileOpen && profileRef.current && !profileRef.current.contains(e.target as Node)) {
@@ -102,33 +99,32 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
     return () => document.removeEventListener('mousedown', clickOutside)
   }, [profileOpen, notificationsOpen])
 
-  // Map route to Page Title
   const getPageTitle = (pathname: string) => {
-    if (pathname === '/dashboard') return 'Dashboard'
+    if (pathname === '/dashboard') return 'Dashboard Overview'
     if (pathname === '/digital-twin') return 'Tables & Layout'
     if (pathname === '/waiter/dashboard') return 'Waiter Dashboard'
     if (pathname.startsWith('/waiter/orders/create')) return 'Create Order'
     if (pathname.match(/^\/waiter\/orders\/[^/]+$/)) return 'Order Details'
-    if (pathname === '/menu') return 'Menu Matrix'
+    if (pathname === '/menu') return 'Menu Operations'
     if (pathname.startsWith('/menu/add')) return 'Add Menu Item'
     if (pathname.startsWith('/menu/edit')) return 'Edit Menu Item'
     if (pathname.startsWith('/inventory/items')) return 'Inventory Items'
     if (pathname.startsWith('/inventory/recipes')) return 'Recipe Mapper'
-    if (pathname.startsWith('/inventory/suppliers')) return 'Suppliers'
+    if (pathname.startsWith('/inventory/suppliers')) return 'Suppliers Directory'
     if (pathname.startsWith('/inventory/purchase-orders')) return 'Purchase Orders'
     if (pathname.startsWith('/inventory/transactions')) return 'Stock Movements'
     if (pathname.startsWith('/inventory/alerts')) return 'Low Stock Alerts'
-    if (pathname === '/inventory') return 'Inventory'
+    if (pathname === '/inventory') return 'Inventory Hub'
     if (pathname.startsWith('/billing/editor')) return 'Invoice Editor'
-    if (pathname === '/billing') return 'Billing'
-    if (pathname === '/analytics') return 'Analytics'
+    if (pathname === '/billing') return 'Billing & Invoices'
+    if (pathname === '/analytics') return 'Analytics & Insights'
     if (pathname === '/ai') return 'AI Intelligence'
     if (pathname === '/ai-optimizer') return 'AI Menu Optimizer'
-    if (pathname === '/employees') return 'Employee Management'
+    if (pathname === '/employees') return 'Employee Directory'
     if (pathname === '/settings') return 'Restaurant Settings'
-    if (pathname === '/ai-vision' || pathname === '/ai-import') return 'Gemini Vision Understanding'
-    if (pathname === '/kitchen') return 'Kitchen KDS'
-    return 'Control Panel'
+    if (pathname === '/ai-vision' || pathname === '/ai-import') return 'Gemini Vision Document Intelligence'
+    if (pathname === '/kitchen') return 'Kitchen Display System (KDS)'
+    return 'Restaurant OS'
   }
 
   const unreadCount = notifications.filter(n => n.unread).length
@@ -138,13 +134,13 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
   }
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-white/5 bg-slate-950/70 px-4 sm:px-6 shadow-md backdrop-blur-xl">
-      {/* Left: Branding & Subtitle */}
+    <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-[#E5E7EB] bg-white px-4 sm:px-6 shadow-sm">
+      {/* Left Section */}
       <div className="flex items-center gap-3">
         <button
           type="button"
           onClick={onToggleSidebar}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 lg:hidden"
+          className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#E5E7EB] bg-gray-50 text-gray-600 hover:bg-gray-100 lg:hidden"
         >
           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -152,21 +148,21 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
         </button>
 
         <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-500/10 border border-cyan-400/20 text-cyan-300 text-sm font-bold shadow-lg shadow-cyan-500/5">
-            OS
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#0F6B4B] text-white text-xs font-extrabold shadow-sm">
+            SS
           </div>
           <div className="hidden sm:block">
-            <span className="text-sm font-bold text-white tracking-wide">SmartServe AI</span>
-            <span className="ml-2 text-2xs text-slate-400 font-medium tracking-wider uppercase opacity-80">(Restaurant OS)</span>
+            <span className="text-sm font-bold text-gray-900 tracking-tight">SmartServe AI</span>
+            <span className="ml-2 text-[10px] text-gray-500 font-semibold uppercase tracking-wider">Restaurant OS</span>
           </div>
         </div>
 
         {workspaceInfo && (
-          <div className="hidden lg:flex items-center gap-2 border-l border-white/10 pl-3">
-            <span className="text-2xs font-semibold uppercase tracking-wider text-slate-500">Workspace:</span>
-            <span className="text-xs font-bold text-cyan-400 font-mono bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 rounded">{workspaceInfo.code}</span>
+          <div className="hidden lg:flex items-center gap-2 border-l border-[#E5E7EB] pl-3">
+            <span className="text-[11px] font-semibold text-gray-500">Workspace:</span>
+            <span className="text-xs font-bold text-[#0F6B4B] bg-[#0F6B4B]/10 border border-[#0F6B4B]/20 px-2 py-0.5 rounded-md font-mono">{workspaceInfo.code}</span>
             {workspaceInfo.name && (
-              <span className="text-xs text-slate-400 max-w-[120px] truncate" title={workspaceInfo.name}>
+              <span className="text-xs text-gray-500 max-w-[140px] truncate" title={workspaceInfo.name}>
                 ({workspaceInfo.name.replace("'s Workspace", "")})
               </span>
             )}
@@ -174,20 +170,20 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
         )}
       </div>
 
-      {/* Center: Dynamic Current Page Title */}
+      {/* Center Section: Page Title */}
       <div className="text-center">
-        <h2 className="text-base font-bold text-slate-100 tracking-wide md:text-lg">
+        <h2 className="text-base font-bold text-gray-900 tracking-tight md:text-lg">
           {getPageTitle(location.pathname)}
         </h2>
       </div>
 
-      {/* Right: Search, Notifications, Theme, Profile */}
+      {/* Right Section */}
       <div className="flex items-center gap-2">
-        {/* Search Palette Toggle */}
+        {/* Search Command Palette Trigger */}
         <button
           type="button"
           onClick={onOpenSearch}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-400 transition hover:bg-white/10 hover:text-white"
+          className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#E5E7EB] bg-gray-50 text-gray-600 transition hover:bg-gray-100 hover:text-gray-900"
           title="Search Menu (Ctrl+K)"
         >
           <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -195,12 +191,12 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
           </svg>
         </button>
 
-        {/* Notifications Bell */}
+        {/* Notifications Dropdown */}
         <div className="relative" ref={notificationsRef}>
           <button
             type="button"
             onClick={() => setNotificationsOpen(!notificationsOpen)}
-            className={`relative flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-400 transition hover:bg-white/10 hover:text-white ${
+            className={`relative flex h-9 w-9 items-center justify-center rounded-lg border border-[#E5E7EB] bg-gray-50 text-gray-600 transition hover:bg-gray-100 hover:text-gray-900 ${
               bellShaking ? 'animate-[bounce_0.3s_infinite]' : ''
             }`}
           >
@@ -208,21 +204,20 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
             {unreadCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-3xs font-bold text-white ring-2 ring-slate-950">
+              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#EF4444] text-[10px] font-bold text-white ring-2 ring-white">
                 {unreadCount}
               </span>
             )}
           </button>
 
-          {/* Notifications Dropdown */}
           {notificationsOpen && (
-            <div className="absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-2xl border border-white/10 bg-slate-900 shadow-2xl backdrop-blur-xl">
-              <div className="flex items-center justify-between border-b border-white/5 px-4 py-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-300">Notifications</span>
+            <div className="absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-xl border border-[#E5E7EB] bg-white shadow-xl">
+              <div className="flex items-center justify-between border-b border-[#E5E7EB] px-4 py-3 bg-gray-50">
+                <span className="text-xs font-bold uppercase tracking-wider text-gray-700">Notifications</span>
                 {unreadCount > 0 && (
                   <button
                     onClick={markAllRead}
-                    className="text-2xs font-semibold text-cyan-400 hover:text-cyan-300 transition"
+                    className="text-xs font-semibold text-[#0F6B4B] hover:underline"
                   >
                     Mark all read
                   </button>
@@ -230,21 +225,21 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
               </div>
               <div className="max-h-64 overflow-y-auto">
                 {notifications.length === 0 ? (
-                  <div className="py-8 text-center text-xs text-slate-500">No notifications</div>
+                  <div className="py-8 text-center text-xs text-gray-500">No notifications</div>
                 ) : (
-                  <div className="divide-y divide-white/5">
+                  <div className="divide-y divide-[#E5E7EB]">
                     {notifications.map((n) => (
                       <div
                         key={n.id}
-                        className={`px-4 py-3 transition hover:bg-white/[0.02] ${
-                          n.unread ? 'bg-cyan-500/[0.03]' : ''
+                        className={`px-4 py-3 transition hover:bg-gray-50 ${
+                          n.unread ? 'bg-[#0F6B4B]/5' : ''
                         }`}
                       >
                         <div className="flex items-start justify-between gap-1">
-                          <p className={`text-xs font-semibold ${n.unread ? 'text-white' : 'text-slate-300'}`}>{n.title}</p>
-                          <span className="text-4xs text-slate-500 whitespace-nowrap">{n.time}</span>
+                          <p className={`text-xs font-semibold ${n.unread ? 'text-gray-900' : 'text-gray-600'}`}>{n.title}</p>
+                          <span className="text-[10px] text-gray-400 whitespace-nowrap">{n.time}</span>
                         </div>
-                        <p className="mt-0.5 text-2xs text-slate-400 leading-normal">{n.subtitle}</p>
+                        <p className="mt-0.5 text-xs text-gray-500 leading-normal">{n.subtitle}</p>
                       </div>
                     ))}
                   </div>
@@ -262,20 +257,19 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
           <button
             type="button"
             onClick={() => setProfileOpen(!profileOpen)}
-            className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 p-1 text-left text-slate-300 hover:bg-white/10 hover:text-white"
+            className="flex items-center gap-2 rounded-lg border border-[#E5E7EB] bg-gray-50 p-1 pr-2.5 text-left text-gray-700 hover:bg-gray-100 transition"
           >
-            <span className="flex h-7.5 w-7.5 items-center justify-center rounded-lg bg-cyan-500/10 border border-cyan-400/20 text-xs font-bold text-cyan-300">
+            <span className="flex h-7.5 w-7.5 items-center justify-center rounded-md bg-[#0F6B4B] text-xs font-bold text-white">
               {user?.name ? user.name.charAt(0).toUpperCase() : 'G'}
             </span>
-            <span className="hidden text-xs font-semibold pr-2 lg:inline">{user?.name || 'Guest'}</span>
+            <span className="hidden text-xs font-semibold lg:inline">{user?.name || 'Guest'}</span>
           </button>
 
-          {/* Profile Dropdown */}
           {profileOpen && (
-            <div className="absolute right-0 top-full z-50 mt-2 w-48 overflow-hidden rounded-2xl border border-white/10 bg-slate-900 p-1 shadow-2xl backdrop-blur-xl">
-              <div className="px-3 py-2 border-b border-white/5 mb-1">
-                <p className="text-xs font-bold text-white truncate">{user?.name || 'Guest User'}</p>
-                <p className="text-3xs text-slate-400 capitalize tracking-wider mt-0.5">Role: {user?.role || 'Guest'}</p>
+            <div className="absolute right-0 top-full z-50 mt-2 w-52 overflow-hidden rounded-xl border border-[#E5E7EB] bg-white p-1 shadow-xl">
+              <div className="px-3 py-2 border-b border-[#E5E7EB] mb-1 bg-gray-50">
+                <p className="text-xs font-bold text-gray-900 truncate">{user?.name || 'Guest User'}</p>
+                <p className="text-[11px] text-gray-500 uppercase font-medium tracking-wide mt-0.5">Role: {user?.role || 'Guest'}</p>
               </div>
               <button
                 type="button"
@@ -283,7 +277,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
                   setProfileOpen(false)
                   logout()
                 }}
-                className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-medium text-red-400 transition hover:bg-red-500/10"
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-semibold text-red-600 transition hover:bg-red-50"
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

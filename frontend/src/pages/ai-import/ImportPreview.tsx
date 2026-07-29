@@ -1,3 +1,4 @@
+// File: frontend/src/pages/ai-import/ImportPreview.tsx
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { API_BASE } from '../../config';
@@ -140,32 +141,32 @@ const ImportPreview: React.FC<ImportPreviewProps> = ({ previewData, file, onCanc
   const inventoryItems = data.inventory_items || [];
 
   return (
-    <div className="space-y-8 text-white">
+    <div className="space-y-6 text-gray-900">
       {/* Header Actions */}
-      <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+      <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center border-b border-[#E5E7EB] pb-5">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-extrabold tracking-tight">AI Understanding Result</h1>
+            <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">AI Understanding Result</h1>
             <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
               documentType === 'MENU'
-                ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-400/20'
+                ? 'bg-[#0F6B4B]/10 text-[#0F6B4B] border border-[#0F6B4B]/20'
                 : documentType === 'INVENTORY'
-                ? 'bg-purple-500/10 text-purple-400 border border-purple-400/20'
-                : 'bg-red-500/10 text-red-400 border border-red-400/20'
+                ? 'bg-purple-100 text-purple-800 border border-purple-200'
+                : 'bg-red-100 text-red-800 border border-red-200'
             }`}>
               Detected: {documentType}
             </span>
           </div>
-          <p className="text-slate-400 text-sm mt-1">
+          <p className="text-gray-500 text-xs sm:text-sm mt-1">
             Gemini 2.5 Flash Vision automatically categorized and extracted items from your document.
           </p>
         </div>
 
-        <div className="flex gap-4">
+        <div className="flex gap-3">
           <button
             onClick={onCancel}
             disabled={isSaving}
-            className="px-6 py-2.5 rounded-xl text-sm font-semibold transition border border-white/10 hover:bg-white/5"
+            className="px-5 py-2.5 rounded-lg text-xs font-semibold text-gray-700 bg-white border border-[#E5E7EB] hover:bg-gray-50 transition"
           >
             Cancel
           </button>
@@ -173,7 +174,7 @@ const ImportPreview: React.FC<ImportPreviewProps> = ({ previewData, file, onCanc
             <button
               onClick={confirmImport}
               disabled={isSaving}
-              className="px-6 py-2.5 rounded-xl text-sm font-semibold transition bg-cyan-500 text-slate-950 font-bold hover:bg-cyan-400 flex items-center gap-2"
+              className="px-5 py-2.5 rounded-lg text-xs font-bold text-white bg-[#0F6B4B] hover:bg-[#084C37] transition shadow-sm flex items-center gap-2"
             >
               {isSaving ? 'Importing...' : `Commit to ${documentType}`}
             </button>
@@ -182,60 +183,60 @@ const ImportPreview: React.FC<ImportPreviewProps> = ({ previewData, file, onCanc
       </div>
 
       {/* Reasoning Summary Card */}
-      <div className="p-5 rounded-2xl bg-slate-900/60 border border-white/10 backdrop-blur-xl space-y-3">
+      <div className="p-4 rounded-xl bg-[#0F6B4B]/5 border border-[#0F6B4B]/20 space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
-            <h3 className="font-bold text-sm text-cyan-300">Gemini Vision Reasoning & Context</h3>
+            <span className="h-2.5 w-2.5 rounded-full bg-[#0F6B4B]"></span>
+            <h3 className="font-bold text-xs uppercase tracking-wider text-[#0F6B4B]">Gemini Vision Intelligence Context</h3>
           </div>
-          <div className="text-xs text-slate-400">
-            Confidence: <span className="font-bold text-white">{previewData.confidence}%</span> | Language: <span className="font-bold text-white">{previewData.languageDetected}</span> | Time: <span className="font-bold text-white">{previewData.durationMs}ms</span>
+          <div className="text-xs text-gray-600">
+            Confidence: <span className="font-bold text-gray-900">{previewData.confidence}%</span> | Language: <span className="font-bold text-gray-900">{previewData.languageDetected}</span> | Processing: <span className="font-bold text-gray-900">{previewData.durationMs}ms</span>
           </div>
         </div>
-        <p className="text-sm text-slate-300 leading-relaxed">{previewData.reasoningSummary}</p>
+        <p className="text-xs text-gray-700 leading-relaxed">{previewData.reasoningSummary}</p>
       </div>
 
       {saveError && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm font-medium">
+        <div className="p-3.5 bg-red-50 border border-red-200 rounded-lg text-red-700 text-xs font-semibold">
           {saveError}
         </div>
       )}
 
-      {/* Main Grid split: Document image & Structured Data */}
+      {/* Main Grid: Image Preview & Table */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left column: Image preview */}
+        {/* Left Column: Source Image */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="p-4 bg-slate-900/60 rounded-2xl border border-white/5 space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Original Document Source</h4>
+          <div className="p-4 bg-white rounded-xl border border-[#E5E7EB] shadow-sm space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500">Original Document Source</h4>
             {imageUrl ? (
-              <div className="rounded-xl overflow-hidden border border-white/10 max-h-[500px] flex items-center justify-center bg-slate-950">
-                <img src={imageUrl} alt="Document upload" className="object-contain max-h-[480px] w-full" />
+              <div className="rounded-lg overflow-hidden border border-[#E5E7EB] max-h-[480px] flex items-center justify-center bg-gray-50">
+                <img src={imageUrl} alt="Document upload" className="object-contain max-h-[460px] w-full" />
               </div>
             ) : (
-              <div className="p-12 text-center text-slate-500 text-xs border border-dashed border-white/10 rounded-xl">
+              <div className="p-10 text-center text-gray-400 text-xs border border-dashed border-gray-200 rounded-lg">
                 No visual preview available
               </div>
             )}
           </div>
         </div>
 
-        {/* Right column: Extracted Items Table */}
+        {/* Right Column: Extracted Items */}
         <div className="lg:col-span-7 space-y-4">
           {documentType === 'MENU' && (
-            <div className="p-5 bg-slate-900/60 rounded-2xl border border-white/5 space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="font-bold text-base text-white">Extracted Menu Items ({menuItems.length})</h3>
+            <div className="p-5 bg-white rounded-xl border border-[#E5E7EB] shadow-sm space-y-4">
+              <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                <h3 className="font-bold text-sm text-gray-900">Extracted Menu Items ({menuItems.length})</h3>
                 <button
                   onClick={() => handleAddRow('MENU')}
-                  className="px-3 py-1.5 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-xs font-semibold hover:bg-cyan-500/20"
+                  className="px-3 py-1.5 rounded-lg bg-[#0F6B4B]/10 text-[#0F6B4B] border border-[#0F6B4B]/20 text-xs font-semibold hover:bg-[#0F6B4B]/20"
                 >
                   + Add Item
                 </button>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs text-slate-300">
-                  <thead className="bg-slate-950/50 uppercase text-[10px] tracking-wider text-slate-400 border-b border-white/10">
+              <div className="overflow-x-auto border border-[#E5E7EB] rounded-lg">
+                <table className="w-full text-left text-xs text-gray-700">
+                  <thead className="bg-gray-50 uppercase text-[10px] tracking-wider text-gray-500 border-b border-[#E5E7EB]">
                     <tr>
                       <th className="p-2.5">Item Name</th>
                       <th className="p-2.5">Category</th>
@@ -244,15 +245,15 @@ const ImportPreview: React.FC<ImportPreviewProps> = ({ previewData, file, onCanc
                       <th className="p-2.5 text-right">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5">
+                  <tbody className="divide-y divide-[#E5E7EB]">
                     {menuItems.map((item: any, idx: number) => (
-                      <tr key={idx} className="hover:bg-white/[0.02]">
+                      <tr key={idx} className="hover:bg-gray-50">
                         <td className="p-2">
                           <input
                             type="text"
                             value={item.name}
                             onChange={(e) => handleMenuItemChange(idx, 'name', e.target.value)}
-                            className="bg-slate-950/80 border border-white/10 rounded px-2 py-1 text-white w-full text-xs"
+                            className="bg-white border border-[#E5E7EB] rounded px-2 py-1 text-gray-900 w-full text-xs"
                           />
                         </td>
                         <td className="p-2">
@@ -260,7 +261,7 @@ const ImportPreview: React.FC<ImportPreviewProps> = ({ previewData, file, onCanc
                             type="text"
                             value={item.category}
                             onChange={(e) => handleMenuItemChange(idx, 'category', e.target.value)}
-                            className="bg-slate-950/80 border border-white/10 rounded px-2 py-1 text-white w-full text-xs"
+                            className="bg-white border border-[#E5E7EB] rounded px-2 py-1 text-gray-900 w-full text-xs"
                           />
                         </td>
                         <td className="p-2 w-24">
@@ -268,14 +269,14 @@ const ImportPreview: React.FC<ImportPreviewProps> = ({ previewData, file, onCanc
                             type="number"
                             value={item.price}
                             onChange={(e) => handleMenuItemChange(idx, 'price', parseFloat(e.target.value) || 0)}
-                            className="bg-slate-950/80 border border-white/10 rounded px-2 py-1 text-white w-full text-xs"
+                            className="bg-white border border-[#E5E7EB] rounded px-2 py-1 text-gray-900 w-full text-xs font-mono font-semibold"
                           />
                         </td>
                         <td className="p-2 w-28">
                           <select
                             value={item.veg_status}
                             onChange={(e) => handleMenuItemChange(idx, 'veg_status', e.target.value)}
-                            className="bg-slate-950/80 border border-white/10 rounded px-2 py-1 text-white w-full text-xs"
+                            className="bg-white border border-[#E5E7EB] rounded px-2 py-1 text-gray-900 w-full text-xs"
                           >
                             <option value="VEG">VEG</option>
                             <option value="NON-VEG">NON-VEG</option>
@@ -287,7 +288,7 @@ const ImportPreview: React.FC<ImportPreviewProps> = ({ previewData, file, onCanc
                         <td className="p-2 text-right">
                           <button
                             onClick={() => handleDeleteItem(idx, 'MENU')}
-                            className="text-red-400 hover:text-red-300 text-xs px-2 py-1"
+                            className="text-red-600 hover:text-red-800 text-xs px-2 py-1 font-semibold"
                           >
                             Delete
                           </button>
@@ -301,20 +302,20 @@ const ImportPreview: React.FC<ImportPreviewProps> = ({ previewData, file, onCanc
           )}
 
           {documentType === 'INVENTORY' && (
-            <div className="p-5 bg-slate-900/60 rounded-2xl border border-white/5 space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="font-bold text-base text-white">Extracted Inventory Items ({inventoryItems.length})</h3>
+            <div className="p-5 bg-white rounded-xl border border-[#E5E7EB] shadow-sm space-y-4">
+              <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                <h3 className="font-bold text-sm text-gray-900">Extracted Inventory Items ({inventoryItems.length})</h3>
                 <button
                   onClick={() => handleAddRow('INVENTORY')}
-                  className="px-3 py-1.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 text-xs font-semibold hover:bg-purple-500/20"
+                  className="px-3 py-1.5 rounded-lg bg-purple-50 text-purple-700 border border-purple-200 text-xs font-semibold hover:bg-purple-100"
                 >
                   + Add Item
                 </button>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs text-slate-300">
-                  <thead className="bg-slate-950/50 uppercase text-[10px] tracking-wider text-slate-400 border-b border-white/10">
+              <div className="overflow-x-auto border border-[#E5E7EB] rounded-lg">
+                <table className="w-full text-left text-xs text-gray-700">
+                  <thead className="bg-gray-50 uppercase text-[10px] tracking-wider text-gray-500 border-b border-[#E5E7EB]">
                     <tr>
                       <th className="p-2.5">Ingredient Name</th>
                       <th className="p-2.5">Qty</th>
@@ -323,15 +324,15 @@ const ImportPreview: React.FC<ImportPreviewProps> = ({ previewData, file, onCanc
                       <th className="p-2.5 text-right">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5">
+                  <tbody className="divide-y divide-[#E5E7EB]">
                     {inventoryItems.map((item: any, idx: number) => (
-                      <tr key={idx} className="hover:bg-white/[0.02]">
+                      <tr key={idx} className="hover:bg-gray-50">
                         <td className="p-2">
                           <input
                             type="text"
                             value={item.ingredient_name || item.name}
                             onChange={(e) => handleInventoryItemChange(idx, 'ingredient_name', e.target.value)}
-                            className="bg-slate-950/80 border border-white/10 rounded px-2 py-1 text-white w-full text-xs"
+                            className="bg-white border border-[#E5E7EB] rounded px-2 py-1 text-gray-900 w-full text-xs"
                           />
                         </td>
                         <td className="p-2 w-20">
@@ -339,7 +340,7 @@ const ImportPreview: React.FC<ImportPreviewProps> = ({ previewData, file, onCanc
                             type="number"
                             value={item.quantity}
                             onChange={(e) => handleInventoryItemChange(idx, 'quantity', parseFloat(e.target.value) || 0)}
-                            className="bg-slate-950/80 border border-white/10 rounded px-2 py-1 text-white w-full text-xs"
+                            className="bg-white border border-[#E5E7EB] rounded px-2 py-1 text-gray-900 w-full text-xs font-mono font-semibold"
                           />
                         </td>
                         <td className="p-2 w-20">
@@ -347,7 +348,7 @@ const ImportPreview: React.FC<ImportPreviewProps> = ({ previewData, file, onCanc
                             type="text"
                             value={item.unit}
                             onChange={(e) => handleInventoryItemChange(idx, 'unit', e.target.value)}
-                            className="bg-slate-950/80 border border-white/10 rounded px-2 py-1 text-white w-full text-xs"
+                            className="bg-white border border-[#E5E7EB] rounded px-2 py-1 text-gray-900 w-full text-xs"
                           />
                         </td>
                         <td className="p-2">
@@ -355,13 +356,13 @@ const ImportPreview: React.FC<ImportPreviewProps> = ({ previewData, file, onCanc
                             type="text"
                             value={item.inventory_category || item.category || 'General'}
                             onChange={(e) => handleInventoryItemChange(idx, 'inventory_category', e.target.value)}
-                            className="bg-slate-950/80 border border-white/10 rounded px-2 py-1 text-white w-full text-xs"
+                            className="bg-white border border-[#E5E7EB] rounded px-2 py-1 text-gray-900 w-full text-xs"
                           />
                         </td>
                         <td className="p-2 text-right">
                           <button
                             onClick={() => handleDeleteItem(idx, 'INVENTORY')}
-                            className="text-red-400 hover:text-red-300 text-xs px-2 py-1"
+                            className="text-red-600 hover:text-red-800 text-xs px-2 py-1 font-semibold"
                           >
                             Delete
                           </button>
@@ -375,9 +376,9 @@ const ImportPreview: React.FC<ImportPreviewProps> = ({ previewData, file, onCanc
           )}
 
           {documentType === 'NEEDS_REVIEW' && (
-            <div className="p-8 bg-red-500/10 border border-red-500/20 rounded-2xl text-center space-y-3">
-              <h3 className="font-bold text-lg text-red-400">Manual Review Required</h3>
-              <p className="text-sm text-red-300/80 max-w-md mx-auto">
+            <div className="p-8 bg-red-50 border border-red-200 rounded-xl text-center space-y-3">
+              <h3 className="font-bold text-base text-red-700">Manual Review Required</h3>
+              <p className="text-xs text-red-600 max-w-md mx-auto">
                 Gemini Vision could not automatically classify this document with sufficient confidence. Please upload a clearer photo of your menu card or supplier receipt.
               </p>
             </div>
