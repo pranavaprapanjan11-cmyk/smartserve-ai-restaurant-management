@@ -8,9 +8,6 @@ import AppShell from './components/Layout/AppShell'
 import CommandCenter from './pages/command-center/CommandCenter'
 import DigitalTwin from './pages/restaurant/DigitalTwin'
 import MenuMatrix from './pages/menu/MenuMatrix'
-import OcrPanel from './pages/ocr/OcrPanel'
-import OCRUpload from './pages/ocr/OCRUpload'
-import OCRReview from './pages/ocr/OCRReview'
 import AiOptimizer from './pages/ai/AiOptimizer'
 import AIDashboard from './pages/ai/AIDashboard'
 import AIAssistant from './pages/ai/AIAssistant'
@@ -107,9 +104,8 @@ const App: React.FC = () => {
         <Route path="/menu" element={<MenuMatrix />} />
         <Route path="/menu/add" element={<AddMenuItem />} />
         <Route path="/menu/edit/:id" element={<EditMenuItem />} />
-        <Route path="/ocr" element={<OcrPanel />} />
-        <Route path="/ocr/upload" element={<OCRUpload />} />
-        <Route path="/ocr/review" element={<OCRReview />} />
+        <Route path="/ai-vision" element={<ProtectedRoute roles={["OWNER","RESTAURANT_OWNER","MANAGER","SUPER_ADMIN"]}><AiImportCenter /></ProtectedRoute>} />
+        <Route path="/ocr" element={<Navigate to="/ai-vision" replace />} />
         <Route path="/ai-import" element={<ProtectedRoute roles={["OWNER","RESTAURANT_OWNER","MANAGER","SUPER_ADMIN"]}><AiImportCenter /></ProtectedRoute>} />
         <Route path="/ai-optimizer" element={<AiOptimizer />} />
         <Route path="/ai" element={<AIDashboard />} />

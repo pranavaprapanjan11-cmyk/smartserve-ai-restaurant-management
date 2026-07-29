@@ -423,7 +423,7 @@ export async function getChatResponse(
     try {
       model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     } catch (e) {
-      model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
     }
 
     const systemInstruction = `
@@ -478,7 +478,7 @@ export async function getAiSummary(userId: string, role: string): Promise<string
     try {
       model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     } catch (e) {
-      model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
     }
 
     const prompt = `

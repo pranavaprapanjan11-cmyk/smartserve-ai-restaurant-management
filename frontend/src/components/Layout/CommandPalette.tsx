@@ -134,12 +134,12 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose }) => {
       action: () => { navigate('/settings'); onClose(); }
     },
     {
-      id: 'ocr',
-      title: 'Go to OCR Panel',
-      subtitle: 'Scan invoices and receipts automatically',
+      id: 'ai-vision',
+      title: 'Go to AI Vision Center',
+      subtitle: 'Analyze menus and supplier invoices using Gemini Vision',
       category: 'Navigation',
-      roles: ['OWNER', 'SUPER_ADMIN'],
-      action: () => { navigate('/ocr'); onClose(); }
+      roles: ['OWNER', 'SUPER_ADMIN', 'MANAGER'],
+      action: () => { navigate('/ai-vision'); onClose(); }
     },
     {
       id: 'ai-import',

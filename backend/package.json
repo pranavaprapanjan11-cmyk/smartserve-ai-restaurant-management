@@ -31,7 +31,6 @@
     "pdf-parse": "^2.4.5",
     "pg": "^8.21.0",
     "recharts": "^2.9.0",
-    "tesseract.js": "^7.0.0",
     "typescript": "^5.2.2",
     "uuid": "^14.0.0"
   },

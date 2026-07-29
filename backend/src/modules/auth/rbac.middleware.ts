@@ -48,8 +48,8 @@ export const ROLE_PERMISSIONS = {
     'view.orders',
     'view.settings',
     'manage.all',
-    'view.ocr',
-    'manage.ocr',
+    'view.ai_vision',
+    'manage.ai_vision',
   ],
   RESTAURANT_OWNER: [
     'view.dashboard',
@@ -60,8 +60,8 @@ export const ROLE_PERMISSIONS = {
     'view.orders',
     'view.settings',
     'manage.all',
-    'view.ocr',
-    'manage.ocr',
+    'view.ai_vision',
+    'manage.ai_vision',
   ],
   MANAGER: [
     'view.dashboard',

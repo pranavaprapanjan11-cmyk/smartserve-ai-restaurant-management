@@ -44,7 +44,7 @@ const AppShell: React.FC = () => {
       'ai-optimizer': 'Intelligence',
       employees: 'Administration',
       settings: 'Administration',
-      ocr: 'Tools',
+      'ai-vision': 'Tools',
       'ai-import': 'Tools'
     }
 
@@ -61,7 +61,7 @@ const AppShell: React.FC = () => {
       'ai-optimizer': 'AI Menu Optimizer',
       employees: 'Employees',
       settings: 'Settings',
-      ocr: 'OCR Import',
+      'ai-vision': 'AI Vision Center',
       'ai-import': 'AI Smart Import',
       create: 'Create Order',
       items: 'Items',

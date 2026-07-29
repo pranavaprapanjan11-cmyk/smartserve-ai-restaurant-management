@@ -18,8 +18,8 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
     'view.orders',
     'view.settings',
     'manage.all',
-    'view.ocr',
-    'manage.ocr',
+    'view.ai_vision',
+    'manage.ai_vision',
   ],
   RESTAURANT_OWNER: [
     'view.dashboard',
@@ -30,8 +30,8 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
     'view.orders',
     'view.settings',
     'manage.all',
-    'view.ocr',
-    'manage.ocr',
+    'view.ai_vision',
+    'manage.ai_vision',
   ],
   MANAGER: [
     'view.dashboard',

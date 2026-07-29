@@ -126,9 +126,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
     if (pathname === '/ai-optimizer') return 'AI Menu Optimizer'
     if (pathname === '/employees') return 'Employee Management'
     if (pathname === '/settings') return 'Restaurant Settings'
-    if (pathname === '/ocr') return 'OCR Import Panel'
-    if (pathname.startsWith('/ocr/upload')) return 'OCR Invoice Upload'
-    if (pathname.startsWith('/ocr/review')) return 'OCR Invoice Review'
+    if (pathname === '/ai-vision' || pathname === '/ai-import') return 'Gemini Vision Understanding'
     if (pathname === '/kitchen') return 'Kitchen KDS'
     return 'Control Panel'
   }

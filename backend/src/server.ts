@@ -14,7 +14,6 @@ import settingsRouter from './modules/settings/settings.routes';
 import inventoryRouter from './modules/inventory/inventory.routes';
 import analyticsRouter from './modules/analytics/analytics.routes';
 import aiRouter from './modules/ai/ai.routes';
-import ocrRouter from './modules/ocr/ocr.routes';
 import employeesRouter from './modules/employees/employees.controller';
 import tablesRouter from './modules/tables/tables.routes';
 import aiOperationsRouter from './modules/ai-operations/aiOperations.routes';
@@ -50,9 +49,6 @@ app.use('/api/analytics', analyticsRouter);
 
 // Mount AI intelligence routes
 app.use('/api/ai', aiRouter);
-
-// Mount OCR routes
-app.use('/api/ocr', ocrRouter);
 
 // Mount employees routes
 app.use('/api/restaurants', employeesRouter);
