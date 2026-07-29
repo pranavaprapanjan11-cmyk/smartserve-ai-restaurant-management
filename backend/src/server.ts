@@ -2,7 +2,7 @@
 // Express server that mounts all module routes
 
 import 'dotenv/config';
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import path from 'path';
 import authRouter from './modules/auth/auth.routes';
@@ -78,6 +78,16 @@ app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 
 // Workspace updates endpoint
 app.get('/api/workspace/updates', sseHandler);
+
+// Global Error Handler guaranteeing JSON responses across all status codes
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  console.error('[Global Error Handler]', err);
+  const statusCode = err.status || err.statusCode || 500;
+  res.status(statusCode).json({
+    error: err.message || 'Internal Server Error',
+    code: err.code || 'SERVER_ERROR'
+  });
+});
 
 const PORT = Number(process.env.PORT) || 4000;
 app.listen(PORT, () => {

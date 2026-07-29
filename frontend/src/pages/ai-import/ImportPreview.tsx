@@ -118,9 +118,14 @@ const ImportPreview: React.FC<ImportPreviewProps> = ({ previewData, file, onCanc
         })
       });
 
+      const responseText = await res.text();
+      let errorData: any = {};
+      try {
+        errorData = responseText ? JSON.parse(responseText) : {};
+      } catch (e) {}
+
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to import document');
+        throw new Error(errorData.error || errorData.message || `Failed to import document (${res.status})`);
       }
 
       onSuccess();

@@ -98,12 +98,19 @@ const AiImportCenter: React.FC = () => {
         body: formData
       });
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to analyze document');
+      const responseText = await res.text();
+      let result: any = null;
+      try {
+        result = responseText ? JSON.parse(responseText) : {};
+      } catch (parseErr) {
+        console.error('[Vision API] Non-JSON server response:', responseText);
+        throw new Error(`Server returned unexpected response (${res.status}): ${responseText.substring(0, 120) || 'Empty response'}`);
       }
 
-      const result = await res.json();
+      if (!res.ok) {
+        throw new Error(result.error || result.message || `Vision API error (${res.status})`);
+      }
+
       setPreviewData(result);
     } catch (err: any) {
       setError(err.message || 'An error occurred during Gemini Vision analysis.');
