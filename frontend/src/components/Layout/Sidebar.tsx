@@ -163,8 +163,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed, mobileOpen, 
               exit={{ opacity: 0, x: -6 }}
               className="flex flex-col"
             >
-              <span className="text-sm font-bold text-white tracking-tight">SmartServe AI</span>
-              <span className="text-[10px] text-emerald-200/60 font-semibold uppercase tracking-wider">Enterprise OS</span>
+              <span className="text-sm font-extrabold text-white tracking-tight">SmartServe AI</span>
+              <span className="text-[10px] text-emerald-300 font-bold uppercase tracking-wider">Enterprise OS</span>
             </motion.div>
           )}
         </AnimatePresence>
@@ -175,7 +175,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed, mobileOpen, 
         {visibleSections.map((sec) => (
           <div key={sec.title} className="space-y-1.5">
             {!collapsed && (
-              <h4 className="px-2.5 text-[10px] font-bold uppercase tracking-wider text-emerald-200/50">
+              <h4 className="px-2.5 text-[10px] font-bold uppercase tracking-wider text-emerald-300 font-bold">
                 {sec.title}
               </h4>
             )}
@@ -186,14 +186,14 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed, mobileOpen, 
                   to={item.to}
                   onClick={handleLinkClick}
                   className={({ isActive }) =>
-                    `group relative flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150 ${
+                    `group relative flex items-center rounded-lg px-3 py-2 text-sm font-semibold transition-all duration-150 ${
                       isActive
-                        ? 'bg-[rgba(47,163,107,0.20)] text-white border-l-3 border-[#2FA36B]'
-                        : 'text-emerald-100/70 hover:bg-[#0F4A37]/60 hover:text-white'
+                        ? 'bg-[rgba(47,163,107,0.30)] text-white border-l-3 border-[#2FA36B]'
+                        : 'text-emerald-100 hover:bg-[#0F4A37] hover:text-white'
                     }`
                   }
                 >
-                  <span className="flex-shrink-0 opacity-90">{item.icon}</span>
+                  <span className="flex-shrink-0 text-white">{item.icon}</span>
                   {!collapsed && (
                     <span className="ml-3 text-xs tracking-wide">{item.label}</span>
                   )}
@@ -215,7 +215,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed, mobileOpen, 
         <button
           type="button"
           onClick={() => setCollapsed(!collapsed)}
-          className="flex w-full items-center justify-center rounded-lg border border-[#0F4A37] bg-[#084C37]/40 py-2 text-emerald-200/70 transition hover:bg-[#0F4A37] hover:text-white"
+          className="flex w-full items-center justify-center rounded-lg border border-[#0F4A37] bg-[#084C37] py-2 text-emerald-100 font-bold transition hover:bg-[#0F4A37] hover:text-white"
         >
           <svg
             className={`h-4 w-4 transform transition-transform duration-200 ${

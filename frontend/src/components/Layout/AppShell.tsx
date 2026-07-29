@@ -122,13 +122,13 @@ const AppShell: React.FC = () => {
         />
 
         {/* Sub-header Navigation Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-[#E5E7EB] bg-white px-6 py-2.5 gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-[#D1D5DB] bg-white px-6 py-2.5 gap-2">
           {/* Breadcrumb Trail */}
-          <div className="flex items-center gap-2 text-xs font-medium text-gray-500">
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#4B5563]">
             {breadcrumbs.map((bc, idx) => (
               <React.Fragment key={bc}>
-                {idx > 0 && <span className="text-gray-300">/</span>}
-                <span className={idx === breadcrumbs.length - 1 ? 'text-[#0F6B4B] font-bold' : ''}>
+                {idx > 0 && <span className="text-gray-400 font-bold">/</span>}
+                <span className={idx === breadcrumbs.length - 1 ? 'text-[#0F6B4B] font-extrabold' : ''}>
                   {bc}
                 </span>
               </React.Fragment>
@@ -139,7 +139,7 @@ const AppShell: React.FC = () => {
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
-            className="flex items-center justify-between rounded-lg border border-[#E5E7EB] bg-gray-50 px-3 py-1.5 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition w-full sm:w-56"
+            className="flex items-center justify-between rounded-lg border border-[#D1D5DB] bg-gray-50 px-3 py-1.5 text-xs text-[#4B5563] font-semibold hover:bg-gray-100 hover:text-[#111827] transition w-full sm:w-56"
           >
             <div className="flex items-center gap-2">
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -147,7 +147,7 @@ const AppShell: React.FC = () => {
               </svg>
               <span>Search commands...</span>
             </div>
-            <kbd className="rounded bg-white px-1.5 py-0.5 border border-[#E5E7EB] text-[10px] font-mono text-gray-400">
+            <kbd className="rounded bg-white px-1.5 py-0.5 border border-[#D1D5DB] text-[10px] font-mono font-bold text-[#4B5563]">
               Ctrl+K
             </kbd>
           </button>

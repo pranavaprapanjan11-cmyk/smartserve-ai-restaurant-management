@@ -318,8 +318,8 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose }) => {
                             }`}
                           >
                             <div className="min-w-0">
-                              <p className="text-xs font-semibold">{cmd.title}</p>
-                              <p className={`truncate text-[11px] ${isSelected ? 'text-[#0F6B4B]/80' : 'text-gray-500'}`}>
+                              <p className={`text-xs ${isSelected ? 'font-extrabold text-[#0F6B4B]' : 'font-bold text-[#111827]'}`}>{cmd.title}</p>
+                              <p className={`truncate text-[11px] ${isSelected ? 'text-[#0F6B4B] font-semibold' : 'text-[#4B5563] font-medium'}`}>
                                 {cmd.subtitle}
                               </p>
                             </div>

@@ -152,17 +152,17 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
             SS
           </div>
           <div className="hidden sm:block">
-            <span className="text-sm font-bold text-gray-900 tracking-tight">SmartServe AI</span>
-            <span className="ml-2 text-[10px] text-gray-500 font-semibold uppercase tracking-wider">Restaurant OS</span>
+            <span className="text-sm font-extrabold text-[#111827] tracking-tight">SmartServe AI</span>
+            <span className="ml-2 text-[10px] text-[#4B5563] font-bold uppercase tracking-wider">Restaurant OS</span>
           </div>
         </div>
 
         {workspaceInfo && (
-          <div className="hidden lg:flex items-center gap-2 border-l border-[#E5E7EB] pl-3">
-            <span className="text-[11px] font-semibold text-gray-500">Workspace:</span>
+          <div className="hidden lg:flex items-center gap-2 border-l border-[#D1D5DB] pl-3">
+            <span className="text-[11px] font-bold text-[#4B5563]">Workspace:</span>
             <span className="text-xs font-bold text-[#0F6B4B] bg-[#0F6B4B]/10 border border-[#0F6B4B]/20 px-2 py-0.5 rounded-md font-mono">{workspaceInfo.code}</span>
             {workspaceInfo.name && (
-              <span className="text-xs text-gray-500 max-w-[140px] truncate" title={workspaceInfo.name}>
+              <span className="text-xs text-[#4B5563] font-medium max-w-[140px] truncate" title={workspaceInfo.name}>
                 ({workspaceInfo.name.replace("'s Workspace", "")})
               </span>
             )}
@@ -172,7 +172,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
 
       {/* Center Section: Page Title */}
       <div className="text-center">
-        <h2 className="text-base font-bold text-gray-900 tracking-tight md:text-lg">
+        <h2 className="text-base font-extrabold text-[#111827] tracking-tight md:text-lg">
           {getPageTitle(location.pathname)}
         </h2>
       </div>

@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* SmartServe-AI Enterprise Royal Green Theme Tokens */
+/* SmartServe-AI Enterprise High-Contrast Design Tokens */
 :root {
   color-scheme: light;
   
@@ -10,36 +10,37 @@
   --light-green: #2FA36B;
   --accent-green: #10B981;
 
-  /* Surfaces & Backgrounds */
+  /* Surfaces & Canvas */
   --surface: #F8FAF9;
   --surface-2: #FFFFFF;
   --surface-3: #F3F4F6;
   --card-bg: #FFFFFF;
   --sidebar-bg: #083B2C;
-  --sidebar-hover: rgba(255, 255, 255, 0.08);
-  --sidebar-active: rgba(47, 163, 107, 0.22);
+  --sidebar-hover: rgba(255, 255, 255, 0.12);
+  --sidebar-active: rgba(47, 163, 107, 0.25);
   
-  /* Text & Contrast */
-  --text-primary: #1F2937;
-  --text-secondary: #6B7280;
-  --text-muted: #9CA3AF;
+  /* WCAG AA Compliant High-Contrast Text Tokens */
+  --text-primary: #111827;      /* Charcoal / Slate 900 - Headings & High Emphasis */
+  --text-secondary: #4B5563;    /* Slate 600 - Subheadings, Labels, Body */
+  --text-muted: #6B7280;        /* Slate 500 - Captions, Metadata (No Low Opacity) */
+  --text-disabled: #9CA3AF;     /* Slate 400 - Disabled States Only */
   --text-on-dark: #FFFFFF;
 
-  /* Borders & Shadows */
-  --border-color: #E5E7EB;
-  --border-subtle: #F3F4F6;
+  /* Borders & Dividers */
+  --border-color: #D1D5DB;      /* Crisp Visible Border (Slate 300) */
+  --border-subtle: #E5E7EB;     /* Light Divider (Slate 200) */
   --border-focus: #0F6B4B;
-  
+
   /* Enterprise Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-card: 0 2px 8px 0 rgba(0, 0, 0, 0.06), 0 1px 2px 0 rgba(0, 0, 0, 0.04);
   --shadow-modal: 0 12px 32px 0 rgba(0, 0, 0, 0.12), 0 4px 12px 0 rgba(0, 0, 0, 0.06);
 
-  /* Status Colors */
-  --success: #22C55E;
-  --warning: #F59E0B;
-  --danger: #EF4444;
-  --info: #3B82F6;
+  /* High-Contrast Status Text Colors */
+  --success-text: #15803D;      /* Emerald 700 */
+  --warning-text: #B45309;      /* Amber 700 */
+  --danger-text: #DC2626;       /* Red 600 */
+  --info-text: #1D4ED8;         /* Blue 700 */
 }
 
 html, body, #root {
@@ -54,7 +55,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Typography & Form Elements Default Reset */
+/* Typography Reset & Defaults */
 button,
 input,
 textarea,
@@ -63,7 +64,37 @@ select {
   color: var(--text-primary);
 }
 
-/* Enterprise Utility Classes */
+/* Reusable Typography Hierarchy Tokens */
+.text-heading-lg {
+  color: #111827 !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.025em !important;
+}
+
+.text-heading-md {
+  color: #111827 !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.015em !important;
+}
+
+.text-heading-sm {
+  color: #111827 !important;
+  font-weight: 700 !important;
+}
+
+.text-body-primary {
+  color: #111827 !important;
+}
+
+.text-body-secondary {
+  color: #4B5563 !important;
+}
+
+.text-body-muted {
+  color: #6B7280 !important;
+}
+
+/* Utility Classes */
 .bg-surface {
   background-color: var(--surface);
 }
@@ -84,18 +115,10 @@ select {
   box-shadow: var(--shadow-modal);
 }
 
-.text-primary-theme {
-  color: var(--text-primary);
-}
-
-.text-secondary-theme {
-  color: var(--text-secondary);
-}
-
 .btn-royal-primary {
   background-color: var(--primary);
   color: #FFFFFF;
-  font-weight: 600;
+  font-weight: 700;
   border-radius: 0.625rem; /* 10px */
   padding: 0.625rem 1.25rem;
   transition: all 0.15s ease-in-out;
@@ -109,7 +132,7 @@ select {
 
 .btn-royal-secondary {
   background-color: #FFFFFF;
-  color: var(--text-primary);
+  color: #111827;
   font-weight: 600;
   border-radius: 0.625rem;
   padding: 0.625rem 1.25rem;
@@ -119,10 +142,10 @@ select {
 
 .btn-royal-secondary:hover {
   background-color: #F9FAFB;
-  border-color: #D1D5DB;
+  border-color: #9CA3AF;
 }
 
-/* Custom Scrollbar for Enterprise UI */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -133,15 +156,15 @@ select {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #D1D5DB;
+  background: #9CA3AF;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9CA3AF;
+  background: #6B7280;
 }
 
 ::selection {
-  background: rgba(15, 107, 75, 0.18);
-  color: var(--primary);
+  background: rgba(15, 107, 75, 0.22);
+  color: #0F6B4B;
 }

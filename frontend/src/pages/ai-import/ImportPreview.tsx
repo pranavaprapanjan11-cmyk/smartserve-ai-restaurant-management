@@ -143,21 +143,21 @@ const ImportPreview: React.FC<ImportPreviewProps> = ({ previewData, file, onCanc
   return (
     <div className="space-y-6 text-gray-900">
       {/* Header Actions */}
-      <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center border-b border-[#E5E7EB] pb-5">
+      <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center border-b border-[#D1D5DB] pb-5">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">AI Understanding Result</h1>
+            <h1 className="text-2xl font-extrabold text-[#111827] tracking-tight">AI Understanding Result</h1>
             <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
               documentType === 'MENU'
-                ? 'bg-[#0F6B4B]/10 text-[#0F6B4B] border border-[#0F6B4B]/20'
+                ? 'bg-[#0F6B4B]/10 text-[#0F6B4B] border border-[#0F6B4B]/30'
                 : documentType === 'INVENTORY'
-                ? 'bg-purple-100 text-purple-800 border border-purple-200'
-                : 'bg-red-100 text-red-800 border border-red-200'
+                ? 'bg-purple-100 text-purple-900 border border-purple-300'
+                : 'bg-red-100 text-red-900 border border-red-300'
             }`}>
               Detected: {documentType}
             </span>
           </div>
-          <p className="text-gray-500 text-xs sm:text-sm mt-1">
+          <p className="text-[#4B5563] text-xs sm:text-sm font-medium mt-1">
             Gemini 2.5 Flash Vision automatically categorized and extracted items from your document.
           </p>
         </div>
@@ -166,7 +166,7 @@ const ImportPreview: React.FC<ImportPreviewProps> = ({ previewData, file, onCanc
           <button
             onClick={onCancel}
             disabled={isSaving}
-            className="px-5 py-2.5 rounded-lg text-xs font-semibold text-gray-700 bg-white border border-[#E5E7EB] hover:bg-gray-50 transition"
+            className="px-5 py-2.5 rounded-lg text-xs font-bold text-[#111827] bg-white border border-[#D1D5DB] hover:bg-gray-50 transition"
           >
             Cancel
           </button>
@@ -174,7 +174,7 @@ const ImportPreview: React.FC<ImportPreviewProps> = ({ previewData, file, onCanc
             <button
               onClick={confirmImport}
               disabled={isSaving}
-              className="px-5 py-2.5 rounded-lg text-xs font-bold text-white bg-[#0F6B4B] hover:bg-[#084C37] transition shadow-sm flex items-center gap-2"
+              className="px-5 py-2.5 rounded-lg text-xs font-extrabold text-white bg-[#0F6B4B] hover:bg-[#084C37] transition shadow-sm flex items-center gap-2"
             >
               {isSaving ? 'Importing...' : `Commit to ${documentType}`}
             </button>
@@ -183,21 +183,21 @@ const ImportPreview: React.FC<ImportPreviewProps> = ({ previewData, file, onCanc
       </div>
 
       {/* Reasoning Summary Card */}
-      <div className="p-4 rounded-xl bg-[#0F6B4B]/5 border border-[#0F6B4B]/20 space-y-2">
+      <div className="p-4 rounded-xl bg-[#0F6B4B]/5 border border-[#0F6B4B]/30 space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="h-2.5 w-2.5 rounded-full bg-[#0F6B4B]"></span>
-            <h3 className="font-bold text-xs uppercase tracking-wider text-[#0F6B4B]">Gemini Vision Intelligence Context</h3>
+            <h3 className="font-extrabold text-xs uppercase tracking-wider text-[#0F6B4B]">Gemini Vision Intelligence Context</h3>
           </div>
-          <div className="text-xs text-gray-600">
-            Confidence: <span className="font-bold text-gray-900">{previewData.confidence}%</span> | Language: <span className="font-bold text-gray-900">{previewData.languageDetected}</span> | Processing: <span className="font-bold text-gray-900">{previewData.durationMs}ms</span>
+          <div className="text-xs text-[#4B5563] font-medium">
+            Confidence: <span className="font-extrabold text-[#111827]">{previewData.confidence}%</span> | Language: <span className="font-extrabold text-[#111827]">{previewData.languageDetected}</span> | Processing: <span className="font-extrabold text-[#111827]">{previewData.durationMs}ms</span>
           </div>
         </div>
-        <p className="text-xs text-gray-700 leading-relaxed">{previewData.reasoningSummary}</p>
+        <p className="text-xs text-[#111827] font-medium leading-relaxed">{previewData.reasoningSummary}</p>
       </div>
 
       {saveError && (
-        <div className="p-3.5 bg-red-50 border border-red-200 rounded-lg text-red-700 text-xs font-semibold">
+        <div className="p-3.5 bg-red-50 border border-red-300 rounded-lg text-red-900 text-xs font-bold">
           {saveError}
         </div>
       )}
@@ -206,14 +206,14 @@ const ImportPreview: React.FC<ImportPreviewProps> = ({ previewData, file, onCanc
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Source Image */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="p-4 bg-white rounded-xl border border-[#E5E7EB] shadow-sm space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500">Original Document Source</h4>
+          <div className="p-4 bg-white rounded-xl border border-[#D1D5DB] shadow-sm space-y-3">
+            <h4 className="text-xs font-extrabold uppercase tracking-wider text-[#111827]">Original Document Source</h4>
             {imageUrl ? (
-              <div className="rounded-lg overflow-hidden border border-[#E5E7EB] max-h-[480px] flex items-center justify-center bg-gray-50">
+              <div className="rounded-lg overflow-hidden border border-[#D1D5DB] max-h-[480px] flex items-center justify-center bg-gray-50">
                 <img src={imageUrl} alt="Document upload" className="object-contain max-h-[460px] w-full" />
               </div>
             ) : (
-              <div className="p-10 text-center text-gray-400 text-xs border border-dashed border-gray-200 rounded-lg">
+              <div className="p-10 text-center text-[#4B5563] text-xs font-semibold border border-dashed border-gray-300 rounded-lg">
                 No visual preview available
               </div>
             )}
@@ -223,20 +223,20 @@ const ImportPreview: React.FC<ImportPreviewProps> = ({ previewData, file, onCanc
         {/* Right Column: Extracted Items */}
         <div className="lg:col-span-7 space-y-4">
           {documentType === 'MENU' && (
-            <div className="p-5 bg-white rounded-xl border border-[#E5E7EB] shadow-sm space-y-4">
-              <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-                <h3 className="font-bold text-sm text-gray-900">Extracted Menu Items ({menuItems.length})</h3>
+            <div className="p-5 bg-white rounded-xl border border-[#D1D5DB] shadow-sm space-y-4">
+              <div className="flex items-center justify-between border-b border-gray-200 pb-3">
+                <h3 className="font-extrabold text-sm text-[#111827]">Extracted Menu Items ({menuItems.length})</h3>
                 <button
                   onClick={() => handleAddRow('MENU')}
-                  className="px-3 py-1.5 rounded-lg bg-[#0F6B4B]/10 text-[#0F6B4B] border border-[#0F6B4B]/20 text-xs font-semibold hover:bg-[#0F6B4B]/20"
+                  className="px-3 py-1.5 rounded-lg bg-[#0F6B4B]/10 text-[#0F6B4B] border border-[#0F6B4B]/30 text-xs font-bold hover:bg-[#0F6B4B]/20"
                 >
                   + Add Item
                 </button>
               </div>
 
-              <div className="overflow-x-auto border border-[#E5E7EB] rounded-lg">
-                <table className="w-full text-left text-xs text-gray-700">
-                  <thead className="bg-gray-50 uppercase text-[10px] tracking-wider text-gray-500 border-b border-[#E5E7EB]">
+              <div className="overflow-x-auto border border-[#D1D5DB] rounded-lg">
+                <table className="w-full text-left text-xs text-[#111827]">
+                  <thead className="bg-gray-100 uppercase text-[10px] tracking-wider text-[#111827] font-extrabold border-b border-[#D1D5DB]">
                     <tr>
                       <th className="p-2.5">Item Name</th>
                       <th className="p-2.5">Category</th>
