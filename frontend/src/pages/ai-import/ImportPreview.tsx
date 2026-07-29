@@ -1,6 +1,6 @@
-// File: frontend/src/pages/ai-import/ImportPreview.tsx
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { API_BASE } from '../../config';
 
 interface ImportPreviewProps {
   previewData: {
@@ -104,7 +104,7 @@ const ImportPreview: React.FC<ImportPreviewProps> = ({ previewData, file, onCanc
     setSaveError(null);
 
     try {
-      const res = await fetch('/api/ai-import/confirm', {
+      const res = await fetch(`${API_BASE}/ai-import/confirm`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

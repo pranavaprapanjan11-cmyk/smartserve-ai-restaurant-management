@@ -1,6 +1,7 @@
 // File: frontend/src/pages/ai-import/AiImportCenter.tsx
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { API_BASE } from '../../config';
 import ImportPreview from './ImportPreview';
 
 interface ImportHistoryLog {
@@ -50,8 +51,8 @@ const AiImportCenter: React.FC = () => {
   const fetchHistoryAndAnalytics = async () => {
     try {
       const [histRes, analRes] = await Promise.all([
-        fetch('/api/ai-import/history', { headers: { Authorization: `Bearer ${token}` } }),
-        fetch('/api/ai-import/analytics', { headers: { Authorization: `Bearer ${token}` } })
+        fetch(`${API_BASE}/ai-import/history`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${API_BASE}/ai-import/analytics`, { headers: { Authorization: `Bearer ${token}` } })
       ]);
       if (histRes.ok) setHistory(await histRes.json());
       if (analRes.ok) setAnalytics(await analRes.json());
@@ -92,7 +93,7 @@ const AiImportCenter: React.FC = () => {
       const formData = new FormData();
       formData.append('file', file);
 
-      const res = await fetch('/api/ai-import/process', {
+      const res = await fetch(`${API_BASE}/ai-import/process`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: formData
