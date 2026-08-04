@@ -89,28 +89,22 @@ const MenuDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 sm:p-6 lg:p-8">
-      {/* Background Effects */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-5" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-5" />
-      </div>
-
+    <div className="p-4 sm:p-6 lg:p-8">
       {/* Main Content */}
-      <div className="relative z-10 max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8 md:mb-12">
+        <div className="flex items-center justify-between mb-8 md:mb-10">
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-1 tracking-tight">
               Menu Management
             </h1>
-            <p className="text-slate-400">Manage your restaurant's menu items and categories</p>
+            <p className="text-white/60 text-sm">Manage your restaurant's menu items and categories</p>
           </div>
           <button
             onClick={() => navigate('/menu/add')}
-            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/50 flex items-center gap-2 whitespace-nowrap"
+            className="px-5 py-2.5 bg-white hover:bg-gray-100 text-[#0F6B4B] rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap shadow-sm border border-white/20"
           >
-            <span className="text-xl">➕</span>
+            <span className="text-base">➕</span>
             Add Item
           </button>
         </div>
@@ -127,7 +121,7 @@ const MenuDashboard: React.FC = () => {
               placeholder="🔍 Search menu items..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-6 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              className="w-full px-5 py-3 bg-white border border-[#E5E7EB] rounded-xl text-[#111827] text-sm placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-white/40 transition-all shadow-sm"
             />
           </div>
 
@@ -135,10 +129,10 @@ const MenuDashboard: React.FC = () => {
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setSelectedCategory('')}
-              className={`px-4 py-2 rounded-lg font-medium transition-all ${
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
                 selectedCategory === ''
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/50'
-                  : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 border border-slate-700'
+                  ? 'bg-white text-[#0F6B4B] shadow-sm'
+                  : 'bg-white/20 text-white hover:bg-white/30 border border-white/20'
               }`}
             >
               All Categories
@@ -147,18 +141,11 @@ const MenuDashboard: React.FC = () => {
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
+                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${
                   selectedCategory === cat.id
-                    ? 'text-white shadow-lg'
-                    : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 border border-slate-700'
+                    ? 'bg-white text-[#111827] shadow-sm'
+                    : 'bg-white/20 text-white hover:bg-white/30 border border-white/20'
                 }`}
-                style={
-                  selectedCategory === cat.id
-                    ? {
-                        background: `linear-gradient(135deg, ${cat.color_code || '#3b82f6'} 0%, ${cat.color_code || '#3b82f6'}80 100%)`,
-                      }
-                    : {}
-                }
               >
                 <span>{cat.icon_emoji}</span>
                 {cat.name}
@@ -175,13 +162,13 @@ const MenuDashboard: React.FC = () => {
               .map((_, i) => (
                 <div
                   key={i}
-                  className="bg-slate-800 rounded-2xl h-96 animate-pulse border border-slate-700"
+                  className="bg-white/10 rounded-2xl h-96 animate-pulse border border-white/10"
                 />
               ))}
           </div>
         ) : filteredItems.length > 0 ? (
           <>
-            <div className="text-sm text-slate-400 mb-4">
+            <div className="text-xs text-white/60 mb-4 font-semibold">
               Showing {filteredItems.length} of {menuItems.length} items
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -200,32 +187,19 @@ const MenuDashboard: React.FC = () => {
         ) : (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="text-6xl mb-4">🍽️</div>
-            <h3 className="text-2xl font-bold text-white mb-2">No Items Found</h3>
-            <p className="text-slate-400 mb-6">
+            <h3 className="text-2xl font-extrabold text-white mb-2">No Items Found</h3>
+            <p className="text-white/60 text-sm mb-6">
               {searchQuery ? 'Try adjusting your search criteria' : 'Start by adding your first menu item'}
             </p>
             <button
               onClick={() => navigate('/menu/add')}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-all"
+              className="px-6 py-3 bg-white hover:bg-gray-100 text-[#0F6B4B] rounded-lg text-xs font-extrabold transition-all shadow-sm"
             >
               Add First Item
             </button>
           </div>
         )}
       </div>
-
-      <style>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </div>
   )
 }

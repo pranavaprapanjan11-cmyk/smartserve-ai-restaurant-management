@@ -1,41 +1,54 @@
-import React, { useMemo, useState } from 'react'
-import { ThemeKey, themeOptions, useTheme } from '../../context/ThemeContext'
-
-const themeSwatches: Record<ThemeKey, { primary: string; accent: string }> = {
-  'obsidian-midnight': { primary: '#070a13', accent: '#38bdf8' },
-  'arctic-light': { primary: '#f8fbff', accent: '#0ea5e9' },
-  'neon-cyber': { primary: '#020617', accent: '#22d3ee' },
-  'emerald-pro': { primary: '#021d12', accent: '#34d399' },
-  'sunset-amber': { primary: '#1a1206', accent: '#f97316' },
-  'crimson-command': { primary: '#2b0a10', accent: '#f43f5e' },
-}
+import React, { useState, useRef, useEffect } from 'react'
+import { useTheme, themeOptions } from '../../context/ThemeContext'
 
 const ThemeSwitcher: React.FC = () => {
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme, isDark } = useTheme()
   const [open, setOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
 
-  const currentTheme = useMemo(
-    () => themeOptions.find((option) => option.key === theme),
-    [theme]
-  )
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   return (
-    <div className="relative">
+    <div className="relative" ref={menuRef}>
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        aria-label="Open theme selector"
-        className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-400 transition hover:bg-white/10 hover:text-white"
+        aria-label="Toggle theme mode"
+        title={`Current Theme: ${isDark ? 'Enterprise Dark' : 'Enterprise Light'}`}
+        className="flex h-9 items-center gap-1.5 rounded-lg border border-[var(--card-border)] bg-[var(--input-bg)] px-2.5 text-xs font-semibold text-[var(--text-primary)] shadow-xs transition hover:bg-[var(--card-hover-bg)]"
       >
-        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M12 2a7 7 0 0 1 7 7 7 7 0 1 1-7-7Z" fill="currentColor" />
-          <path d="M12 2v2M12 18v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <span className="text-sm">{isDark ? '🌙' : '☀'}</span>
+        <span className="hidden md:inline font-bold">
+          {isDark ? 'Dark' : 'Light'}
+        </span>
+        <svg
+          className={`h-3.5 w-3.5 text-[var(--text-muted)] transition-transform duration-200 ${
+            open ? 'rotate-180' : ''
+          }`}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-48 overflow-hidden rounded-[1.5rem] border surface-border bg-surface-panel shadow-2xl shadow-black/35">
-          <div className="grid gap-1 p-2">
+        <div className="absolute right-0 top-full z-50 mt-2 w-44 overflow-hidden rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] p-1.5 shadow-xl">
+          <div className="px-2 py-1 border-b border-[var(--card-border)] mb-1">
+            <p className="text-[10px] font-extrabold uppercase tracking-wider text-[var(--text-muted)]">
+              Appearance
+            </p>
+          </div>
+          <div className="space-y-0.5">
             {themeOptions.map((option) => {
               const active = option.key === theme
               return (
@@ -46,14 +59,21 @@ const ThemeSwitcher: React.FC = () => {
                     setTheme(option.key)
                     setOpen(false)
                   }}
-                  className={`flex w-full items-center justify-between rounded-2xl px-3 py-2 text-left text-sm font-medium transition ${
+                  className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-bold transition ${
                     active
-                      ? 'bg-cyan-500/15 text-cyan-100'
-                      : 'text-slate-200 hover:bg-white/5'
+                      ? 'bg-[#0F6B4B] text-white shadow-xs'
+                      : 'text-[var(--text-primary)] hover:bg-[var(--card-hover-bg)]'
                   }`}
                 >
-                  <span>{option.label}</span>
-                  {active && <span className="rounded-full bg-cyan-500/20 px-2 text-xs text-cyan-100">On</span>}
+                  <div className="flex items-center gap-2">
+                    <span>{option.icon}</span>
+                    <span>{option.label}</span>
+                  </div>
+                  {active && (
+                    <svg className="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
                 </button>
               )
             })}

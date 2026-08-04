@@ -39,6 +39,7 @@ const AppShell: React.FC = () => {
       analytics: 'Intelligence',
       ai: 'Intelligence',
       'ai-optimizer': 'Intelligence',
+      'ai-operations': 'Intelligence',
       employees: 'Administration',
       settings: 'Administration',
       'ai-vision': 'AI Intelligence Center',
@@ -56,6 +57,7 @@ const AppShell: React.FC = () => {
       analytics: 'Analytics',
       ai: 'AI Intelligence',
       'ai-optimizer': 'AI Menu Optimizer',
+      'ai-operations': 'AI Operations Command',
       employees: 'Employee Directory',
       settings: 'Restaurant Settings',
       'ai-vision': 'AI Vision Center',
@@ -97,7 +99,7 @@ const AppShell: React.FC = () => {
   const breadcrumbs = getBreadcrumbs(location.pathname)
 
   return (
-    <div className="min-h-screen bg-[#F8FAF9] text-[#1F2937]">
+    <div className="min-h-screen bg-[var(--app-bg)] text-[var(--text-primary)] transition-colors duration-200">
       {/* Sidebar Navigation */}
       <Sidebar
         collapsed={sidebarCollapsed}
@@ -122,13 +124,13 @@ const AppShell: React.FC = () => {
         />
 
         {/* Sub-header Navigation Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-[#D1D5DB] bg-white px-6 py-2.5 gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-[var(--subheader-border)] bg-[var(--subheader-bg)] px-6 py-2.5 gap-2 transition-colors duration-200">
           {/* Breadcrumb Trail */}
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#4B5563]">
+          <div className="flex items-center gap-2 text-xs font-semibold text-[var(--text-secondary)]">
             {breadcrumbs.map((bc, idx) => (
               <React.Fragment key={bc}>
-                {idx > 0 && <span className="text-gray-400 font-bold">/</span>}
-                <span className={idx === breadcrumbs.length - 1 ? 'text-[#0F6B4B] font-extrabold' : ''}>
+                {idx > 0 && <span className="text-[var(--text-muted)] font-bold">/</span>}
+                <span className={idx === breadcrumbs.length - 1 ? 'text-[var(--text-primary)] font-extrabold' : ''}>
                   {bc}
                 </span>
               </React.Fragment>
@@ -139,7 +141,7 @@ const AppShell: React.FC = () => {
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
-            className="flex items-center justify-between rounded-lg border border-[#D1D5DB] bg-gray-50 px-3 py-1.5 text-xs text-[#4B5563] font-semibold hover:bg-gray-100 hover:text-[#111827] transition w-full sm:w-56"
+            className="flex items-center justify-between rounded-lg border border-[var(--card-border)] bg-[var(--input-bg)] px-3 py-1.5 text-xs text-[var(--text-muted)] font-semibold hover:bg-[var(--card-hover-bg)] hover:text-[var(--text-primary)] transition w-full sm:w-56"
           >
             <div className="flex items-center gap-2">
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -147,7 +149,7 @@ const AppShell: React.FC = () => {
               </svg>
               <span>Search commands...</span>
             </div>
-            <kbd className="rounded bg-white px-1.5 py-0.5 border border-[#D1D5DB] text-[10px] font-mono font-bold text-[#4B5563]">
+            <kbd className="rounded bg-[var(--subheader-bg)] px-1.5 py-0.5 border border-[var(--card-border)] text-[10px] font-mono font-bold text-[var(--text-muted)]">
               Ctrl+K
             </kbd>
           </button>

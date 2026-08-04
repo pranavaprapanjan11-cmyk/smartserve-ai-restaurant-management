@@ -1,88 +1,79 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
 
-export type ThemeKey =
-  | 'obsidian-midnight'
-  | 'arctic-light'
-  | 'neon-cyber'
-  | 'emerald-pro'
-  | 'sunset-amber'
-  | 'crimson-command'
+export type ThemeMode = 'light' | 'dark'
 
-export const themeOptions: { key: ThemeKey; label: string }[] = [
-  { key: 'obsidian-midnight', label: 'Obsidian Midnight' },
-  { key: 'arctic-light', label: 'Arctic Light' },
-  { key: 'neon-cyber', label: 'Neon Cyber' },
-  { key: 'emerald-pro', label: 'Emerald Pro' },
-  { key: 'sunset-amber', label: 'Sunset Amber' },
-  { key: 'crimson-command', label: 'Crimson Command' },
+export interface ThemeOption {
+  key: ThemeMode
+  label: string
+  icon: string
+}
+
+export const themeOptions: ThemeOption[] = [
+  { key: 'light', label: 'Enterprise Light', icon: '☀' },
+  { key: 'dark', label: 'Enterprise Dark', icon: '🌙' },
 ]
 
-const STORAGE_KEY = 'smartserve-appearance'
+const STORAGE_KEY = 'smartserve-theme'
 
 interface ThemeContextValue {
-  theme: ThemeKey
-  setTheme: (theme: ThemeKey) => void
+  theme: ThemeMode
+  setTheme: (theme: ThemeMode) => void
+  toggleTheme: () => void
+  isDark: boolean
   compactMode: boolean
   setCompactMode: (value: boolean) => void
   highContrast: boolean
   setHighContrast: (value: boolean) => void
   animationsEnabled: boolean
   setAnimationsEnabled: (value: boolean) => void
-  themes: typeof themeOptions
+  themes: ThemeOption[]
 }
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined)
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setThemeState] = useState<ThemeKey>('obsidian-midnight')
+  const [theme, setThemeState] = useState<ThemeMode>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = window.localStorage.getItem(STORAGE_KEY)
+      if (stored === 'dark' || stored === 'light') {
+        return stored
+      }
+    }
+    return 'light'
+  })
+
   const [compactMode, setCompactModeState] = useState(false)
   const [highContrast, setHighContrastState] = useState(false)
   const [animationsEnabled, setAnimationsEnabledState] = useState(true)
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(STORAGE_KEY)
-    if (!stored) return
-
-    try {
-      const parsed = JSON.parse(stored) as {
-        theme?: ThemeKey
-        compactMode?: boolean
-        highContrast?: boolean
-        animationsEnabled?: boolean
-      }
-
-      if (parsed.theme && themeOptions.some((option) => option.key === parsed.theme)) {
-        setThemeState(parsed.theme)
-      }
-      if (typeof parsed.compactMode === 'boolean') {
-        setCompactModeState(parsed.compactMode)
-      }
-      if (typeof parsed.highContrast === 'boolean') {
-        setHighContrastState(parsed.highContrast)
-      }
-      if (typeof parsed.animationsEnabled === 'boolean') {
-        setAnimationsEnabledState(parsed.animationsEnabled)
-      }
-    } catch {
-      // ignore invalid storage value
+    if (typeof window === 'undefined') return
+    const root = document.documentElement
+    root.setAttribute('data-theme', theme)
+    if (theme === 'dark') {
+      root.classList.add('dark')
+    } else {
+      root.classList.remove('dark')
     }
-  }, [])
+    window.localStorage.setItem(STORAGE_KEY, theme)
+  }, [theme])
 
   useEffect(() => {
-    window.localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ theme, compactMode, highContrast, animationsEnabled })
-    )
-    document.documentElement.setAttribute('data-theme', theme)
     document.documentElement.dataset.compactMode = compactMode ? 'true' : 'false'
     document.documentElement.dataset.highContrast = highContrast ? 'true' : 'false'
     document.documentElement.dataset.animationsEnabled = animationsEnabled ? 'true' : 'false'
-  }, [theme, compactMode, highContrast, animationsEnabled])
+  }, [compactMode, highContrast, animationsEnabled])
+
+  const toggleTheme = () => {
+    setThemeState((prev) => (prev === 'light' ? 'dark' : 'light'))
+  }
 
   const value = useMemo(
     () => ({
       theme,
       setTheme: setThemeState,
+      toggleTheme,
+      isDark: theme === 'dark',
       compactMode,
       setCompactMode: setCompactModeState,
       highContrast,

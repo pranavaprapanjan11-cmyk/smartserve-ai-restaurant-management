@@ -12,41 +12,41 @@ const AlertCenter: React.FC<AlertCenterProps> = ({ alerts }) => {
     switch (severity) {
       case 'CRITICAL':
         return {
-          card: 'border-rose-500/20 bg-rose-500/5 shadow-rose-500/5',
-          tag: 'bg-rose-500/10 text-rose-300 border-rose-500/20',
-          dot: 'bg-rose-500 shadow-rose-500/50',
+          card: 'border-rose-500/30 bg-rose-500/10 dark:bg-rose-950/20',
+          tag: 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-500/30',
+          dot: 'bg-rose-500',
           indicator: '⚡ CRITICAL',
         };
       case 'WARNING':
         return {
-          card: 'border-amber-500/20 bg-amber-500/5 shadow-amber-500/5',
-          tag: 'bg-amber-500/10 text-amber-300 border-amber-500/20',
-          dot: 'bg-amber-500 shadow-amber-500/50',
+          card: 'border-amber-500/30 bg-amber-500/10 dark:bg-amber-950/20',
+          tag: 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30',
+          dot: 'bg-amber-500',
           indicator: '⚠️ WARNING',
         };
       default:
         return {
-          card: 'border-cyan-500/20 bg-cyan-500/5 shadow-cyan-500/5',
-          tag: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/20',
-          dot: 'bg-cyan-400 shadow-cyan-400/50',
+          card: 'border-sky-500/30 bg-sky-500/10 dark:bg-sky-950/20',
+          tag: 'bg-sky-500/15 text-sky-700 dark:text-sky-300 border-sky-500/30',
+          dot: 'bg-sky-400',
           indicator: 'ℹ️ INFO',
         };
     }
   };
 
   return (
-    <div className="rounded-3xl border border-white/5 bg-slate-900/60 p-6 backdrop-blur-xl flex flex-col h-full">
+    <div className="rounded-3xl border border-[var(--card-border)] bg-[var(--card-bg)] p-6 shadow-card-enterprise flex flex-col h-full">
       <div className="flex items-center justify-between">
-        <h3 className="text-xs uppercase tracking-[0.25em] text-slate-400 font-bold">Alert Control Center</h3>
-        <span className="rounded-full bg-rose-500/15 px-2.5 py-1 text-3xs font-semibold text-rose-300 ring-1 ring-rose-400/20">
+        <h3 className="text-xs uppercase tracking-[0.25em] text-[var(--text-muted)] font-extrabold">Alert Control Center</h3>
+        <span className="rounded-full bg-rose-500/15 border border-rose-500/30 px-2.5 py-1 text-[10px] font-extrabold text-rose-700 dark:text-rose-300">
           {alerts.length} Active Alarms
         </span>
       </div>
 
-      <div className="mt-6 flex-1 overflow-y-auto pr-1 max-h-[380px] custom-scrollbar space-y-3">
+      <div className="mt-6 flex-1 overflow-y-auto pr-1 max-h-[380px] space-y-3">
         <AnimatePresence initial={false}>
           {alerts.length === 0 ? (
-            <div className="flex h-32 items-center justify-center text-xs text-slate-500">
+            <div className="flex h-32 items-center justify-center text-xs text-[var(--text-muted)]">
               No active operational alerts.
             </div>
           ) : (
@@ -58,7 +58,7 @@ const AlertCenter: React.FC<AlertCenterProps> = ({ alerts }) => {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className={`rounded-2xl border p-4 shadow-lg backdrop-blur-xl ${styles.card} flex gap-4`}
+                  className={`rounded-2xl border p-4 shadow-xs ${styles.card} flex gap-4`}
                 >
                   {/* Status Dot with pulse */}
                   <div className="relative mt-1 flex h-2 w-2 items-center justify-center shrink-0">
@@ -72,11 +72,11 @@ const AlertCenter: React.FC<AlertCenterProps> = ({ alerts }) => {
                       <span className={`rounded-full border px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider ${styles.tag}`}>
                         {styles.indicator} - {alert.category}
                       </span>
-                      <span className="text-[9px] text-slate-500">
+                      <span className="text-[10px] text-[var(--text-muted)] font-bold">
                         {new Date(alert.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
-                    <p className="mt-2 text-xs font-semibold text-slate-200 leading-relaxed">
+                    <p className="mt-2 text-xs font-semibold text-[var(--text-primary)] leading-relaxed">
                       {alert.message}
                     </p>
                   </div>

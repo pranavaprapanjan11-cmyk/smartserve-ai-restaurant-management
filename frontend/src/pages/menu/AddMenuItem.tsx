@@ -88,48 +88,42 @@ const AddMenuItem: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 sm:p-6 lg:p-8">
-      {/* Background Effects */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-5" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-5" />
-      </div>
-
-      <div className="relative z-10 max-w-2xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="max-w-2xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6">
           <button
             onClick={() => navigate('/menu')}
-            className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-4"
+            className="flex items-center gap-2 text-white/70 hover:text-white transition-colors mb-4 text-sm font-semibold"
           >
             <span>←</span> Back to Menu
           </button>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">
+          <h1 className="text-3xl font-extrabold text-white mb-1 tracking-tight">
             Add Menu Item
           </h1>
-          <p className="text-slate-400">Create a new menu item for your restaurant</p>
+          <p className="text-white/60 text-sm">Create a new menu item for your restaurant</p>
         </div>
 
         {/* Form Card */}
-        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-8 shadow-2xl">
+        <div className="bg-white border border-[#E5E7EB] rounded-2xl p-8 shadow-[0_4px_18px_rgba(0,0,0,0.08)]">
           {errors.submit && (
-            <div className="mb-6 p-4 bg-red-600/20 border border-red-600/50 rounded-lg text-red-300">
+            <div className="mb-6 p-4 bg-red-50 border border-red-300 rounded-lg text-red-800 text-xs font-bold">
               {errors.submit}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Category */}
             <div>
-              <label className="block text-sm font-semibold text-white mb-2">
+              <label className="block text-xs font-extrabold text-[#111827] uppercase tracking-wide mb-1.5">
                 Category *
               </label>
               <select
                 value={formData.category_id}
                 onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
                 disabled={isLoadingCategories}
-                className={`w-full px-4 py-3 bg-slate-700/50 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-                  errors.category_id ? 'border-red-500' : 'border-slate-600'
+                className={`w-full px-3.5 py-2.5 bg-white border rounded-lg text-[#111827] text-xs focus:outline-none focus:ring-2 focus:ring-[#0F6B4B] transition-all ${
+                  errors.category_id ? 'border-red-500' : 'border-[#D1D5DB]'
                 }`}
               >
                 <option value="">Select a category...</option>
@@ -139,12 +133,12 @@ const AddMenuItem: React.FC = () => {
                   </option>
                 ))}
               </select>
-              {errors.category_id && <p className="text-red-400 text-sm mt-1">{errors.category_id}</p>}
+              {errors.category_id && <p className="text-red-600 text-xs mt-1 font-semibold">{errors.category_id}</p>}
             </div>
 
             {/* Name */}
             <div>
-              <label className="block text-sm font-semibold text-white mb-2">
+              <label className="block text-xs font-extrabold text-[#111827] uppercase tracking-wide mb-1.5">
                 Item Name *
               </label>
               <input
@@ -152,16 +146,16 @@ const AddMenuItem: React.FC = () => {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="e.g., Chicken Biryani"
-                className={`w-full px-4 py-3 bg-slate-700/50 border rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-                  errors.name ? 'border-red-500' : 'border-slate-600'
+                className={`w-full px-3.5 py-2.5 bg-white border rounded-lg text-[#111827] text-xs placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#0F6B4B] transition-all ${
+                  errors.name ? 'border-red-500' : 'border-[#D1D5DB]'
                 }`}
               />
-              {errors.name && <p className="text-red-400 text-sm mt-1">{errors.name}</p>}
+              {errors.name && <p className="text-red-600 text-xs mt-1 font-semibold">{errors.name}</p>}
             </div>
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-semibold text-white mb-2">
+              <label className="block text-xs font-extrabold text-[#111827] uppercase tracking-wide mb-1.5">
                 Description
               </label>
               <textarea
@@ -169,13 +163,13 @@ const AddMenuItem: React.FC = () => {
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Describe your menu item..."
                 rows={4}
-                className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                className="w-full px-3.5 py-2.5 bg-white border border-[#D1D5DB] rounded-lg text-[#111827] text-xs placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#0F6B4B] transition-all"
               />
             </div>
 
             {/* Price */}
             <div>
-              <label className="block text-sm font-semibold text-white mb-2">
+              <label className="block text-xs font-extrabold text-[#111827] uppercase tracking-wide mb-1.5">
                 Price (₹) *
               </label>
               <input
@@ -185,16 +179,16 @@ const AddMenuItem: React.FC = () => {
                 placeholder="0.00"
                 step="0.01"
                 min="0"
-                className={`w-full px-4 py-3 bg-slate-700/50 border rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-                  errors.price ? 'border-red-500' : 'border-slate-600'
+                className={`w-full px-3.5 py-2.5 bg-white border rounded-lg text-[#111827] text-xs placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#0F6B4B] transition-all ${
+                  errors.price ? 'border-red-500' : 'border-[#D1D5DB]'
                 }`}
               />
-              {errors.price && <p className="text-red-400 text-sm mt-1">{errors.price}</p>}
+              {errors.price && <p className="text-red-600 text-xs mt-1 font-semibold">{errors.price}</p>}
             </div>
 
             {/* Image URL */}
             <div>
-              <label className="block text-sm font-semibold text-white mb-2">
+              <label className="block text-xs font-extrabold text-[#111827] uppercase tracking-wide mb-1.5">
                 Image URL
               </label>
               <input
@@ -202,15 +196,15 @@ const AddMenuItem: React.FC = () => {
                 value={formData.image_url}
                 onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
                 placeholder="https://example.com/image.jpg"
-                className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                className="w-full px-3.5 py-2.5 bg-white border border-[#D1D5DB] rounded-lg text-[#111827] text-xs placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#0F6B4B] transition-all"
               />
             </div>
 
             {/* Grid: Prep Time & Spice Level */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-white mb-2">
-                  Preparation Time (min)
+                <label className="block text-xs font-extrabold text-[#111827] uppercase tracking-wide mb-1.5">
+                  Prep Time (min)
                 </label>
                 <input
                   type="number"
@@ -218,17 +212,17 @@ const AddMenuItem: React.FC = () => {
                   onChange={(e) => setFormData({ ...formData, preparation_time: e.target.value })}
                   placeholder="30"
                   min="0"
-                  className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full px-3.5 py-2.5 bg-white border border-[#D1D5DB] rounded-lg text-[#111827] text-xs placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#0F6B4B] transition-all"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-white mb-2">
+                <label className="block text-xs font-extrabold text-[#111827] uppercase tracking-wide mb-1.5">
                   Spice Level
                 </label>
                 <select
                   value={formData.spice_level}
                   onChange={(e) => setFormData({ ...formData, spice_level: e.target.value })}
-                  className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full px-3.5 py-2.5 bg-white border border-[#D1D5DB] rounded-lg text-[#111827] text-xs focus:outline-none focus:ring-2 focus:ring-[#0F6B4B] transition-all"
                 >
                   <option value="0">🟢 None</option>
                   <option value="1">🟡 Mild</option>
@@ -242,13 +236,13 @@ const AddMenuItem: React.FC = () => {
             {/* Dietary Info & Calories */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-white mb-2">
+                <label className="block text-xs font-extrabold text-[#111827] uppercase tracking-wide mb-1.5">
                   Dietary Info
                 </label>
                 <select
                   value={formData.dietary_info}
                   onChange={(e) => setFormData({ ...formData, dietary_info: e.target.value })}
-                  className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full px-3.5 py-2.5 bg-white border border-[#D1D5DB] rounded-lg text-[#111827] text-xs focus:outline-none focus:ring-2 focus:ring-[#0F6B4B] transition-all"
                 >
                   <option value="">None</option>
                   <option value="VEGETARIAN">Vegetarian</option>
@@ -261,7 +255,7 @@ const AddMenuItem: React.FC = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-white mb-2">
+                <label className="block text-xs font-extrabold text-[#111827] uppercase tracking-wide mb-1.5">
                   Calories
                 </label>
                 <input
@@ -270,30 +264,30 @@ const AddMenuItem: React.FC = () => {
                   onChange={(e) => setFormData({ ...formData, calories: e.target.value })}
                   placeholder="0"
                   min="0"
-                  className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full px-3.5 py-2.5 bg-white border border-[#D1D5DB] rounded-lg text-[#111827] text-xs placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#0F6B4B] transition-all"
                 />
               </div>
             </div>
 
             {/* Toggles */}
-            <div className="space-y-3 p-4 bg-slate-700/30 rounded-lg border border-slate-600">
+            <div className="space-y-3 p-4 bg-[#F8FAF9] rounded-lg border border-[#E5E7EB]">
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={formData.is_available}
                   onChange={(e) => setFormData({ ...formData, is_available: e.target.checked })}
-                  className="w-4 h-4 rounded border-slate-600 text-blue-600 focus:ring-blue-500"
+                  className="w-4 h-4 rounded border-[#D1D5DB] text-[#0F6B4B] focus:ring-[#0F6B4B]"
                 />
-                <span className="text-white font-medium">Available for order</span>
+                <span className="text-[#111827] text-xs font-bold">Available for order</span>
               </label>
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={formData.is_bestseller}
                   onChange={(e) => setFormData({ ...formData, is_bestseller: e.target.checked })}
-                  className="w-4 h-4 rounded border-slate-600 text-blue-600 focus:ring-blue-500"
+                  className="w-4 h-4 rounded border-[#D1D5DB] text-[#0F6B4B] focus:ring-[#0F6B4B]"
                 />
-                <span className="text-white font-medium">Mark as bestseller 🔥</span>
+                <span className="text-[#111827] text-xs font-bold">Mark as bestseller 🔥</span>
               </label>
             </div>
 
@@ -302,14 +296,14 @@ const AddMenuItem: React.FC = () => {
               <button
                 type="button"
                 onClick={() => navigate('/menu')}
-                className="flex-1 py-3 px-6 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-semibold transition-all"
+                className="flex-1 py-3 px-6 bg-white border border-[#D1D5DB] text-[#4B5563] rounded-lg text-xs font-bold hover:bg-gray-50 transition-all"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isLoading}
-                className="flex-1 py-3 px-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 py-3 px-6 bg-[#0F6B4B] hover:bg-[#0B563D] text-white rounded-lg text-xs font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
               >
                 {isLoading ? 'Creating...' : 'Create Item'}
               </button>

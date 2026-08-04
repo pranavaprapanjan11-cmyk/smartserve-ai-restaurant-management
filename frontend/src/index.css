@@ -1,47 +1,130 @@
 @import "tailwindcss";
 
-/* SmartServe-AI Permanent Brand Tokens */
+/* SmartServe AI Enterprise Theme System */
 :root {
   color-scheme: light;
-  
-  /* Main Application Canvas (Royal Green) */
-  --surface: #0F6B4B;
-  --surface-2: #145C46;
-  --surface-3: #1A7358;
 
-  /* Sidebar (Blush Pink) */
-  --sidebar-bg: #F7D6E6;
-  --sidebar-hover: #F2C6DA;
-  --sidebar-active: #EAA8C4;
-  --sidebar-border: #E8B9CF;
-  --sidebar-icon: #6B2146;
-  --sidebar-text: #4A1D35;
-  --sidebar-active-text: #FFFFFF;
-
-  /* Card Containers (Pure White) */
+  /* Theme 1: Enterprise Light Canvas & Surface */
+  --app-bg: #F7F8FA;
   --card-bg: #FFFFFF;
-  --border-color: #E5E7EB;
-  --shadow-card: 0 4px 18px rgba(0, 0, 0, 0.08);
+  --card-border: #E5E7EB;
+  --card-hover-bg: #F8FAFC;
+  --shadow-card: 0 4px 18px rgba(0, 0, 0, 0.04);
 
-  /* Primary Brand Buttons & Accents */
+  /* Sidebar Palette: Royal Green Enterprise */
+  --sidebar-bg: #0F6B4B;
+  --sidebar-hover: #17835E;
+  --sidebar-active: #1E8A63;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-icon: #FFFFFF;
+  --sidebar-text: #FFFFFF;
+  --sidebar-heading: rgba(255, 255, 255, 0.72);
+  --sidebar-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  --sidebar-glow: 0 0 14px rgba(30, 138, 99, 0.4);
+
+  /* Header & Sub-header Canvas */
+  --header-bg: #FFFFFF;
+  --header-border: #E5E7EB;
+  --subheader-bg: #F1F5F9;
+  --subheader-border: #E2E8F0;
+  --subheader-text: #475569;
+
+  /* Typography Tokens (WCAG AA Compliant) */
+  --text-primary: #101828;      /* Large Titles & Primary Headings */
+  --text-heading: #1F2937;      /* Page Headings */
+  --text-card-title: #111827;   /* Card Titles */
+  --text-secondary: #4B5563;    /* Body Text & Subtitles */
+  --text-muted: #6B7280;        /* Muted Labels & Small Hints */
+  --text-on-primary: #FFFFFF;
+
+  /* Brand Buttons & Actions */
   --primary: #0F6B4B;
   --primary-hover: #0B563D;
-  --secondary-btn: #F7D6E6;
-  --secondary-btn-hover: #F2C6DA;
-  --secondary-btn-text: #4A1D35;
-  --secondary-btn-border: #E8B9CF;
+  --secondary-btn-bg: #F1F5F9;
+  --secondary-btn-hover: #E2E8F0;
+  --secondary-btn-text: #1F2937;
+  --secondary-btn-border: #CBD5E1;
 
-  /* High-Contrast Card Typography */
-  --text-primary: #111827;      /* Charcoal / Slate 900 */
-  --text-secondary: #4B5563;    /* Slate 600 */
-  --text-muted: #6B7280;        /* Slate 500 */
-  --text-disabled: #9CA3AF;     /* Slate 400 */
-  --text-on-green: #FFFFFF;
+  /* Forms & Inputs */
+  --input-bg: #FFFFFF;
+  --input-border: #D1D5DB;
+  --input-text: #111827;
+  --input-placeholder: #9CA3AF;
+  --input-focus-border: #0F6B4B;
+
+  /* Tables & Lists */
+  --table-header-bg: #F8FAFC;
+  --table-row-hover: #F1F5F9;
+  --table-border: #E5E7EB;
 
   /* Status Colors */
   --success-text: #15803D;
   --warning-text: #B45309;
   --danger-text: #DC2626;
+  --info-text: #0284C7;
+}
+
+/* Theme 2: Enterprise Dark Canvas & Surface */
+html[data-theme="dark"] {
+  color-scheme: dark;
+
+  --app-bg: #0B1220;
+  --card-bg: #1B2432;
+  --card-border: #2C3645;
+  --card-hover-bg: #222D3D;
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.35);
+
+  /* Dark Mode Sidebar */
+  --sidebar-bg: #071A14;
+  --sidebar-hover: #0E2920;
+  --sidebar-active: #144234;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-icon: #FFFFFF;
+  --sidebar-text: #FFFFFF;
+  --sidebar-heading: rgba(255, 255, 255, 0.72);
+  --sidebar-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  --sidebar-glow: 0 0 16px rgba(23, 131, 94, 0.45);
+
+  /* Header & Sub-header Canvas */
+  --header-bg: #151E2D;
+  --header-border: #2C3645;
+  --subheader-bg: #1B2432;
+  --subheader-border: #2C3645;
+  --subheader-text: #CBD5E1;
+
+  /* Typography Tokens (Dark Mode) */
+  --text-primary: #FFFFFF;
+  --text-heading: #F1F5F9;
+  --text-card-title: #F8FAFC;
+  --text-secondary: #CBD5E1;
+  --text-muted: #94A3B8;
+  --text-on-primary: #FFFFFF;
+
+  /* Brand Buttons & Actions */
+  --primary: #0F6B4B;
+  --primary-hover: #17835E;
+  --secondary-btn-bg: #2C3645;
+  --secondary-btn-hover: #374151;
+  --secondary-btn-text: #F1F5F9;
+  --secondary-btn-border: #4B5563;
+
+  /* Forms & Inputs */
+  --input-bg: #111827;
+  --input-border: #374151;
+  --input-text: #F9FAFB;
+  --input-placeholder: #6B7280;
+  --input-focus-border: #17835E;
+
+  /* Tables & Lists */
+  --table-header-bg: #151E2D;
+  --table-row-hover: #222D3D;
+  --table-border: #2C3645;
+
+  /* Status Colors */
+  --success-text: #4ADE80;
+  --warning-text: #FBBF24;
+  --danger-text: #F87171;
+  --info-text: #38BDF8;
 }
 
 html, body, #root {
@@ -51,9 +134,10 @@ html, body, #root {
 body {
   margin: 0;
   font-family: 'Plus Jakarta Sans', Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: var(--surface);
+  background-color: var(--app-bg);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* Form Elements Reset */
@@ -62,24 +146,44 @@ input,
 textarea,
 select {
   font: inherit;
-  color: var(--text-primary);
+  color: var(--input-text);
 }
 
-/* Global Utility Classes */
-.bg-surface {
-  background-color: var(--surface);
+/* Global Dynamic Utility Classes */
+.bg-app-canvas {
+  background-color: var(--app-bg);
 }
 
-.bg-card {
+.bg-card-panel {
   background-color: var(--card-bg);
 }
 
-.border-card {
-  border-color: var(--border-color);
+.border-card-panel {
+  border-color: var(--card-border);
 }
 
 .shadow-card-enterprise {
   box-shadow: var(--shadow-card);
+}
+
+.text-title-large {
+  color: var(--text-primary);
+}
+
+.text-page-heading {
+  color: var(--text-heading);
+}
+
+.text-card-title {
+  color: var(--text-card-title);
+}
+
+.text-body-main {
+  color: var(--text-secondary);
+}
+
+.text-label-muted {
+  color: var(--text-muted);
 }
 
 .btn-royal-primary {
@@ -94,11 +198,11 @@ select {
 
 .btn-royal-primary:hover {
   background-color: var(--primary-hover);
-  box-shadow: 0 2px 8px rgba(15, 107, 75, 0.3);
+  box-shadow: 0 2px 10px rgba(15, 107, 75, 0.35);
 }
 
 .btn-royal-secondary {
-  background-color: var(--secondary-btn);
+  background-color: var(--secondary-btn-bg);
   color: var(--secondary-btn-text);
   font-weight: 700;
   border-radius: 0.625rem;
@@ -122,15 +226,15 @@ select {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #E8B9CF;
+  background: rgba(15, 107, 75, 0.25);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #EAA8C4;
+  background: rgba(15, 107, 75, 0.45);
 }
 
 ::selection {
-  background: rgba(247, 214, 230, 0.6);
-  color: #4A1D35;
+  background: rgba(15, 107, 75, 0.25);
+  color: var(--text-primary);
 }

@@ -149,10 +149,10 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed, mobileOpen, 
   }
 
   const sidebarContent = (
-    <div className="flex h-full flex-col bg-[#F7D6E6] border-r border-[#E8B9CF] text-[#4A1D35]">
+    <div className="flex h-full flex-col bg-[var(--sidebar-bg)] border-r border-[var(--sidebar-border)] text-[var(--sidebar-text)] shadow-lg transition-colors duration-200">
       {/* Brand Header */}
-      <div className="flex h-16 items-center px-5 border-b border-[#E8B9CF] gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#6B2146] text-white text-sm font-extrabold shadow-sm">
+      <div className="flex h-16 items-center px-5 border-b border-[var(--sidebar-border)] gap-3">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 text-white text-sm font-extrabold shadow-sm border border-white/10">
           SS
         </div>
         <AnimatePresence>
@@ -163,8 +163,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed, mobileOpen, 
               exit={{ opacity: 0, x: -6 }}
               className="flex flex-col"
             >
-              <span className="text-sm font-extrabold text-[#4A1D35] tracking-tight">SmartServe AI</span>
-              <span className="text-[10px] text-[#6B2146] font-extrabold uppercase tracking-wider">Restaurant OS</span>
+              <span className="text-sm font-extrabold text-white tracking-tight">SmartServe AI</span>
+              <span className="text-[10px] text-white/70 font-extrabold uppercase tracking-wider">Restaurant OS</span>
             </motion.div>
           )}
         </AnimatePresence>
@@ -175,7 +175,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed, mobileOpen, 
         {visibleSections.map((sec) => (
           <div key={sec.title} className="space-y-1.5">
             {!collapsed && (
-              <h4 className="px-2.5 text-[10px] font-extrabold uppercase tracking-wider text-[#6B2146]">
+              <h4 className="px-2.5 text-[10px] font-extrabold uppercase tracking-wider text-[var(--sidebar-heading)]">
                 {sec.title}
               </h4>
             )}
@@ -186,22 +186,31 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed, mobileOpen, 
                   to={item.to}
                   onClick={handleLinkClick}
                   className={({ isActive }) =>
-                    `group relative flex items-center rounded-lg px-3 py-2 text-sm font-bold transition-all duration-150 ${
+                    `group relative flex items-center rounded-xl px-3 py-2 text-xs font-bold transition-all duration-150 ${
                       isActive
-                        ? 'bg-[#EAA8C4] text-white border-l-4 border-[#6B2146] shadow-xs'
-                        : 'text-[#4A1D35] hover:bg-[#F2C6DA]'
+                        ? 'bg-[var(--sidebar-active)] text-white shadow-md border-l-4 border-white'
+                        : 'text-white/90 hover:bg-[var(--sidebar-hover)] hover:text-white'
                     }`
+                  }
+                  style={({ isActive }) =>
+                    isActive
+                      ? {
+                          boxShadow: 'var(--sidebar-glow)',
+                        }
+                      : {}
                   }
                 >
                   {({ isActive }) => (
                     <>
-                      <span className={`flex-shrink-0 ${isActive ? 'text-white' : 'text-[#6B2146]'}`}>{item.icon}</span>
+                      <span className={`flex-shrink-0 transition-transform duration-150 group-hover:scale-105 ${isActive ? 'text-white' : 'text-white/80'}`}>
+                        {item.icon}
+                      </span>
                       {!collapsed && (
                         <span className="ml-3 text-xs tracking-wide">{item.label}</span>
                       )}
 
                       {collapsed && (
-                        <div className="absolute left-full top-1/2 ml-3 -translate-y-1/2 pointer-events-none rounded-md bg-[#F7D6E6] border border-[#E8B9CF] px-2.5 py-1 text-xs font-bold text-[#4A1D35] shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap z-50">
+                        <div className="absolute left-full top-1/2 ml-3 -translate-y-1/2 pointer-events-none rounded-md bg-[var(--sidebar-bg)] border border-[var(--sidebar-border)] px-2.5 py-1 text-xs font-bold text-white shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap z-50">
                           {item.label}
                         </div>
                       )}
@@ -215,11 +224,11 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed, mobileOpen, 
       </div>
 
       {/* Collapse Toggle Footer */}
-      <div className="hidden lg:block border-t border-[#E8B9CF] p-3.5">
+      <div className="hidden lg:block border-t border-[var(--sidebar-border)] p-3.5">
         <button
           type="button"
           onClick={() => setCollapsed(!collapsed)}
-          className="flex w-full items-center justify-center rounded-lg border border-[#E8B9CF] bg-[#F2C6DA] py-2 text-[#4A1D35] font-extrabold transition hover:bg-[#EAA8C4] hover:text-white"
+          className="flex w-full items-center justify-center rounded-xl border border-white/10 bg-white/10 py-2 text-white font-extrabold transition hover:bg-white/20"
         >
           <svg
             className={`h-4 w-4 transform transition-transform duration-200 ${
@@ -256,7 +265,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed, mobileOpen, 
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMobileOpen(false)}
-              className="fixed inset-0 bg-black/50"
+              className="fixed inset-0 bg-black/60 backdrop-blur-xs"
             />
             <motion.div
               initial={{ x: '-100%' }}

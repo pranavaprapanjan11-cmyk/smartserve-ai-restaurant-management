@@ -18,24 +18,24 @@ const HealthScoreCard: React.FC<HealthScoreCardProps> = ({ monitor }) => {
   const getSeverityColor = (label: string) => {
     switch (label) {
       case 'Excellent':
-        return 'text-emerald-400 stroke-emerald-400 shadow-emerald-500/20';
+        return 'text-emerald-600 dark:text-emerald-400 stroke-emerald-600 dark:stroke-emerald-400';
       case 'Good':
-        return 'text-cyan-400 stroke-cyan-400 shadow-cyan-500/20';
+        return 'text-[#0F6B4B] dark:text-emerald-400 stroke-[#0F6B4B] dark:stroke-emerald-400';
       case 'Needs Attention':
-        return 'text-amber-400 stroke-amber-400 shadow-amber-500/20';
+        return 'text-amber-600 dark:text-amber-400 stroke-amber-600 dark:stroke-amber-400';
       default:
-        return 'text-rose-500 stroke-rose-500 shadow-rose-500/20';
+        return 'text-rose-600 dark:text-rose-500 stroke-rose-600 dark:stroke-rose-500';
     }
   };
 
   const getSubcategoryProgressColor = (label: string) => {
     switch (label) {
       case 'Excellent':
-        return 'bg-emerald-400';
+        return 'bg-emerald-600 dark:bg-emerald-400';
       case 'Good':
-        return 'bg-cyan-400';
+        return 'bg-[#0F6B4B] dark:bg-emerald-400';
       case 'Needs Attention':
-        return 'bg-amber-400';
+        return 'bg-amber-500';
       default:
         return 'bg-rose-500';
     }
@@ -53,8 +53,8 @@ const HealthScoreCard: React.FC<HealthScoreCardProps> = ({ monitor }) => {
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-[0.8fr_1.2fr]">
       {/* Circular Progress Gauge */}
-      <div className="flex flex-col items-center justify-center rounded-3xl border border-white/5 bg-slate-900/60 p-6 text-center backdrop-blur-xl">
-        <h3 className="text-xs uppercase tracking-[0.25em] text-slate-400">SmartServe Health Score</h3>
+      <div className="flex flex-col items-center justify-center rounded-3xl border border-[var(--card-border)] bg-[var(--card-bg)] p-6 text-center shadow-card-enterprise">
+        <h3 className="text-xs uppercase tracking-[0.25em] text-[var(--text-muted)] font-extrabold">SmartServe Health Score</h3>
         <div className="relative mt-8 flex h-36 w-36 items-center justify-center">
           <svg className="h-full w-full rotate-[-90deg]">
             {/* Background Circle */}
@@ -62,7 +62,7 @@ const HealthScoreCard: React.FC<HealthScoreCardProps> = ({ monitor }) => {
               cx="72"
               cy="72"
               r={radius}
-              className="stroke-slate-800 fill-none"
+              className="stroke-[var(--card-border)] fill-none"
               strokeWidth="10"
             />
             {/* Animated Gauge Progress */}
@@ -84,29 +84,29 @@ const HealthScoreCard: React.FC<HealthScoreCardProps> = ({ monitor }) => {
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.5 }}
-              className="text-4xl font-extrabold text-white"
+              className="text-4xl font-extrabold text-[var(--text-primary)]"
             >
               {score}
             </motion.span>
-            <span className="text-4xs uppercase tracking-widest text-slate-400 mt-0.5">/ 100</span>
+            <span className="text-4xs uppercase tracking-widest text-[var(--text-muted)] mt-0.5 font-bold">/ 100</span>
           </div>
         </div>
-        <p className="mt-4 text-xs font-bold uppercase tracking-wider text-slate-200">
+        <p className="mt-4 text-xs font-extrabold uppercase tracking-wider text-[var(--text-primary)]">
           {getGrade(score)} Operations
         </p>
       </div>
 
       {/* Subcategory Bars */}
-      <div className="rounded-3xl border border-white/5 bg-slate-900/60 p-6 backdrop-blur-xl space-y-4">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300">Operational Breakdown</h3>
+      <div className="rounded-3xl border border-[var(--card-border)] bg-[var(--card-bg)] p-6 shadow-card-enterprise space-y-4">
+        <h3 className="text-xs font-extrabold uppercase tracking-wider text-[var(--text-primary)]">Operational Breakdown</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           {subcategories.map((sub, idx) => (
-            <div key={idx} className="space-y-1.5 rounded-2xl border border-white/5 bg-slate-950/40 p-4">
+            <div key={idx} className="space-y-1.5 rounded-2xl border border-[var(--card-border)] bg-[var(--subheader-bg)] p-4">
               <div className="flex items-center justify-between text-2xs">
-                <span className="font-semibold text-slate-400">{sub.name}</span>
-                <span className="font-bold text-white">{sub.score}%</span>
+                <span className="font-semibold text-[var(--text-secondary)]">{sub.name}</span>
+                <span className="font-bold text-[var(--text-primary)]">{sub.score}%</span>
               </div>
-              <div className="h-2 overflow-hidden rounded-full bg-slate-850">
+              <div className="h-2 overflow-hidden rounded-full bg-[var(--card-border)]">
                 <motion.div
                   className={`h-full rounded-full ${getSubcategoryProgressColor(sub.label)}`}
                   initial={{ width: '0%' }}
@@ -114,7 +114,7 @@ const HealthScoreCard: React.FC<HealthScoreCardProps> = ({ monitor }) => {
                   transition={{ duration: 1, delay: idx * 0.1 }}
                 />
               </div>
-              <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">
+              <p className="text-[9px] uppercase tracking-widest text-[var(--text-muted)] font-bold">
                 {sub.label}
               </p>
             </div>

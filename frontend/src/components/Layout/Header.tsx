@@ -120,6 +120,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
     if (pathname === '/analytics') return 'Analytics & Insights'
     if (pathname === '/ai') return 'AI Intelligence'
     if (pathname === '/ai-optimizer') return 'AI Menu Optimizer'
+    if (pathname === '/ai-operations') return 'AI Operations Command'
     if (pathname === '/employees') return 'Employee Directory'
     if (pathname === '/settings') return 'Restaurant Settings'
     if (pathname === '/ai-vision' || pathname === '/ai-import') return 'Gemini Vision Document Intelligence'
@@ -134,13 +135,13 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
   }
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-[#E5E7EB] bg-white px-4 sm:px-6 shadow-sm">
+    <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-[var(--header-border)] bg-[var(--header-bg)] px-4 sm:px-6 shadow-xs transition-colors duration-200">
       {/* Left Section */}
       <div className="flex items-center gap-3">
         <button
           type="button"
           onClick={onToggleSidebar}
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#E5E7EB] bg-gray-50 text-gray-600 hover:bg-gray-100 lg:hidden"
+          className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--card-border)] bg-[var(--input-bg)] text-[var(--text-secondary)] hover:bg-[var(--card-hover-bg)] lg:hidden"
         >
           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -148,21 +149,23 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
         </button>
 
         <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#0F6B4B] text-white text-xs font-extrabold shadow-sm">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#0F6B4B] text-white text-xs font-extrabold shadow-sm">
             SS
           </div>
           <div className="hidden sm:block">
-            <span className="text-sm font-extrabold text-[#111827] tracking-tight">SmartServe AI</span>
-            <span className="ml-2 text-[10px] text-[#4B5563] font-bold uppercase tracking-wider">Restaurant OS</span>
+            <span className="text-sm font-extrabold text-[var(--text-primary)] tracking-tight">SmartServe AI</span>
+            <span className="ml-2 text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-wider">Restaurant OS</span>
           </div>
         </div>
 
         {workspaceInfo && (
-          <div className="hidden lg:flex items-center gap-2 border-l border-[#D1D5DB] pl-3">
-            <span className="text-[11px] font-bold text-[#4B5563]">Workspace:</span>
-            <span className="text-xs font-bold text-[#4A1D35] bg-[#F7D6E6] border border-[#E8B9CF] px-2.5 py-0.5 rounded-md font-mono">{workspaceInfo.code}</span>
+          <div className="hidden lg:flex items-center gap-2 border-l border-[var(--card-border)] pl-3">
+            <span className="text-[11px] font-bold text-[var(--text-muted)]">Workspace:</span>
+            <span className="text-xs font-bold text-[#0F6B4B] dark:text-[#4ADE80] bg-[#0F6B4B]/10 dark:bg-[#0F6B4B]/20 border border-[#0F6B4B]/30 px-2.5 py-0.5 rounded-md font-mono">
+              {workspaceInfo.code}
+            </span>
             {workspaceInfo.name && (
-              <span className="text-xs text-[#4B5563] font-medium max-w-[140px] truncate" title={workspaceInfo.name}>
+              <span className="text-xs text-[var(--text-secondary)] font-medium max-w-[140px] truncate" title={workspaceInfo.name}>
                 ({workspaceInfo.name.replace("'s Workspace", "")})
               </span>
             )}
@@ -172,7 +175,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
 
       {/* Center Section: Page Title */}
       <div className="text-center">
-        <h2 className="text-base font-extrabold text-[#111827] tracking-tight md:text-lg">
+        <h2 className="text-base font-extrabold text-[var(--text-primary)] tracking-tight md:text-lg">
           {getPageTitle(location.pathname)}
         </h2>
       </div>
@@ -183,7 +186,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
         <button
           type="button"
           onClick={onOpenSearch}
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#E5E7EB] bg-gray-50 text-gray-600 transition hover:bg-gray-100 hover:text-gray-900"
+          className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--card-border)] bg-[var(--input-bg)] text-[var(--text-secondary)] transition hover:bg-[var(--card-hover-bg)] hover:text-[var(--text-primary)]"
           title="Search Menu (Ctrl+K)"
         >
           <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -196,7 +199,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
           <button
             type="button"
             onClick={() => setNotificationsOpen(!notificationsOpen)}
-            className={`relative flex h-9 w-9 items-center justify-center rounded-lg border border-[#E5E7EB] bg-gray-50 text-gray-600 transition hover:bg-gray-100 hover:text-gray-900 ${
+            className={`relative flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--card-border)] bg-[var(--input-bg)] text-[var(--text-secondary)] transition hover:bg-[var(--card-hover-bg)] hover:text-[var(--text-primary)] ${
               bellShaking ? 'animate-[bounce_0.3s_infinite]' : ''
             }`}
           >
@@ -211,13 +214,13 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
           </button>
 
           {notificationsOpen && (
-            <div className="absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-xl border border-[#E5E7EB] bg-white shadow-xl">
-              <div className="flex items-center justify-between border-b border-[#E5E7EB] px-4 py-3 bg-gray-50">
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-700">Notifications</span>
+            <div className="absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] shadow-xl">
+              <div className="flex items-center justify-between border-b border-[var(--card-border)] px-4 py-3 bg-[var(--subheader-bg)]">
+                <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)]">Notifications</span>
                 {unreadCount > 0 && (
                   <button
                     onClick={markAllRead}
-                    className="text-xs font-semibold text-[#0F6B4B] hover:underline"
+                    className="text-xs font-semibold text-[#0F6B4B] dark:text-[#4ADE80] hover:underline"
                   >
                     Mark all read
                   </button>
@@ -225,21 +228,21 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
               </div>
               <div className="max-h-64 overflow-y-auto">
                 {notifications.length === 0 ? (
-                  <div className="py-8 text-center text-xs text-gray-500">No notifications</div>
+                  <div className="py-8 text-center text-xs text-[var(--text-muted)]">No notifications</div>
                 ) : (
-                  <div className="divide-y divide-[#E5E7EB]">
+                  <div className="divide-y divide-[var(--card-border)]">
                     {notifications.map((n) => (
                       <div
                         key={n.id}
-                        className={`px-4 py-3 transition hover:bg-gray-50 ${
+                        className={`px-4 py-3 transition hover:bg-[var(--card-hover-bg)] ${
                           n.unread ? 'bg-[#0F6B4B]/5' : ''
                         }`}
                       >
                         <div className="flex items-start justify-between gap-1">
-                          <p className={`text-xs font-semibold ${n.unread ? 'text-gray-900' : 'text-gray-600'}`}>{n.title}</p>
-                          <span className="text-[10px] text-gray-400 whitespace-nowrap">{n.time}</span>
+                          <p className={`text-xs font-semibold ${n.unread ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}>{n.title}</p>
+                          <span className="text-[10px] text-[var(--text-muted)] whitespace-nowrap">{n.time}</span>
                         </div>
-                        <p className="mt-0.5 text-xs text-gray-500 leading-normal">{n.subtitle}</p>
+                        <p className="mt-0.5 text-xs text-[var(--text-secondary)] leading-normal">{n.subtitle}</p>
                       </div>
                     ))}
                   </div>
@@ -249,7 +252,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
           )}
         </div>
 
-        {/* Theme Switcher */}
+        {/* Theme Switcher Component */}
         <ThemeSwitcher />
 
         {/* User Profile */}
@@ -257,19 +260,19 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
           <button
             type="button"
             onClick={() => setProfileOpen(!profileOpen)}
-            className="flex items-center gap-2 rounded-lg border border-[#E5E7EB] bg-gray-50 p-1 pr-2.5 text-left text-gray-700 hover:bg-gray-100 transition"
+            className="flex items-center gap-2 rounded-lg border border-[var(--card-border)] bg-[var(--input-bg)] p-1 pr-2.5 text-left text-[var(--text-primary)] hover:bg-[var(--card-hover-bg)] transition"
           >
-            <span className="flex h-7.5 w-7.5 items-center justify-center rounded-md bg-[#0F6B4B] text-xs font-bold text-white">
+            <span className="flex h-7.5 w-7.5 items-center justify-center rounded-md bg-[#0F6B4B] text-xs font-bold text-white shadow-xs">
               {user?.name ? user.name.charAt(0).toUpperCase() : 'G'}
             </span>
             <span className="hidden text-xs font-semibold lg:inline">{user?.name || 'Guest'}</span>
           </button>
 
           {profileOpen && (
-            <div className="absolute right-0 top-full z-50 mt-2 w-52 overflow-hidden rounded-xl border border-[#E5E7EB] bg-white p-1 shadow-xl">
-              <div className="px-3 py-2 border-b border-[#E5E7EB] mb-1 bg-gray-50">
-                <p className="text-xs font-bold text-gray-900 truncate">{user?.name || 'Guest User'}</p>
-                <p className="text-[11px] text-gray-500 uppercase font-medium tracking-wide mt-0.5">Role: {user?.role || 'Guest'}</p>
+            <div className="absolute right-0 top-full z-50 mt-2 w-52 overflow-hidden rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] p-1 shadow-xl">
+              <div className="px-3 py-2 border-b border-[var(--card-border)] mb-1 bg-[var(--subheader-bg)]">
+                <p className="text-xs font-bold text-[var(--text-primary)] truncate">{user?.name || 'Guest User'}</p>
+                <p className="text-[11px] text-[var(--text-muted)] uppercase font-medium tracking-wide mt-0.5">Role: {user?.role || 'Guest'}</p>
               </div>
               <button
                 type="button"
@@ -277,7 +280,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSearch }) => {
                   setProfileOpen(false)
                   logout()
                 }}
-                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-semibold text-red-600 transition hover:bg-red-50"
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-semibold text-red-600 transition hover:bg-red-50 dark:hover:bg-red-950/30"
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

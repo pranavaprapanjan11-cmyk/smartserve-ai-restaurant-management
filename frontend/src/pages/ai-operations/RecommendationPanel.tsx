@@ -11,26 +11,26 @@ const RecommendationPanel: React.FC<RecommendationPanelProps> = ({ recommendatio
   const getPriorityStyle = (priority: string) => {
     switch (priority) {
       case 'HIGH':
-        return 'border-rose-500/25 bg-rose-500/5 text-rose-300 ring-1 ring-rose-500/20';
+        return 'border-rose-500/30 bg-rose-500/10 dark:bg-rose-950/20 text-rose-700 dark:text-rose-300';
       case 'MEDIUM':
-        return 'border-amber-500/25 bg-amber-500/5 text-amber-300 ring-1 ring-amber-500/20';
+        return 'border-amber-500/30 bg-amber-500/10 dark:bg-amber-950/20 text-amber-700 dark:text-amber-300';
       default:
-        return 'border-cyan-500/25 bg-cyan-500/5 text-cyan-300 ring-1 ring-cyan-500/20';
+        return 'border-sky-500/30 bg-sky-500/10 dark:bg-sky-950/20 text-sky-700 dark:text-sky-300';
     }
   };
 
   return (
-    <div className="rounded-3xl border border-white/5 bg-slate-900/60 p-6 backdrop-blur-xl h-full flex flex-col">
+    <div className="rounded-3xl border border-[var(--card-border)] bg-[var(--card-bg)] p-6 shadow-card-enterprise h-full flex flex-col">
       <div className="flex items-center justify-between">
-        <h3 className="text-xs uppercase tracking-[0.25em] text-slate-400 font-bold">AI Operational Recommendations</h3>
-        <span className="rounded-full bg-cyan-500/10 px-2 py-0.5 text-3xs font-semibold text-cyan-200">
+        <h3 className="text-xs uppercase tracking-[0.25em] text-[var(--text-muted)] font-extrabold">AI Operational Recommendations</h3>
+        <span className="rounded-full bg-[#0F6B4B]/10 dark:bg-[#0F6B4B]/20 border border-[#0F6B4B]/30 px-2.5 py-1 text-[10px] font-extrabold text-[#0F6B4B] dark:text-[#4ADE80]">
           Decision engine
         </span>
       </div>
 
-      <div className="mt-6 flex-1 overflow-y-auto pr-1 max-h-[380px] custom-scrollbar space-y-4">
+      <div className="mt-6 flex-1 overflow-y-auto pr-1 max-h-[380px] space-y-4">
         {recommendations.length === 0 ? (
-          <div className="flex h-32 items-center justify-center text-xs text-slate-500">
+          <div className="flex h-32 items-center justify-center text-xs text-[var(--text-muted)]">
             No recommendations generated.
           </div>
         ) : (
@@ -40,15 +40,15 @@ const RecommendationPanel: React.FC<RecommendationPanelProps> = ({ recommendatio
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.4, delay: idx * 0.1 }}
-              className={`rounded-2xl border p-5 shadow-lg ${getPriorityStyle(rec.priority)}`}
+              className={`rounded-2xl border p-5 shadow-xs ${getPriorityStyle(rec.priority)}`}
             >
               <div className="flex items-start justify-between gap-3">
-                <p className="text-xs font-extrabold tracking-wide text-white">{rec.recommendation}</p>
+                <p className="text-xs font-extrabold tracking-wide text-[var(--text-primary)]">{rec.recommendation}</p>
                 <span className="text-[9px] uppercase tracking-widest font-extrabold">
                   {rec.priority}
                 </span>
               </div>
-              <p className="mt-2 text-3xs text-slate-300 leading-relaxed">
+              <p className="mt-2 text-xs text-[var(--text-secondary)] leading-relaxed font-medium">
                 {rec.reason}
               </p>
             </motion.div>
